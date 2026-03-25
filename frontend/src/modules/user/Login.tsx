@@ -221,7 +221,7 @@ export default function Login() {
                 onClick={handleContinue}
                 disabled={mobileNumber.length !== 10 || loading}
                 className={`w-full py-2 sm:py-2.5 rounded-lg font-semibold text-sm transition-colors border px-3 ${mobileNumber.length === 10 && !loading
-                  ? "bg-orange-50 text-orange-600 border-orange-500 hover:bg-orange-100"
+                  ? "bg-amber-50 text-purple-700 border-amber-500 hover:bg-amber-100"
                   : "bg-neutral-300 text-neutral-500 cursor-not-allowed border-neutral-300"
                   }`}>
                 {loading ? "Calling..." : "Continue"}
@@ -260,7 +260,7 @@ export default function Login() {
               <button
                 onClick={handleContinue}
                 disabled={loading}
-                className="flex-1 py-2 rounded-lg font-semibold text-xs bg-orange-50 text-orange-600 border border-orange-500 hover:bg-orange-100 transition-colors">
+                className="flex-1 py-2 rounded-lg font-semibold text-xs bg-amber-50 text-purple-700 border border-amber-500 hover:bg-amber-100 transition-colors">
                 {loading ? "Verifying..." : "Resend OTP"}
               </button>
             </div>
@@ -269,7 +269,7 @@ export default function Login() {
 
         {/* Privacy Text */}
         <p className="text-[9px] sm:text-[10px] text-neutral-500 text-center max-w-sm leading-tight px-4 relative z-10 pb-1">
-          Access your saved addresses from Kosil automatically!
+          Access your saved addresses from Speeddo automatically!
         </p>
       </div>
     </div>

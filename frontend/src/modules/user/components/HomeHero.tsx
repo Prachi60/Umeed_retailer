@@ -340,7 +340,7 @@ export default function HomeHero({
   };
 
   const theme = getTheme(activeTab || "all");
-  const heroGradient = `linear-gradient(to bottom right, ${theme.primary[0]}, ${theme.primary[1]}, ${theme.primary[2]})`;
+  const heroGradient = `linear-gradient(to bottom, ${theme.primary[0]}, ${theme.primary[1]} 40%, ${theme.primary[2]})`;
 
   // Helper to convert RGB to RGBA
   const rgbToRgba = (rgb: string, alpha: number) => {
@@ -350,11 +350,22 @@ export default function HomeHero({
   return (
     <div
       ref={heroRef}
+      className="relative overflow-hidden"
       style={{
         background: heroGradient,
         paddingBottom: 0,
         marginBottom: 0,
+        borderBottomLeftRadius: '2.5rem',
+        borderBottomRightRadius: '2.5rem',
+        boxShadow: '0 10px 40px rgba(255, 193, 7, 0.15)',
       }}>
+      {/* Premium Glow Overlay */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-32 opacity-40 pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%)',
+        }}
+      />
       {/* Top section with delivery info and buttons - NOT sticky */}
       <div>
         <div
@@ -365,7 +376,7 @@ export default function HomeHero({
             <div className="flex-1 pr-2">
               {/* Service name - small, dark */}
               <div className="text-neutral-800 font-medium text-[10px] md:text-xs mb-0 leading-tight">
-                Kosil E-Commerce
+                Speeddo
               </div>
               {/* Delivery time - large, bold, dark grey/black */}
               <div className="text-neutral-900 font-extrabold text-2xl md:text-xl mb-0 md:mb-0.5 leading-tight">

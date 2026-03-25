@@ -82,11 +82,11 @@ export default function CategoryTileSection({
   };
 
   const gridCols = getGridCols();
-  const gapClass = columns >= 6 ? "gap-1.5 md:gap-2.5" : "gap-2.5 md:gap-4";
+  const gapClass = columns >= 6 ? "gap-2 md:gap-3" : "gap-4 md:gap-6";
 
   return (
     <div className="mb-6 md:mb-8 mt-0 overflow-visible">
-      <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight">
+      <h2 className="text-base md:text-xl font-bold text-neutral-900 mb-4 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight">
         {title}
       </h2>
       <div className="px-4 md:px-6 lg:px-8 overflow-visible">
@@ -140,12 +140,12 @@ export default function CategoryTileSection({
                       handleTileClick(tile);
                     }
                   }}
-                  className={`block bg-white rounded-xl shadow-sm border border-neutral-200 hover:shadow-md transition-shadow h-full ${showProductCount ? "px-2.5" : "px-1.5"
+                  className={`block bg-white rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-neutral-100/50 hover:shadow-md transition-all duration-300 h-full ${showProductCount ? "px-2.5" : "p-1.5"
                     }`}>
                   {/* Image - Single image for non-bestsellers, 2x2 grid for bestsellers */}
                   <div
-                    className={`w-full rounded-lg overflow-hidden ${showProductCount ? "h-32 md:h-36 mb-2" : "aspect-square"
-                      } ${tile.bgColor || "bg-cyan-50"}`}>
+                    className={`w-full rounded-xl overflow-hidden ${showProductCount ? "h-32 md:h-36 mb-2" : "aspect-square"
+                      } ${tile.bgColor || "bg-[#F0F4F9]"}`}>
                     {hasImages ? (
                       showProductCount ? (
                         // Bestsellers: 2x2 grid
@@ -215,8 +215,8 @@ export default function CategoryTileSection({
 
                 {/* Category name - outside card for non-bestsellers */}
                 {!showProductCount && (
-                  <div className="mt-1.5 text-center">
-                    <span className="text-xs font-semibold text-neutral-900 line-clamp-2 leading-tight">
+                  <div className="mt-2 text-center px-1">
+                    <span className="text-[11px] md:text-xs font-bold text-neutral-800 line-clamp-2 leading-tight">
                       {tile.name}
                     </span>
                   </div>

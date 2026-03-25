@@ -66,11 +66,11 @@ export default function Categories() {
   return (
     <div className="pb-4 md:pb-8 bg-white min-h-screen">
       {/* Page Header */}
-      <div className="px-4 py-4 md:px-6 md:py-6 bg-white border-b border-neutral-200 sticky top-0 z-10 shadow-sm">
-        <h1 className="text-xl md:text-2xl font-bold text-neutral-900">Categories</h1>
+      <div className="px-4 py-3 md:px-6 md:py-5 bg-white border-b border-neutral-100 sticky top-0 z-10 transition-shadow duration-300">
+        <h1 className="text-xl md:text-2xl font-black text-neutral-900 tracking-tight">Categories</h1>
       </div>
 
-      <div className="bg-neutral-50 pt-1 space-y-5 md:space-y-8 md:pt-4">
+      <div className="bg-white pt-2 space-y-6 md:space-y-10 md:pt-6">
         {/* Render all admin-created home sections */}
         {homeData.homeSections && homeData.homeSections.length > 0 ? (
           <>
@@ -93,7 +93,7 @@ export default function Categories() {
                 return (
                   <div key={section.id} className="mt-6 mb-6 md:mt-8 md:mb-8">
                     {section.title && (
-                      <h2 className="text-lg md:text-2xl font-semibold text-neutral-900 mb-3 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight capitalize">
+                      <h2 className="text-base md:text-xl font-bold text-neutral-900 mb-4 md:mb-6 px-4 md:px-6 lg:px-8 tracking-tight capitalize">
                         {section.title}
                       </h2>
                     )}

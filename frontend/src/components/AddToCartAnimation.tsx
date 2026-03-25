@@ -231,7 +231,7 @@ export default function AddToCartAnimation({
       // Step 1: Scale up with glow
       tl.to(linkRef.current, {
         scale: 1.08,
-        boxShadow: '0 10px 25px rgba(22, 163, 74, 0.4)',
+        boxShadow: '0 10px 25px rgba(109, 7, 54, 0.4)',
         duration: 0.15,
         ease: 'power2.out',
         transformOrigin: 'center center',
@@ -240,7 +240,7 @@ export default function AddToCartAnimation({
         // Step 2: Bounce back
         .to(linkRef.current, {
           scale: 1.0,
-          boxShadow: '0 4px 12px rgba(22, 163, 74, 0.3)',
+          boxShadow: '0 4px 12px rgba(109, 7, 54, 0.3)',
           duration: 0.2,
           ease: 'power2.inOut',
         })
@@ -330,62 +330,46 @@ export default function AddToCartAnimation({
             <Link
               ref={linkRef}
               to={linkTo}
-              className={`bg-gradient-to-r from-green-700 via-green-600 to-green-700 text-white rounded-full shadow-xl shadow-green-900/30 px-3 py-2 flex items-center gap-2 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition-all duration-300 pointer-events-auto border border-green-800/30 backdrop-blur-sm ${pillClassName}`}
+              className={`rounded-full shadow-lg px-3 py-2 flex items-center gap-3 hover:opacity-95 transition-all duration-300 pointer-events-auto border border-white/10 backdrop-blur-sm ${pillClassName}`}
+              style={{
+                background: 'linear-gradient(to right, #6D0736, #943521, #B95F15)',
+              }}
             >
-              {/* Left: Product thumbnails */}
-              <div className="flex items-center -space-x-4">
-                {thumbnailItems.map((item, idx) => (
-                  <motion.div
-                    key={item.product._id || item.product.id || `item-${idx}`}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{
-                      delay: idx * 0.1,
-                      type: 'spring',
-                      stiffness: 500,
-                      damping: 25,
-                    }}
-                    className="w-7 h-7 rounded-full border-2 border-white/90 overflow-hidden bg-white flex-shrink-0 shadow-md"
+              <div className="flex items-center">
+                <div className="w-9 h-9 rounded-full bg-[#FFC107] flex items-center justify-center text-[#6D0736] font-bold shadow-sm">
+                  <svg 
+                    width="18" 
+                    height="18" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
                   >
-                    {item.product.imageUrl || item.product.mainImage ? (
-                      <img
-                        src={item.product.imageUrl || item.product.mainImage}
-                        alt={item.product.name || item.product.productName || 'Product'}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-neutral-400 text-xs font-semibold">
-                        {(item.product.name || item.product.productName || 'P').charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
+                    <circle cx="9" cy="21" r="1" fill="currentColor"></circle>
+                    <circle cx="20" cy="21" r="1" fill="currentColor"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor"></path>
+                  </svg>
+                </div>
               </div>
 
               {/* Middle: Text */}
               <motion.div
-                className="flex flex-col"
+                className="flex flex-col ml-1"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1, duration: 0.3 }}
               >
-                <span className="text-xs font-bold leading-tight drop-shadow-sm">View cart</span>
-                <span className="text-[10px] opacity-95 leading-tight font-medium">
-                  {cart.itemCount} {cart.itemCount === 1 ? 'item' : 'items'}
+                <span className="text-sm font-bold leading-tight text-white">View Cart</span>
+                <span className="text-[11px] text-white/90 leading-tight font-medium">
+                  {cart.itemCount} {cart.itemCount === 1 ? 'item' : 'items'} - ₹{cart.total.toFixed(2)}
                 </span>
               </motion.div>
 
-              {/* Right: Arrow icon */}
-              <motion.div
-                className="ml-auto bg-white/25 rounded-full p-1 backdrop-blur-sm"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.15, duration: 0.3 }}
-                whileHover={{ scale: 1.1, rotate: -5 }}
-              >
                 <svg
-                  width="14"
-                  height="14"
+                  width="16"
+                  height="16"
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -394,12 +378,11 @@ export default function AddToCartAnimation({
                   <path
                     d="M6 12L10 8L6 4"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
-              </motion.div>
             </Link>
           </motion.div>
         )}

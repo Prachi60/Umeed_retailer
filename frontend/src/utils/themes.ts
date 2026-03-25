@@ -10,13 +10,13 @@ export interface Theme {
 
 export const themes: Record<string, Theme> = {
   all: {
-    primary: ['rgb(34, 197, 94)', 'rgb(74, 222, 128)', 'rgb(134, 239, 172)', 'rgb(187, 247, 208)'],
-    secondary: ['rgb(187, 247, 208)', 'rgb(134, 239, 172)', 'rgb(74, 222, 128)'],
-    textColor: '#1a1a1a',
-    accentColor: '#000',
+    primary: ['#FFFDE7', '#FFC107', '#FF8F00', '#FFB300'],
+    secondary: ['#7B1FA2', '#9C27B0', '#BA68C8', '#E1BEE7'],
+    textColor: '#000000',
+    accentColor: '#7B1FA2',
     bannerText: 'HOUSEFULL',
     saleText: 'SALE',
-    headerTextColor: '#ffffff',
+    headerTextColor: '#000000',
   },
   wedding: {
     primary: ['rgb(252, 165, 165)', 'rgb(253, 182, 182)', 'rgb(254, 202, 202)', 'rgb(255, 228, 228)'],

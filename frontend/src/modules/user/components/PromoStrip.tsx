@@ -731,11 +731,13 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
           {/* Crazy Deals Section - Left */}
           <div className="flex-shrink-0 w-[100px] promo-card">
             <div
-              className="h-full rounded-lg p-1 flex flex-col items-center justify-between relative overflow-hidden"
+              className="h-full rounded-xl p-1.5 flex flex-col items-center justify-between relative overflow-hidden shadow-lg border border-white/30"
               style={{
-                background: `radial-gradient(circle at center, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, ${theme.primary[0]}, ${theme.primary[1]}, ${theme.primary[2]})`,
-                minHeight: "110px",
+                background: `linear-gradient(135deg, ${theme.primary[0]} 0%, ${theme.primary[1]} 50%, ${theme.primary[2]} 100%)`,
+                minHeight: "115px",
               }}>
+              {/* Decorative inner glow */}
+              <div className="absolute inset-0 bg-white/10 pointer-events-none" />
               {/* CRAZY DEALS - Two lines, bigger */}
               <div className="text-center mb-1.5" style={{ marginTop: "4px" }}>
                 <div
@@ -772,14 +774,14 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                 </div>
                 {/* Discounted Price - Bright Green Banner */}
                 <div
-                  className="bg-green-500 rounded px-2 inline-block relative -mt-0.5 z-20"
+                  className="bg-[#7B1FA2] rounded px-2 inline-block relative -mt-0.5 z-20 shadow-sm"
                   style={{
                     height: "fit-content",
                     lineHeight: "1",
-                    paddingTop: "2px",
-                    paddingBottom: "2px",
+                    paddingTop: "2.5px",
+                    paddingBottom: "2.5px",
                   }}>
-                  <span className="text-white text-[9px] font-bold leading-none">
+                  <span className="text-white text-[9px] font-black leading-none uppercase tracking-tighter">
                     ₹{safeDiscountedPrice}
                   </span>
                 </div>
@@ -859,16 +861,17 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                 <div key={card.id} className="promo-card">
                   <Link
                     to={card.slug || card.categoryId ? `/category/${card.slug || card.categoryId}` : "#"}
-                    className="group rounded-lg transition-all duration-300 hover:shadow-md active:scale-[0.98] h-full flex flex-col overflow-hidden relative"
+                    className="group rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] h-full flex flex-col overflow-hidden relative border border-purple-50/50"
                     style={{
-                      minHeight: "90px",
-                      background: "rgba(255, 247, 237, 0.9)", // Very light orange
+                      minHeight: "95px",
+                      background: "rgba(255, 255, 255, 0.95)", // Clean white background
+                      boxShadow: "0 4px 15px -1px rgba(123, 31, 162, 0.05)",
                     }}>
-                    {/* Green Discount Banner - Only around text, centered at top */}
+                    {/* Purple Discount Badge - Floating style */}
                     <div
-                      className="w-full flex justify-center"
-                      style={{ paddingTop: "0", paddingBottom: "2px" }}>
-                      <div className="bg-green-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded tracking-tight text-center inline-block">
+                      className="w-full flex justify-center sticky top-0 z-10"
+                      style={{ paddingTop: "0", transform: "translateY(-1px)" }}>
+                      <div className="bg-[#7B1FA2] text-white text-[8px] font-black px-2 py-0.5 rounded-b shadow-sm tracking-tight text-center inline-block min-w-[60px]">
                         {card.badge}
                       </div>
                     </div>

@@ -8,7 +8,7 @@ const getStatusColor = (status: string) => {
     case 'On the way':
       return 'bg-blue-100 text-blue-700';
     case 'Accepted':
-      return 'bg-yellow-100 text-yellow-700';
+      return 'bg-[#FFFDE7] text-[#FF8F00]';
     case 'Placed':
       return 'bg-neutral-100 text-neutral-700';
     default:
@@ -41,7 +41,7 @@ export default function Orders() {
         <p className="text-neutral-600 mb-6 md:mb-8 md:text-lg">Start shopping to see your orders here!</p>
         <Link
           to="/"
-          className="inline-block bg-green-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors md:text-lg"
+          className="inline-block bg-gradient-to-r from-[#6D0736] via-[#943521] to-[#B95F15] text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:opacity-90 transition-all md:text-lg shadow-md"
         >
           Start Shopping
         </Link>

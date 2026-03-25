@@ -66,7 +66,7 @@ const faqData: FAQItem[] = [
     id: "10",
     question: "What if I receive a damaged or wrong item?",
     answer:
-      "If you receive a damaged or incorrect item, please contact our customer support immediately. We offer 48-hour replacement guarantee. You can report the issue through the order details page or contact us at help@kosil.com.",
+      "If you receive a damaged or incorrect item, please contact our customer support immediately. We offer 48-hour replacement guarantee. You can report the issue through the order details page or contact us at help@speeddo.com.",
   },
   {
     id: "11",
@@ -99,7 +99,7 @@ export default function FAQ() {
   return (
     <div className="pb-24 md:pb-8 bg-white min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-b from-green-200 via-green-100 to-white pb-6 md:pb-8 pt-12 md:pt-16">
+      <div className="bg-gradient-to-b from-[#FFFDE7] via-[#FFF9C4] to-white pb-6 md:pb-8 pt-12 md:pt-16">
         <div className="px-4 md:px-6 lg:px-8">
           <button
             onClick={() => navigate(-1)}
@@ -122,7 +122,7 @@ export default function FAQ() {
                 height="40"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="text-green-600 md:w-12 md:h-12">
+                className="text-[#7B1FA2] md:w-12 md:h-12">
                 <path
                   d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
                   stroke="currentColor"
@@ -187,14 +187,14 @@ export default function FAQ() {
           </div>
 
           {/* Contact Support Section */}
-          <div className="mt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+          <div className="mt-8 bg-gradient-to-br from-[#FFFDE7] to-[#FFF9C4] rounded-lg p-6 border border-[#FFECB3]">
             <div className="text-center">
               <svg
                 width="48"
                 height="48"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="mx-auto mb-4 text-green-600">
+                className="mx-auto mb-4 text-[#7B1FA2]">
                 <path
                   d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
                   stroke="currentColor"
@@ -217,8 +217,8 @@ export default function FAQ() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <a
-                  href="mailto:help@kosil.com"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors text-sm">
+                  href="mailto:help@speeddo.com"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#6D0736] via-[#943521] to-[#B95F15] text-white rounded-lg font-semibold hover:opacity-90 transition-all text-sm shadow-md">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
@@ -239,7 +239,7 @@ export default function FAQ() {
                 </a>
                 <a
                   href="tel:+91-XXXXX-XXXXX"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-green-600 border-2 border-green-600 rounded-lg font-semibold hover:bg-green-50 transition-colors text-sm">
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-[#6D0736] border-2 border-[#6D0736] rounded-lg font-semibold hover:bg-orange-50 transition-colors text-sm">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"

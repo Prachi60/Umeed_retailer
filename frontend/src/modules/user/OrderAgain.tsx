@@ -26,7 +26,7 @@ const getStatusColor = (status: string) => {
     case 'On the way':
       return 'bg-blue-100 text-blue-700';
     case 'Accepted':
-      return 'bg-yellow-100 text-yellow-700';
+      return 'bg-[#FFFDE7] text-[#FF8F00]';
     case 'Placed':
       return 'bg-neutral-100 text-neutral-700';
     default:
@@ -106,10 +106,34 @@ export default function OrderAgain() {
   const hasOrders = orders && orders.length > 0;
 
   return (
-    <div className="pb-4">
-      {/* BESSELLERS SECTION REMOVED - If you see this comment, new code is loaded */}
-      {/* Header - Same as Home page */}
-      <HomeHero />
+    <div className="pb-4 bg-white min-h-screen">
+      {/* Header */}
+      <div className="bg-gradient-to-b from-[#FFFDE7] via-[#FFF9C4] to-white pb-4 pt-12">
+        <div className="px-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-4 text-neutral-900 p-1 rounded-full hover:bg-black/5 transition-colors"
+            aria-label="Back">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 18L9 12L15 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <div className="flex flex-col items-center">
+            <h1 className="text-xl md:text-2xl font-bold text-neutral-900 mb-1">
+              Order Again
+            </h1>
+            <p className="text-xs text-neutral-600 text-center">
+              Reorder your favorites in a snap
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Orders Section - Show when orders exist */}
       {hasOrders && (
@@ -185,8 +209,8 @@ export default function OrderAgain() {
                         onClick={(e) => handleOrderAgain(order, e)}
                         disabled={addedOrders.has(order.id)}
                         className={`mt-1 text-[10px] font-semibold px-3 py-1 rounded-md transition-colors shadow-sm ${addedOrders.has(order.id)
-                          ? 'bg-orange-200 text-neutral-600 cursor-not-allowed'
-                          : 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'
+                          ? 'bg-purple-100 text-purple-600 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-[#6D0736] via-[#943521] to-[#B95F15] text-white hover:opacity-90 cursor-pointer shadow-sm'
                           }`}
                       >
                         {addedOrders.has(order.id) ? 'Added to Cart!' : 'Order Again'}
@@ -267,7 +291,7 @@ export default function OrderAgain() {
                                 e.stopPropagation();
                                 addToCart(product, e.currentTarget);
                               }}
-                              className="bg-white/95 backdrop-blur-sm text-green-600 border-2 border-green-600 text-[10px] font-semibold px-2 py-1 rounded shadow-md hover:bg-white transition-colors"
+                              className="bg-white/95 backdrop-blur-sm text-[#6D0736] border-2 border-[#6D0736] text-[10px] font-semibold px-2 py-1 rounded shadow-md hover:bg-orange-50 transition-colors"
                             >
                               ADD
                             </motion.button>
@@ -278,7 +302,7 @@ export default function OrderAgain() {
                               animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.8 }}
                               transition={{ duration: 0.2 }}
-                              className="flex items-center gap-1 bg-green-600 rounded px-1.5 py-1 shadow-md"
+                              className="flex items-center gap-1 bg-gradient-to-r from-[#6D0736] via-[#943521] to-[#B95F15] rounded px-1.5 py-1 shadow-md"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <motion.button
@@ -387,13 +411,13 @@ export default function OrderAgain() {
                     {/* Bottom Link */}
                     <div
                       onClick={() => navigate(`/category/${product.categoryId || 'all'}`)}
-                      className="w-full bg-green-100 text-green-700 text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-green-200 transition-colors mt-auto cursor-pointer"
+                      className="w-full bg-orange-50 text-[#6D0736] text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-orange-100 transition-colors mt-auto cursor-pointer"
                     >
                       <span>See more like this</span>
                       <div className="flex items-center gap-0.5">
-                        <div className="w-px h-2 bg-green-300"></div>
+                        <div className="w-px h-2 bg-orange-200"></div>
                         <svg width="6" height="6" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M0 0L8 4L0 8Z" fill="#16a34a" />
+                          <path d="M0 0L8 4L0 8Z" fill="#6D0736" />
                         </svg>
                       </div>
                     </div>
@@ -426,9 +450,9 @@ export default function OrderAgain() {
                   <div className="absolute top-12 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-yellow-600/30"></div>
                   <div className="absolute top-20 left-1/2 -translate-x-1/2 w-28 h-0.5 bg-yellow-600/20"></div>
 
-                  {/* Kosil text inside basket */}
+                  {/* Speeddo text inside basket */}
                   <div className="relative z-10 text-center px-4">
-                    <span className="text-2xl font-extrabold text-neutral-900 tracking-tight drop-shadow-sm">Kosil</span>
+                    <span className="text-2xl font-extrabold text-neutral-900 tracking-tight drop-shadow-sm">Speeddo</span>
                     <span className="inline-block w-2.5 h-2.5 bg-green-500 rounded-full ml-1.5 shadow-sm"></span>
                   </div>
                 </div>

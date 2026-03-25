@@ -90,13 +90,13 @@ export default function AdminHeader({
               </svg>
             )}
           </button>
-          {/* Kosil Logo */}
+          {/* Speeddo Logo */}
           <button
             onClick={handleLogoClick}
             className="hover:opacity-80 transition-opacity">
             <img
               src={kosilLogo}
-              alt="Kosil"
+              alt="Speeddo"
               className="h-10 sm:h-12 w-auto object-contain cursor-pointer"
               style={{ maxWidth: "200px" }}
             />
@@ -184,7 +184,7 @@ export default function AdminHeader({
                       }
                     }}
                     placeholder="Search orders, customers, products..."
-                    className="w-full px-4 py-2 pl-10 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className="w-full px-4 py-2 pl-10 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                     autoFocus
                   />
                   <svg
@@ -273,7 +273,7 @@ export default function AdminHeader({
                       navigate("/admin/notification");
                       setShowNotificationsDropdown(false);
                     }}
-                    className="w-full text-center text-sm text-teal-600 hover:text-teal-700 font-medium">
+                    className="w-full text-center text-sm text-purple-600 hover:text-purple-700 font-medium">
                     View All Notifications
                   </button>
                 </div>

@@ -230,7 +230,7 @@ export default function SellerSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-green-50 flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-purple-50 flex flex-col items-center justify-center px-4 py-8">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -256,21 +256,21 @@ export default function SellerSignUp() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header Section */}
         <div
-          className="px-6 py-4 text-center border-b border-green-700"
+          className="px-6 py-4 text-center border-b border-amber-500"
           style={{
-            backgroundColor: "rgb(21 178 74 / var(--tw-bg-opacity, 1))",
+            backgroundColor: "#FFC107",
           }}>
           <div className="mb-0 -mt-4">
             <img
               src="/assets/kosil1.png"
-              alt="Kosil"
+              alt="Speeddo"
               className="h-44 w-full max-w-xs mx-auto object-fill object-bottom"
             />
           </div>
           <h1 className="text-2xl font-bold text-white mb-1 -mt-12">
             Seller Sign Up
           </h1>
-          <p className="text-green-50 text-sm -mt-2">
+          <p className="text-purple-900/70 text-sm -mt-2">
             Create your seller account
           </p>
         </div>
@@ -308,7 +308,7 @@ export default function SellerSignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter your name"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -317,7 +317,7 @@ export default function SellerSignUp() {
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Mobile Number <span className="text-red-500">*</span>
                   </label>
-                  <div className="flex items-center bg-white border border-neutral-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-200">
+                  <div className="flex items-center bg-white border border-neutral-300 rounded-lg overflow-hidden focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-200">
                     <div className="px-3 py-2.5 text-sm font-medium text-neutral-600 border-r border-neutral-300 bg-neutral-50">
                       +91
                     </div>
@@ -346,7 +346,7 @@ export default function SellerSignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter email address"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -362,7 +362,7 @@ export default function SellerSignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter store name"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -388,7 +388,7 @@ export default function SellerSignUp() {
                               checked={checked}
                               onChange={() => toggleCategory(cat.name)}
                               disabled={loading}
-                              className="h-4 w-4 text-teal-600 border-neutral-300 rounded focus:ring-teal-500"
+                              className="h-4 w-4 text-purple-600 border-neutral-300 rounded focus:ring-purple-500"
                             />
                             <span>{cat.name}</span>
                           </label>
@@ -466,7 +466,7 @@ export default function SellerSignUp() {
                           );
                         }
                       }}
-                      className="p-2.5 bg-teal-50 text-teal-600 rounded-lg border border-teal-200 hover:bg-teal-100 transition-colors"
+                      className="p-2.5 bg-teal-50 text-purple-600 rounded-lg border border-purple-200 hover:bg-teal-100 transition-colors"
                       title="Use Current Location">
                       <svg
                         width="20"
@@ -488,7 +488,7 @@ export default function SellerSignUp() {
                     <div className="mt-4 animate-fadeIn">
                       <p className="text-sm font-medium text-neutral-700 mb-2">
                         Exact Location{" "}
-                        <span className="text-teal-600 text-xs font-normal">
+                        <span className="text-purple-600 text-xs font-normal">
                           (Move the map to place the pin on your store's
                           entrance)
                         </span>
@@ -540,7 +540,7 @@ export default function SellerSignUp() {
                     min="0.1"
                     max="100"
                     step="0.1"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                   <p className="mt-1 text-xs text-neutral-500">
@@ -560,7 +560,7 @@ export default function SellerSignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter city"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -595,7 +595,7 @@ export default function SellerSignUp() {
                       value={formData.panCard}
                       onChange={handleInputChange}
                       placeholder="PAN Card Number"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                       disabled={loading}
                     />
                   </div>
@@ -610,7 +610,7 @@ export default function SellerSignUp() {
                       value={formData.taxName}
                       onChange={handleInputChange}
                       placeholder="Tax Name"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                       disabled={loading}
                     />
                   </div>
@@ -625,7 +625,7 @@ export default function SellerSignUp() {
                       value={formData.taxNumber}
                       onChange={handleInputChange}
                       placeholder="Tax Number"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                       disabled={loading}
                     />
                   </div>
@@ -640,7 +640,7 @@ export default function SellerSignUp() {
                       value={formData.ifsc}
                       onChange={handleInputChange}
                       placeholder="IFSC Code"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                       disabled={loading}
                     />
                   </div>
@@ -658,7 +658,7 @@ export default function SellerSignUp() {
                 disabled={loading}
                 className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${
                   !loading
-                    ? "bg-teal-600 text-white hover:bg-teal-700 shadow-md"
+                    ? "bg-purple-600 text-white hover:bg-purple-700 shadow-md"
                     : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
                 }`}>
                 {loading ? "Creating Account..." : "Sign Up"}
@@ -671,7 +671,7 @@ export default function SellerSignUp() {
                   <button
                     type="button"
                     onClick={() => navigate("/seller/login")}
-                    className="text-teal-600 hover:text-teal-700 font-semibold">
+                    className="text-purple-600 hover:text-purple-700 font-semibold">
                     Login
                   </button>
                 </p>
@@ -722,7 +722,7 @@ export default function SellerSignUp() {
                     }
                   }}
                   disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-teal-600 text-white hover:bg-teal-700 transition-colors">
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-purple-600 text-white hover:bg-purple-700 transition-colors">
                   {loading ? "Sending..." : "Resend OTP"}
                 </button>
               </div>
@@ -733,7 +733,7 @@ export default function SellerSignUp() {
 
       {/* Footer Text */}
       <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Kosil's Terms of Service and Privacy Policy
+        By continuing, you agree to Speeddo's Terms of Service and Privacy Policy
       </p>
     </div>
   );

@@ -58,8 +58,8 @@ export default function AdminLogin() {
     }
   };
 
-  const handleKosilLogin = () => {
-    // Handle Kosil login logic here
+  const handleSpeeddoLogin = () => {
+    // Handle Speeddo login logic here
     navigate("/admin");
   };
 
@@ -69,7 +69,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-green-50 flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-purple-50 flex flex-col items-center justify-center px-4 py-8">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -95,14 +95,14 @@ export default function AdminLogin() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header Section */}
         <div
-          className="px-6 py-4 text-center border-b border-green-700"
+          className="px-6 py-4 text-center border-b border-amber-500"
           style={{
-            backgroundColor: "rgb(21 178 74 / var(--tw-bg-opacity, 1))",
+            backgroundColor: "#FFC107",
           }}>
           <div className="mb-0 -mt-4">
             <img
               src="/assets/kosil1.png"
-              alt="Kosil"
+              alt="Speeddo"
               className="h-44 w-full max-w-xs mx-auto object-fill object-bottom"
             />
           </div>
@@ -153,7 +153,7 @@ export default function AdminLogin() {
                 onClick={handleMobileLogin}
                 disabled={mobileNumber.length !== 10 || loading}
                 className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${mobileNumber.length === 10 && !loading
-                  ? "bg-teal-600 text-white hover:bg-teal-700 shadow-md"
+                  ? "bg-amber-500 text-white hover:bg-amber-600 shadow-md"
                   : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
                   }`}>
                 {loading ? "Sending..." : "Continue"}
@@ -192,7 +192,7 @@ export default function AdminLogin() {
                 <button
                   onClick={handleMobileLogin}
                   disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-teal-600 text-white hover:bg-teal-700 transition-colors">
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-amber-500 text-white hover:bg-amber-600 transition-colors">
                   {loading ? "Verifying..." : "Resend OTP"}
                 </button>
               </div>
@@ -203,7 +203,7 @@ export default function AdminLogin() {
 
       {/* Footer Text */}
       <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Kosil's Terms of Service and Privacy Policy
+        By continuing, you agree to Speeddo's Terms of Service and Privacy Policy
       </p>
     </div>
   );

@@ -268,7 +268,7 @@ export default function AdminHeaderCategory() {
 
                   // Map theme keys to user-friendly color names
                   const colorNames: Record<string, string> = {
-                    all: 'Green',
+                    all: 'Yellow/Purple',
                     wedding: 'Red',
                     winter: 'Sky Blue',
                     electronics: 'Yellow',

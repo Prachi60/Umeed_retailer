@@ -260,7 +260,7 @@ export default function DeliverySignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-green-50 flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-purple-50 flex flex-col items-center justify-center px-4 py-8">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -287,21 +287,21 @@ export default function DeliverySignUp() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header Section */}
         <div
-          className="px-6 py-4 text-center border-b border-green-700"
+          className="px-6 py-4 text-center border-b border-amber-500"
           style={{
-            backgroundColor: "rgb(21 178 74 / var(--tw-bg-opacity, 1))",
+            backgroundColor: "#FFC107",
           }}>
           <div className="mb-0 -mt-4">
             <img
               src="/assets/kosil1.png"
-              alt="Kosil"
+              alt="Speeddo"
               className="h-44 w-full max-w-xs mx-auto object-fill object-bottom"
             />
           </div>
           <h1 className="text-2xl font-bold text-white mb-1 -mt-12">
             Delivery Sign Up
           </h1>
-          <p className="text-green-50 text-sm -mt-2">
+          <p className="text-purple-900/70 text-sm -mt-2">
             Create your delivery partner account
           </p>
         </div>
@@ -339,7 +339,7 @@ export default function DeliverySignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter your full name"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -348,7 +348,7 @@ export default function DeliverySignUp() {
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Mobile Number <span className="text-red-500">*</span>
                   </label>
-                  <div className="flex items-center bg-white border border-neutral-300 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-200">
+                  <div className="flex items-center bg-white border border-neutral-300 rounded-lg overflow-hidden focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-200">
                     <div className="px-3 py-2.5 text-sm font-medium text-neutral-600 border-r border-neutral-300 bg-neutral-50">
                       +91
                     </div>
@@ -377,7 +377,7 @@ export default function DeliverySignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter email address"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -391,7 +391,7 @@ export default function DeliverySignUp() {
                     name="dateOfBirth"
                     value={formData.dateOfBirth}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -408,7 +408,7 @@ export default function DeliverySignUp() {
                     placeholder="Enter password (min 6 characters)"
                     required
                     minLength={4}
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -424,7 +424,7 @@ export default function DeliverySignUp() {
                     onChange={handleInputChange}
                     placeholder="Enter your address"
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -441,17 +441,17 @@ export default function DeliverySignUp() {
                       onChange={handleInputChange}
                       placeholder="Enter your city"
                       required
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                       disabled={loading || isCityLoading}
                     />
                     <button
                       type="button"
                       onClick={fetchCityFromLocation}
                       disabled={isCityLoading || loading}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-teal-600 hover:bg-teal-50 rounded-md transition-colors disabled:text-neutral-400"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-purple-600 hover:bg-teal-50 rounded-md transition-colors disabled:text-neutral-400"
                       title="Fetch current location">
                       {isCityLoading ? (
-                        <div className="w-4 h-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
                       ) : (
                         <svg
                           width="18"
@@ -478,7 +478,7 @@ export default function DeliverySignUp() {
                     value={formData.pincode}
                     onChange={handleInputChange}
                     placeholder="Enter pincode"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -500,7 +500,7 @@ export default function DeliverySignUp() {
                     value={formData.accountName}
                     onChange={handleInputChange}
                     placeholder="Account holder name"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -515,7 +515,7 @@ export default function DeliverySignUp() {
                     value={formData.bankName}
                     onChange={handleInputChange}
                     placeholder="Bank name"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -530,7 +530,7 @@ export default function DeliverySignUp() {
                     value={formData.accountNumber}
                     onChange={handleInputChange}
                     placeholder="Account number"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -545,7 +545,7 @@ export default function DeliverySignUp() {
                     value={formData.ifscCode}
                     onChange={handleInputChange}
                     placeholder="IFSC code"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
                 </div>
@@ -558,7 +558,7 @@ export default function DeliverySignUp() {
                     name="bonusType"
                     value={formData.bonusType}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}>
                     {bonusTypes.map((type) => (
                       <option
@@ -587,7 +587,7 @@ export default function DeliverySignUp() {
                       name="drivingLicense"
                       onChange={handleFileChange}
                       accept="image/*,.pdf"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                       disabled={loading || uploadingDocs}
                     />
                     {drivingLicenseFile && (
@@ -608,7 +608,7 @@ export default function DeliverySignUp() {
                       name="nationalIdentityCard"
                       onChange={handleFileChange}
                       accept="image/*,.pdf"
-                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                      className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                       disabled={loading || uploadingDocs}
                     />
                     {nationalIdentityCardFile && (
@@ -630,7 +630,7 @@ export default function DeliverySignUp() {
                 type="submit"
                 disabled={loading || uploadingDocs}
                 className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${!loading && !uploadingDocs
-                  ? "bg-teal-600 text-white hover:bg-teal-700 shadow-md"
+                  ? "bg-purple-600 text-white hover:bg-purple-700 shadow-md"
                   : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
                   }`}>
                 {uploadingDocs
@@ -647,7 +647,7 @@ export default function DeliverySignUp() {
                   <button
                     type="button"
                     onClick={() => navigate("/delivery/login")}
-                    className="text-teal-600 hover:text-teal-700 font-semibold">
+                    className="text-purple-600 hover:text-purple-700 font-semibold">
                     Login
                   </button>
                 </p>
@@ -697,7 +697,7 @@ export default function DeliverySignUp() {
                     }
                   }}
                   disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-teal-600 text-white hover:bg-teal-700 transition-colors">
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-purple-600 text-white hover:bg-purple-700 transition-colors">
                   {loading ? "Calling..." : "Resend OTP"}
                 </button>
               </div>
@@ -708,7 +708,7 @@ export default function DeliverySignUp() {
 
       {/* Footer Text */}
       <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Kosil's Terms of Service and Privacy Policy
+        By continuing, you agree to Speeddo's Terms of Service and Privacy Policy
       </p>
     </div>
   );
