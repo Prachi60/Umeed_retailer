@@ -1,0 +1,79 @@
+{
+  "total": 6,
+  "published": 6,
+  "sample": [
+    {
+      "_id": "694641169596df826edc3c9a",
+      "name": "Grocery",
+      "iconLibrary": "Custom",
+      "iconName": "grocery",
+      "slug": "grocery",
+      "order": 5,
+      "status": "Published",
+      "__v": 0,
+      "createdAt": "2025-12-20T06:24:22.186Z",
+      "updatedAt": "2025-12-20T06:24:22.186Z"
+    },
+    {
+      "_id": "694641169596df826edc3c9b",
+      "name": "Fashion",
+      "iconLibrary": "Custom",
+      "iconName": "fashion",
+      "slug": "fashion",
+      "order": 6,
+      "status": "Published",
+      "__v": 0,
+      "createdAt": "2025-12-20T06:24:22.187Z",
+      "updatedAt": "2025-12-20T06:24:22.187Z"
+    },
+    {
+      "_id": "694641169596df826edc3c99",
+      "name": "Beauty",
+      "iconLibrary": "Custom",
+      "iconName": "beauty",
+      "slug": "beauty",
+      "order": 4,
+      "status": "Published",
+      "__v": 0,
+      "createdAt": "2025-12-20T06:24:22.186Z",
+      "updatedAt": "2025-12-20T06:24:22.186Z"
+    },
+    {
+      "_id": "694641169596df826edc3c98",
+      "name": "Electronics",
+      "iconLibrary": "Custom",
+      "iconName": "electronics",
+      "slug": "electronics",
+      "order": 3,
+      "status": "Published",
+      "__v": 0,
+      "createdAt": "2025-12-20T06:24:22.186Z",
+      "updatedAt": "2025-12-20T06:24:22.186Z"
+    },
+    {
+      "_id": "694641169596df826edc3c96",
+      "name": "Wedding",
+      "iconLibrary": "Custom",
+      "iconName": "wedding",
+      "slug": "wedding",
+      "order": 1,
+      "status": "Published",
+      "__v": 0,
+      "createdAt": "2025-12-20T06:24:22.186Z",
+      "updatedAt": "2025-12-20T06:44:55.251Z",
+      "relatedCategory": ""
+    },
+    {
+      "_id": "694641169596df826edc3c97",
+      "name": "Winter",
+      "iconLibrary": "Custom",
+      "iconName": "winter",
+      "slug": "winter",
+      "order": 2,
+      "status": "Published",
+      "__v": 0,
+      "createdAt": "2025-12-20T06:24:22.186Z",
+      "updatedAt": "2025-12-20T06:24:22.186Z"
+    }
+  ]
+}
