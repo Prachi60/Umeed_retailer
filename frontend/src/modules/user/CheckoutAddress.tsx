@@ -410,7 +410,6 @@ export default function CheckoutAddress() {
             value={address.phone}
             onChange={(e) => handleInputChange('phone', e.target.value.replace(/\D/g, ''))}
             className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.phone ? 'border-red-500' : 'border-neutral-200'}`}
-            style={!errors.phone ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="Enter mobile number"
             maxLength={10}
           />
@@ -426,7 +425,6 @@ export default function CheckoutAddress() {
             value={address.flat}
             onChange={(e) => handleInputChange('flat', e.target.value)}
             className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.flat ? 'border-red-500' : 'border-neutral-200'}`}
-            style={!errors.flat ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="Flat/House No."
           />
           {errors.flat && <p className="text-[10px] text-red-500 mt-0.5">{errors.flat}</p>}
@@ -441,7 +439,6 @@ export default function CheckoutAddress() {
             value={address.street}
             onChange={(e) => handleInputChange('street', e.target.value)}
             className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.street ? 'border-red-500' : 'border-neutral-200'}`}
-            style={!errors.street ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="Street/Area"
           />
           {errors.street && <p className="text-[10px] text-red-500 mt-0.5">{errors.street}</p>}
@@ -456,7 +453,6 @@ export default function CheckoutAddress() {
             value={address.city}
             onChange={(e) => handleInputChange('city', e.target.value)}
             className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.city ? 'border-red-500' : 'border-neutral-200'}`}
-            style={!errors.city ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="City"
           />
           {errors.city && <p className="text-[10px] text-red-500 mt-0.5">{errors.city}</p>}
@@ -471,7 +467,6 @@ export default function CheckoutAddress() {
             value={address.state || ''}
             onChange={(e) => handleInputChange('state', e.target.value)}
             className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.state ? 'border-red-500' : 'border-neutral-200'}`}
-            style={!errors.state ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="State"
           />
           {errors.state && <p className="text-[10px] text-red-500 mt-0.5">{errors.state}</p>}
@@ -486,7 +481,6 @@ export default function CheckoutAddress() {
             value={address.pincode}
             onChange={(e) => handleInputChange('pincode', e.target.value.replace(/\D/g, ''))}
             className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.pincode ? 'border-red-500' : 'border-neutral-200'}`}
-            style={!errors.pincode ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="Pincode"
             maxLength={6}
           />
