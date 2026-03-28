@@ -9,8 +9,10 @@ import { getAddresses, addAddress, updateAddress, Address } from '../../services
 import { appConfig } from '../../services/configService';
 import { calculateProductPrice } from '../../utils/priceUtils';
 import GoogleMapsLocationPicker from '../../components/GoogleMapsLocationPicker';
+import { useThemeContext } from '../../context/ThemeContext';
 
 export default function CheckoutAddress() {
+  const { currentTheme } = useThemeContext();
   const { cart } = useCart();
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
@@ -318,10 +320,11 @@ export default function CheckoutAddress() {
               value="myself"
               checked={orderingFor === 'myself'}
               onChange={(e) => setOrderingFor(e.target.value as 'myself' | 'someone-else')}
-              className="w-4 h-4 appearance-none border-2 border-neutral-300 rounded-full bg-white checked:bg-white checked:border-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-0"
+              className="w-4 h-4 appearance-none border-2 rounded-full bg-white ring-offset-0 focus:outline-none"
               style={{
+                borderColor: orderingFor === 'myself' ? currentTheme.primary[2] : '#D4D4D4',
                 backgroundImage: orderingFor === 'myself'
-                  ? 'radial-gradient(circle, rgb(22, 163, 74) 35%, transparent 40%)'
+                  ? `radial-gradient(circle, ${currentTheme.primary[2]} 35%, transparent 40%)`
                   : 'none',
                 backgroundSize: '40%',
                 backgroundPosition: 'center',
@@ -337,10 +340,11 @@ export default function CheckoutAddress() {
               value="someone-else"
               checked={orderingFor === 'someone-else'}
               onChange={(e) => setOrderingFor(e.target.value as 'myself' | 'someone-else')}
-              className="w-4 h-4 appearance-none border-2 border-neutral-300 rounded-full bg-white checked:bg-white checked:border-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-0"
+              className="w-4 h-4 appearance-none border-2 rounded-full bg-white ring-offset-0 focus:outline-none"
               style={{
+                borderColor: orderingFor === 'someone-else' ? currentTheme.primary[2] : '#D4D4D4',
                 backgroundImage: orderingFor === 'someone-else'
-                  ? 'radial-gradient(circle, rgb(22, 163, 74) 35%, transparent 40%)'
+                  ? `radial-gradient(circle, ${currentTheme.primary[2]} 35%, transparent 40%)`
                   : 'none',
                 backgroundSize: '40%',
                 backgroundPosition: 'center',
@@ -368,10 +372,10 @@ export default function CheckoutAddress() {
               <button
                 key={type.id}
                 onClick={() => setAddressType(type.id as typeof addressType)}
-                className={`px-3 py-1.5 rounded-lg border-2 text-xs font-medium transition-colors flex items-center gap-1.5 ${addressType === type.id
-                  ? 'border-green-600 bg-green-50 text-green-700'
-                  : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300'
-                  }`}
+                className="px-3 py-1.5 rounded-lg border-2 text-xs font-medium transition-all flex items-center gap-1.5"
+                style={addressType === type.id 
+                  ? { borderColor: currentTheme.primary[2], backgroundColor: `${currentTheme.primary[2]}10`, color: currentTheme.primary[2] } 
+                  : { borderColor: '#E5E5E5', backgroundColor: 'white', color: '#404040' }}
               >
                 <span className="text-sm">{type.icon}</span>
                 <span>{type.label}</span>
@@ -391,8 +395,7 @@ export default function CheckoutAddress() {
             type="text"
             value={address.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors ${errors.name ? 'border-red-500' : 'border-neutral-200'
-              }`}
+            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.name ? 'border-red-500' : 'border-neutral-200'}`}
             placeholder="Enter your name"
           />
           {errors.name && <p className="text-[10px] text-red-500 mt-0.5">{errors.name}</p>}
@@ -406,8 +409,8 @@ export default function CheckoutAddress() {
             type="tel"
             value={address.phone}
             onChange={(e) => handleInputChange('phone', e.target.value.replace(/\D/g, ''))}
-            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors ${errors.phone ? 'border-red-500' : 'border-neutral-200'
-              }`}
+            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.phone ? 'border-red-500' : 'border-neutral-200'}`}
+            style={!errors.phone ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="Enter mobile number"
             maxLength={10}
           />
@@ -422,8 +425,8 @@ export default function CheckoutAddress() {
             type="text"
             value={address.flat}
             onChange={(e) => handleInputChange('flat', e.target.value)}
-            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors ${errors.flat ? 'border-red-500' : 'border-neutral-200'
-              }`}
+            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.flat ? 'border-red-500' : 'border-neutral-200'}`}
+            style={!errors.flat ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="Flat/House No."
           />
           {errors.flat && <p className="text-[10px] text-red-500 mt-0.5">{errors.flat}</p>}
@@ -437,8 +440,8 @@ export default function CheckoutAddress() {
             type="text"
             value={address.street}
             onChange={(e) => handleInputChange('street', e.target.value)}
-            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors ${errors.street ? 'border-red-500' : 'border-neutral-200'
-              }`}
+            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.street ? 'border-red-500' : 'border-neutral-200'}`}
+            style={!errors.street ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="Street/Area"
           />
           {errors.street && <p className="text-[10px] text-red-500 mt-0.5">{errors.street}</p>}
@@ -452,8 +455,8 @@ export default function CheckoutAddress() {
             type="text"
             value={address.city}
             onChange={(e) => handleInputChange('city', e.target.value)}
-            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors ${errors.city ? 'border-red-500' : 'border-neutral-200'
-              }`}
+            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.city ? 'border-red-500' : 'border-neutral-200'}`}
+            style={!errors.city ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="City"
           />
           {errors.city && <p className="text-[10px] text-red-500 mt-0.5">{errors.city}</p>}
@@ -467,8 +470,8 @@ export default function CheckoutAddress() {
             type="text"
             value={address.state || ''}
             onChange={(e) => handleInputChange('state', e.target.value)}
-            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors ${errors.state ? 'border-red-500' : 'border-neutral-200'
-              }`}
+            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.state ? 'border-red-500' : 'border-neutral-200'}`}
+            style={!errors.state ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="State"
           />
           {errors.state && <p className="text-[10px] text-red-500 mt-0.5">{errors.state}</p>}
@@ -482,8 +485,8 @@ export default function CheckoutAddress() {
             type="text"
             value={address.pincode}
             onChange={(e) => handleInputChange('pincode', e.target.value.replace(/\D/g, ''))}
-            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors ${errors.pincode ? 'border-red-500' : 'border-neutral-200'
-              }`}
+            className={`w-full px-3 py-2 bg-white border rounded-lg text-xs focus:outline-none transition-colors ${errors.pincode ? 'border-red-500' : 'border-neutral-200'}`}
+            style={!errors.pincode ? { focusBorderColor: currentTheme.primary } : {}}
             placeholder="Pincode"
             maxLength={6}
           />
@@ -526,7 +529,7 @@ export default function CheckoutAddress() {
             </div>
             <div className="flex justify-between text-xs text-neutral-700">
               <span>Delivery Charges</span>
-              <span className={`font-medium ${deliveryFee === 0 ? 'text-green-600' : ''}`}>
+              <span className="font-medium" style={{ color: deliveryFee === 0 ? currentTheme.primary[2] : '#171717' }}>
                 {deliveryFee === 0 ? 'Free' : `₹${deliveryFee}`}
               </span>
             </div>
@@ -541,14 +544,15 @@ export default function CheckoutAddress() {
       </div>
 
       {/* Save Address Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-[60] shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-[60] shadow-xl">
         <button
           onClick={handleSaveAddress}
           disabled={!isFormValid || isSaving}
-          className={`w-full py-3 px-4 font-semibold text-sm transition-colors ${isFormValid && !isSaving
-            ? 'bg-green-600 text-white hover:bg-green-700'
+          className={`w-full py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors ${isFormValid && !isSaving
+            ? 'text-white'
             : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
             }`}
+          style={isFormValid && !isSaving ? { backgroundColor: currentTheme.primary[2] } : {}}
         >
           {isSaving ? 'Saving...' : 'Save Address'}
         </button>

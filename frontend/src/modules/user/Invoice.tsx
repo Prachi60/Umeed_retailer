@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Button from "../../components/ui/button";
 import { useOrders } from "../../hooks/useOrders";
+import { useThemeContext } from "../../context/ThemeContext";
 
 const ArrowLeftIcon = ({ className }: { className?: string }) => (
   <svg
@@ -54,6 +55,7 @@ const PrinterIcon = ({ className }: { className?: string }) => (
 );
 
 export default function Invoice() {
+  const { currentTheme } = useThemeContext();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getOrderById, fetchOrderById } = useOrders();
@@ -110,7 +112,10 @@ export default function Invoice() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+          <div 
+            className="animate-spin rounded-full h-8 w-8 border-b-2"
+            style={{ borderColor: currentTheme.accentColor }}
+          ></div>
           <p className="text-sm text-neutral-500">Loading invoice...</p>
         </div>
       </div>
@@ -171,7 +176,10 @@ export default function Invoice() {
           <div className="border-b border-gray-200 pb-6 mb-6">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 
+                  className="text-3xl font-bold mb-2"
+                  style={{ color: currentTheme.accentColor }}
+                >
                   Speedoo
                 </h1>
                 <p className="text-gray-600">
@@ -226,7 +234,13 @@ export default function Invoice() {
                 </p>
                 <p>
                   <span className="font-medium">Status:</span>{" "}
-                  <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm font-medium">
+                  <span 
+                    className="inline-block px-2 py-1 rounded text-sm font-bold uppercase tracking-wider"
+                    style={{ 
+                      backgroundColor: `${currentTheme.accentColor}15`, 
+                      color: currentTheme.accentColor 
+                    }}
+                  >
                     {order.status || "Placed"}
                   </span>
                 </p>
@@ -297,7 +311,7 @@ export default function Invoice() {
                       <td className="text-right py-4 px-4 text-gray-700">
                         {formatCurrency(unitPrice)}
                       </td>
-                      <td className="text-right py-4 px-4 font-medium text-gray-900">
+                      <td className="text-right py-4 px-4 font-bold text-gray-900">
                         {formatCurrency(itemTotal)}
                       </td>
                     </tr>
@@ -332,14 +346,14 @@ export default function Invoice() {
               )}
               <div className="border-t-2 border-gray-200 pt-3 flex justify-between text-lg font-bold text-gray-900">
                 <span>Total</span>
-                <span>{formatCurrency(totalAmount)}</span>
+                <span style={{ color: currentTheme.accentColor }}>{formatCurrency(totalAmount)}</span>
               </div>
             </div>
           </div>
 
           {/* Footer */}
           <div className="border-t border-gray-200 pt-6 text-center text-sm text-gray-600">
-            <p className="mb-2">Thank you for your business!</p>
+            <p className="mb-2 font-bold" style={{ color: currentTheme.accentColor }}>Thank you for your business!</p>
             <p>For any queries, please contact our customer support.</p>
           </div>
         </motion.div>

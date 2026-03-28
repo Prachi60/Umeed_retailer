@@ -152,7 +152,7 @@ export default function AddressBook() {
       <div className="px-4 md:px-6 pt-4 pb-6">
         {loading ? (
           <div className="flex justify-center py-10">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#7B1FA2]" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#7A3E8E]" />
           </div>
         ) : error ? (
           <div className="bg-red-50 text-red-700 border border-red-100 rounded-lg p-4 text-sm">

@@ -269,7 +269,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 }}
               />
               {/* Delivery info line */}
-              <div className="px-4 md:px-6 lg:px-8 py-1.5 bg-white/30 backdrop-blur-sm text-[10px] md:text-xs text-purple-900 text-center font-medium border-b border-white/10">
+              <div className="px-4 md:px-6 lg:px-8 py-1.5 bg-purple-900/20 backdrop-blur-sm text-[10px] md:text-xs text-purple-900 text-center font-bold border-b border-white/10 uppercase tracking-widest">
                 Delivering in 10–15 mins
               </div>
 
@@ -367,7 +367,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Fixed Bottom Navigation - Mobile Only, Hidden on checkout pages */}
           {showFooter && (
             <nav
-              className="fixed bottom-0 left-0 right-0 bg-[#7B1FA2]/90 backdrop-blur-xl border-t border-white/10 shadow-[0_-12px_40px_-5px_rgba(0,0,0,0.3)] z-50 md:hidden rounded-t-[2.5rem]"
+              className="fixed bottom-0 left-0 right-0 bg-[#7A3E8E]/90 backdrop-blur-xl border-t border-white/10 shadow-[0_-12px_40px_-5px_rgba(0,0,0,0.3)] z-50 md:hidden rounded-t-[2.5rem]"
             >
               <div className="flex justify-around items-center h-16">
                 {/* Home */}

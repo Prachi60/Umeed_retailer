@@ -11,9 +11,9 @@ export interface Theme {
 export const themes: Record<string, Theme> = {
   all: {
     primary: ['#FFF3E0', '#FFB74D', '#F57C00', '#FF9800'],
-    secondary: ['#7B1FA2', '#9C27B0', '#BA68C8', '#E1BEE7'],
+    secondary: ['#7A3E8E', '#9C27B0', '#BA68C8', '#E1BEE7'],
     textColor: '#000000',
-    accentColor: '#7B1FA2',
+    accentColor: '#7A3E8E',
     bannerText: 'HOUSEFULL',
     saleText: 'SALE',
     headerTextColor: '#000000',

@@ -122,7 +122,7 @@ export default function FAQ() {
                 height="40"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="text-[#7B1FA2] md:w-12 md:h-12">
+                className="text-[#7A3E8E] md:w-12 md:h-12">
                 <path
                   d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
                   stroke="currentColor"
@@ -194,7 +194,7 @@ export default function FAQ() {
                 height="48"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="mx-auto mb-4 text-[#7B1FA2]">
+                className="mx-auto mb-4 text-[#7A3E8E]">
                 <path
                   d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
                   stroke="currentColor"

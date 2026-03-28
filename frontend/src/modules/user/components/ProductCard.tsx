@@ -11,6 +11,9 @@ import Button from '../../../components/ui/button';
 import Badge from '../../../components/ui/badge';
 import StarRating from '../../../components/ui/StarRating';
 import { calculateProductPrice } from '../../../utils/priceUtils';
+import { useThemeContext } from '../../../context/ThemeContext';
+// Helper to get consistent product ID across MongoDB _id and virtual id
+export const getProductId = (p: any): string => String(p?.id || p?._id || '');
 
 interface ProductCardProps {
   product: Product;
@@ -46,6 +49,7 @@ export default function ProductCard({
   const { isAuthenticated } = useAuth();
   const { location } = useLocation();
   const { showToast } = useToast(); // Get toast function
+  const { currentTheme } = useThemeContext();
   const imageRef = useRef<HTMLImageElement>(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -119,7 +123,14 @@ export default function ProductCard({
     }
   };
 
-  const cartItem = cart.items.find((item) => item?.product && (item.product.id === (product as any).id || item.product._id === (product as any).id || item.product.id === product._id));
+  // Robust ID matching
+  const productId = getProductId(product);
+  const cartItem = cart.items.find((item) => {
+      if (!item?.product) return false;
+      const itemProductId = getProductId(item.product);
+      const targetPid = productId;
+      return targetPid && itemProductId && itemProductId === targetPid;
+  });
   const inCartQty = cartItem?.quantity || 0;
 
   // Get Price and MRP using utility
@@ -159,13 +170,15 @@ export default function ProductCard({
 
     // Prevent any operation while another is in progress
     if (isOperationPendingRef.current || inCartQty <= 0) {
+      console.log('Cannot decrease quantity. Pending:', isOperationPendingRef.current, 'Qty:', inCartQty);
       return;
     }
 
     isOperationPendingRef.current = true;
 
     try {
-      await updateQuantity(((product as any).id || product._id) as string, inCartQty - 1);
+      const pid = ((product as any).id || product._id) as string;
+      await updateQuantity(pid, inCartQty - 1);
     } finally {
       // Reset the flag after the operation truly completes
       isOperationPendingRef.current = false;
@@ -189,8 +202,9 @@ export default function ProductCard({
     isOperationPendingRef.current = true;
 
     try {
+      const pid = ((product as any).id || product._id) as string;
       if (inCartQty > 0) {
-        await updateQuantity(((product as any).id || product._id) as string, inCartQty + 1);
+        await updateQuantity(pid, inCartQty + 1);
       } else {
         await addToCart(product, addButtonRef.current);
       }
@@ -207,7 +221,8 @@ export default function ProductCard({
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.97 }}
       transition={{ duration: 0.2 }}
-      className={`${categoryStyle ? 'bg-green-50' : 'bg-white'} rounded-lg shadow-sm overflow-hidden flex flex-col relative`}
+       className="rounded-lg shadow-sm overflow-hidden flex flex-col relative"
+      style={categoryStyle ? { backgroundColor: `${currentTheme.primary[2]}05` } : { backgroundColor: 'white' }}
     >
       <div
         onClick={handleCardClick}
@@ -240,8 +255,11 @@ export default function ProductCard({
             </div>
           )}
 
-          {categoryStyle && showBadge && discount > 0 && (
-            <div className="absolute top-2 left-2 z-10 bg-green-600 text-white text-[10px] font-semibold px-2 py-0.5 rounded">
+           {categoryStyle && showBadge && discount > 0 && (
+            <div 
+              className="absolute top-2 left-2 z-10 text-white text-[10px] font-semibold px-2 py-0.5 rounded"
+              style={{ backgroundColor: currentTheme.primary[2] }}
+            >
               {discount}% off
             </div>
           )}
@@ -307,7 +325,7 @@ export default function ProductCard({
             {inCartQty === 0 ? (
               <div className="flex flex-col items-center w-full">
                 <div className="flex justify-center w-full">
-                  <Button
+                   <Button
                     ref={addButtonRef}
                     variant="outline"
                     size="sm"
@@ -316,34 +334,37 @@ export default function ProductCard({
                       e.stopPropagation();
                       handleAdd(e);
                     }}
-                    className={`w-full border rounded-full font-semibold text-xs h-7 px-3 flex items-center justify-center uppercase tracking-wide ${
-                      product.isAvailable === false
-                      ? 'border-neutral-300 text-neutral-400 bg-neutral-50 cursor-not-allowed'
-                      : 'border-green-600 text-green-600 bg-transparent hover:bg-green-50'
-                    }`}
+                    className="w-full border rounded-full font-semibold text-xs h-7 px-3 flex items-center justify-center uppercase tracking-wide transition-colors"
+                    style={product.isAvailable === false
+                      ? { borderColor: '#D4D4D4', color: '#A3A3A3', backgroundColor: '#F5F5F5' }
+                      : { borderColor: currentTheme.primary[2], color: currentTheme.primary[2], backgroundColor: 'transparent' }
+                    }
                   >
                     {product.isAvailable === false ? 'Out of Range' : 'ADD'}
                   </Button>
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center justify-center gap-1.5 bg-white border border-green-600 rounded-full px-1.5 py-0.5 h-7 w-full">
-                <Button
+             ) : (
+              <div 
+                className="flex items-center justify-center gap-1.5 rounded-full px-1.5 py-0.5 h-7 w-full border"
+                style={{ borderColor: currentTheme.primary[2], backgroundColor: 'white' }}
+              >
+                 <Button
                   variant="default"
                   size="icon"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDecrease(e);
                   }}
-                  className="w-5 h-5 p-0 bg-transparent text-green-600 hover:bg-green-50 shadow-none"
+                  className="w-6 h-6 p-0 shadow-none flex items-center justify-center text-lg leading-none"
                   aria-label="Decrease quantity"
                 >
                   −
                 </Button>
-                <span className="text-xs font-bold text-green-600 min-w-[1rem] text-center">
+                <span className="text-xs font-bold min-w-[1rem] text-center" style={{ color: currentTheme.primary[2] }}>
                   {inCartQty}
                 </span>
-                <Button
+                 <Button
                   variant="default"
                   size="icon"
                   disabled={product.isAvailable === false}
@@ -351,9 +372,8 @@ export default function ProductCard({
                     e.stopPropagation();
                     handleIncrease(e);
                   }}
-                  className={`w-5 h-5 p-0 bg-transparent text-green-600 shadow-none ${
-                    product.isAvailable === false ? 'text-neutral-300 cursor-not-allowed' : 'hover:bg-green-50'
-                  }`}
+                  className="w-6 h-6 p-0 shadow-none transition-colors flex items-center justify-center text-lg leading-none"
+                  style={product.isAvailable === false ? { backgroundColor: '#D4D4D4' } : {}}
                   aria-label="Increase quantity"
                 >
                   +
@@ -399,8 +419,8 @@ export default function ProductCard({
               </p>
 
               {/* 4. % OFF */}
-              {discount > 0 && (
-                <p className="text-[9px] font-semibold text-green-600 mb-0.5 leading-tight">
+               {discount > 0 && (
+                <p className="text-[9px] font-semibold mb-0.5 leading-tight" style={{ color: currentTheme.primary[2] }}>
                   {discount}% OFF
                 </p>
               )}
@@ -442,8 +462,8 @@ export default function ProductCard({
                 />
               </div>
 
-              {showStockInfo && (
-                <p className="text-xs text-green-600 mb-2 font-medium">
+               {showStockInfo && (
+                <p className="text-xs mb-2 font-medium" style={{ color: currentTheme.primary[2] }}>
                   Fast delivery
                 </p>
               )}
@@ -479,17 +499,17 @@ export default function ProductCard({
           <div className="mt-auto">
             {inCartQty === 0 ? (
               <div>
-                <Button
+                 <Button
                   ref={addButtonRef}
                   variant="outline"
                   size="sm"
                   disabled={product.isAvailable === false}
                   onClick={handleAdd}
-                  className={`w-full border h-8 text-xs font-semibold uppercase tracking-wide ${
-                    product.isAvailable === false
-                    ? 'border-neutral-300 text-neutral-400 bg-neutral-50 cursor-not-allowed'
-                    : 'border-green-600 text-green-600 hover:bg-green-50'
-                  }`}
+                  className="w-full border h-8 text-xs font-semibold uppercase tracking-wide transition-colors"
+                  style={product.isAvailable === false
+                    ? { borderColor: '#D4D4D4', color: '#A3A3A3', backgroundColor: '#F5F5F5' }
+                    : { borderColor: currentTheme.primary[2], color: currentTheme.primary[2], backgroundColor: 'transparent' }
+                  }
                 >
                   {product.isAvailable === false ? 'Out of Range' : 'Add'}
                 </Button>
@@ -497,17 +517,20 @@ export default function ProductCard({
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-2 bg-white border border-green-600 rounded-full px-2 py-0.5 h-8">
+               <div 
+                className="flex items-center justify-center gap-2 rounded-full px-2 py-0.5 h-8 border"
+                style={{ borderColor: currentTheme.primary[2], backgroundColor: 'white' }}
+              >
                 <Button
                   variant="default"
                   size="icon"
                   onClick={handleDecrease}
-                  className="w-6 h-6 p-0 bg-transparent text-green-600 hover:bg-green-50 shadow-none"
+                  className="w-7 h-7 p-0 shadow-none flex items-center justify-center text-xl leading-none"
                   aria-label="Decrease quantity"
                 >
                   −
                 </Button>
-                <span className="text-xs font-bold text-green-600 min-w-[1.5rem] text-center">
+                <span className="text-xs font-bold min-w-[1.5rem] text-center" style={{ color: currentTheme.primary[2] }}>
                   {inCartQty}
                 </span>
                 <Button
@@ -515,9 +538,8 @@ export default function ProductCard({
                   size="icon"
                   disabled={product.isAvailable === false}
                   onClick={handleIncrease}
-                  className={`w-6 h-6 p-0 bg-transparent text-green-600 shadow-none ${
-                    product.isAvailable === false ? 'text-neutral-300 cursor-not-allowed' : 'hover:bg-green-50'
-                  }`}
+                  className="w-7 h-7 p-0 shadow-none transition-colors flex items-center justify-center text-xl leading-none"
+                  style={product.isAvailable === false ? { backgroundColor: '#D4D4D4' } : {}}
                   aria-label="Increase quantity"
                 >
                   +

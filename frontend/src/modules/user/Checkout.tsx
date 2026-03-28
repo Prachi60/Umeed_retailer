@@ -7,6 +7,7 @@ import { useLocation as useLocationContext } from "../../hooks/useLocation";
 import { useToast } from "../../context/ToastContext";
 import { useAuth } from "../../context/AuthContext";
 import RazorpayCheckout from "../../components/RazorpayCheckout";
+import { useThemeContext } from "../../context/ThemeContext";
 
 // import { products } from '../../data/products'; // Removed
 import { OrderAddress, Order } from "../../types/order";
@@ -41,6 +42,7 @@ import { calculateProductPrice } from "../../utils/priceUtils";
 // Similar products helper removed - using API
 
 export default function Checkout() {
+  const { currentTheme } = useThemeContext();
   const {
     cart,
     updateQuantity,
@@ -245,7 +247,10 @@ export default function Checkout() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div 
+            className="w-12 h-12 border-4 rounded-full animate-spin mb-4"
+            style={{ borderColor: currentTheme.primary[2], borderTopColor: "transparent" }}
+          ></div>
           <p className="text-sm font-medium text-neutral-600">
             {cartLoading ? "Loading checkout..." : "Redirecting..."}
           </p>
@@ -602,8 +607,8 @@ export default function Checkout() {
 
   return (
     <div
-      className="bg-white min-h-screen flex flex-col opacity-100"
-      style={{ opacity: 1, height: "1250px" }}>
+      className="bg-white min-h-screen flex flex-col opacity-100 pb-24"
+      style={{ opacity: 1 }}>
       {/* Party Popper Animation */}
       <PartyPopper
         show={showPartyPopper}
@@ -647,7 +652,7 @@ export default function Checkout() {
                       }))
                     }
                     placeholder="Enter your full name"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-green-500 transition-colors"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                     disabled={isUpdatingProfile}
                   />
                 </div>
@@ -666,7 +671,8 @@ export default function Checkout() {
                       }))
                     }
                     placeholder="Enter your email"
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-green-500 transition-colors"
+                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                    style={{ focusBorderColor: currentTheme.primary }}
                     disabled={isUpdatingProfile}
                   />
                 </div>
@@ -695,8 +701,9 @@ export default function Checkout() {
                       !profileFormData.name.trim() ||
                       !profileFormData.email.trim()
                       ? "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-                      : "bg-green-600 text-white hover:bg-green-700"
-                      }`}>
+                      : "text-white shadow-lg"
+                      }`}
+                    style={!(isUpdatingProfile || !profileFormData.name.trim() || !profileFormData.email.trim()) ? { backgroundColor: currentTheme.primary[2] } : {}}>
                     {isUpdatingProfile ? "Saving..." : "Save & Continue"}
                   </button>
                 </div>
@@ -822,14 +829,18 @@ export default function Checkout() {
               }}>
               {/* Outer ring animation */}
               <div
-                className="absolute inset-0 w-32 h-32 rounded-full border-4 border-green-500"
+                className="absolute inset-0 w-32 h-32 rounded-full border-4"
                 style={{
+                  borderColor: currentTheme.accentColor,
                   animation: "ringPulse 1.5s ease-out infinite",
                   opacity: 0.3,
                 }}
               />
               {/* Main circle */}
-              <div className="w-32 h-32 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-2xl">
+              <div 
+                className="w-32 h-32 rounded-full flex items-center justify-center shadow-2xl"
+                style={{ background: `linear-gradient(to bottom right, ${currentTheme.accentColor}, ${currentTheme.primary[2]})` }}
+              >
                 <svg
                   className="w-16 h-16 text-white"
                   viewBox="0 0 24 24"
@@ -882,17 +893,16 @@ export default function Checkout() {
             <div
               className="mt-12 text-center"
               style={{ animation: "slideUp 0.5s ease-out 0.8s both" }}>
-              <h3 className="text-3xl font-bold text-green-600 mb-2">
+              <h3 className="text-3xl font-bold mb-2" style={{ color: currentTheme.primary[2] }}>
                 Order Placed!
               </h3>
               <p className="text-gray-600">Your order is on the way</p>
             </div>
 
-            {/* Action Button */}
             <button
               onClick={handleGoToOrders}
-              className="mt-10 bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-12 rounded-xl shadow-lg transition-all hover:shadow-xl hover:scale-105"
-              style={{ animation: "slideUp 0.5s ease-out 1s both" }}>
+              className="mt-10 text-white font-semibold py-4 px-12 rounded-xl shadow-lg transition-all hover:shadow-xl hover:scale-105"
+              style={{ backgroundColor: currentTheme.primary[2], animation: "slideUp 0.5s ease-out 1s both" }}>
               Track Your Order
             </button>
           </div>
@@ -944,7 +954,9 @@ export default function Checkout() {
                 },
               })
             }
-            className="text-xs text-green-600 font-medium hover:text-green-700 transition-colors">
+            className="text-xs font-medium transition-colors"
+            style={{ color: currentTheme.primary[2] }}
+          >
             Add details
           </button>
         </div>
@@ -964,9 +976,10 @@ export default function Checkout() {
 
           <div
             className={`border rounded-lg p-2.5 cursor-pointer transition-all ${selectedAddress && !isMapSelected
-              ? "border-green-600 bg-green-50"
+              ? "border-opacity-100"
               : "border-neutral-300 bg-white"
               }`}
+            style={selectedAddress && !isMapSelected ? { borderColor: currentTheme.primary[2], backgroundColor: `${currentTheme.primary[2]}10` } : {}}
             onClick={() => {
               setSelectedAddress(savedAddress);
               setIsMapSelected(false);
@@ -975,10 +988,11 @@ export default function Checkout() {
               <div className="flex-1">
                 <div className="flex items-center gap-1.5 mb-1">
                   <div
-                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedAddress && !isMapSelected
-                      ? "border-green-600 bg-green-600"
-                      : "border-neutral-400"
-                      }`}>
+                    className="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                    style={selectedAddress && !isMapSelected 
+                      ? { borderColor: currentTheme.primary[2], backgroundColor: currentTheme.primary[2] } 
+                      : { borderColor: "#A3A3A3" }}
+                  >
                     {selectedAddress && !isMapSelected && (
                       <svg
                         width="10"
@@ -1009,7 +1023,7 @@ export default function Checkout() {
                   {savedAddress.landmark ? (
                     <>
                       ,{" "}
-                      <span className="font-medium text-green-700">
+                      <span className="font-medium" style={{ color: currentTheme.primary[2] }}>
                         Near {savedAddress.landmark}
                       </span>
                     </>
@@ -1019,7 +1033,7 @@ export default function Checkout() {
                   , {savedAddress.city} - {savedAddress.pincode}
                 </p>
               </div>
-              <button
+                <button
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate("/checkout/address", {
@@ -1028,7 +1042,9 @@ export default function Checkout() {
                     },
                   });
                 }}
-                className="text-xs text-green-600 font-medium ml-2">
+                className="text-xs font-medium ml-2"
+                style={{ color: currentTheme.primary[2] }}
+              >
                 Edit
               </button>
             </div>
@@ -1045,10 +1061,16 @@ export default function Checkout() {
                 });
                 setShowMapPicker(true);
               }}
-              className={`flex items-center gap-3 text-base font-bold px-5 py-4 rounded-xl w-full justify-center transition-colors ${isMapSelected
-                ? "text-green-700 bg-green-100 border-2 border-green-500 ring-2 ring-green-600"
-                : "text-green-600 hover:text-green-700 bg-green-50 border-2 border-green-300 hover:bg-green-100 hover:border-green-400"
-                }`}>
+              className={`flex items-center gap-3 text-base font-bold px-5 py-4 rounded-xl w-full justify-center transition-all border-2 ${isMapSelected
+                ? "ring-2"
+                : "hover:bg-opacity-80"
+                }`}
+              style={{
+                backgroundColor: isMapSelected ? `${currentTheme.accentColor}15` : `${currentTheme.primary[2]}10`,
+                borderColor: isMapSelected ? currentTheme.accentColor : currentTheme.primary[2],
+                color: isMapSelected ? currentTheme.accentColor : currentTheme.primary[2],
+                boxShadow: isMapSelected ? `0 0 0 2px ${currentTheme.accentColor}` : "none"
+              }}>
               {isMapSelected ? (
                 <svg
                   width="24"
@@ -1101,7 +1123,10 @@ export default function Checkout() {
         <div className="bg-white rounded-lg border border-neutral-200 p-2.5">
           {/* Delivery info */}
           <div className="flex items-center gap-1.5 mb-2">
-            <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+            <div 
+              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: currentTheme.primary[2] }}
+            >
               <svg
                 width="12"
                 height="12"
@@ -1158,30 +1183,37 @@ export default function Checkout() {
                     <p className="text-[10px] text-neutral-600 mb-0.5">
                       {item.quantity} × {item.product?.pack}
                     </p>
-                    <button
+                      <button
                       onClick={(e) => {
                         e.stopPropagation();
                         const variantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id || item.variant;
                         const variantTitle = (item.product as any).variantTitle || item.product.pack;
                         handleMoveToWishlist(item.product, variantId, variantTitle);
                       }}
-                      className="text-[10px] text-green-600 font-medium mb-1.5 hover:text-green-700 transition-colors">
+                      className="text-[10px] font-medium mb-1.5 transition-colors"
+                      style={{ color: currentTheme.primary[2] }}
+                    >
                       Move to wishlist
                     </button>
 
                     {/* Quantity Selector */}
                     <div className="flex items-center justify-between mt-1.5">
-                      <div className="flex items-center gap-1.5 bg-white border-2 border-green-600 rounded-full px-1.5 py-0.5">
+                      <div 
+                        className="flex items-center gap-1.5 bg-white border-2 rounded-full px-1.5 py-0.5"
+                        style={{ borderColor: currentTheme.primary[2] }}
+                      >
                         <button
                           onClick={() => {
                             const variantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id || item.variant;
                             const variantTitle = (item.product as any).variantTitle || item.product.pack;
                             updateQuantity(item.product?.id, item.quantity - 1, variantId, variantTitle);
                           }}
-                          className="w-5 h-5 flex items-center justify-center text-green-600 font-bold hover:bg-green-50 rounded-full transition-colors text-xs">
+                          className="w-5 h-5 flex items-center justify-center font-bold rounded-full transition-colors text-xs"
+                          style={{ color: currentTheme.primary[2] }}
+                        >
                           −
                         </button>
-                        <span className="text-xs font-bold text-green-600 min-w-[1.25rem] text-center">
+                        <span className="text-xs font-bold min-w-[1.25rem] text-center" style={{ color: currentTheme.primary[2] }}>
                           {item.quantity}
                         </span>
                         <button
@@ -1190,7 +1222,9 @@ export default function Checkout() {
                             const variantTitle = (item.product as any).variantTitle || item.product.pack;
                             updateQuantity(item.product?.id, item.quantity + 1, variantId, variantTitle);
                           }}
-                          className="w-5 h-5 flex items-center justify-center text-green-600 font-bold hover:bg-green-50 rounded-full transition-colors text-xs">
+                          className="w-5 h-5 flex items-center justify-center font-bold rounded-full transition-colors text-xs"
+                          style={{ color: currentTheme.primary[2] }}
+                        >
                           +
                         </button>
                       </div>
@@ -1320,7 +1354,9 @@ export default function Checkout() {
                                 e.stopPropagation();
                                 addToCart(product, e.currentTarget);
                               }}
-                              className="bg-white/95 backdrop-blur-sm text-green-600 border-2 border-green-600 text-[10px] font-semibold px-2 py-1 rounded shadow-md hover:bg-white transition-colors">
+                              className="bg-white/95 backdrop-blur-sm text-[10px] font-semibold px-2 py-1 rounded shadow-md hover:bg-white transition-colors border-2"
+                              style={{ borderColor: currentTheme.primary[2], color: currentTheme.primary[2] }}
+                            >
                               ADD
                             </motion.button>
                           ) : (
@@ -1330,7 +1366,8 @@ export default function Checkout() {
                               animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.8 }}
                               transition={{ duration: 0.2 }}
-                              className="flex items-center gap-1 bg-green-600 rounded px-1.5 py-1 shadow-md"
+                              className="flex items-center gap-1 rounded px-1.5 py-1 shadow-md"
+                              style={{ backgroundColor: currentTheme.primary[2] }}
                               onClick={(e) => e.stopPropagation()}>
                               <motion.button
                                 whileTap={{ scale: 0.9 }}
@@ -1339,7 +1376,7 @@ export default function Checkout() {
                                   e.stopPropagation();
                                   updateQuantity(productId, inCartQty - 1);
                                 }}
-                                className="w-4 h-4 flex items-center justify-center text-white font-bold hover:bg-green-700 rounded transition-colors p-0 leading-none"
+                                className="w-4 h-4 flex items-center justify-center text-white font-bold hover:bg-black/10 rounded transition-colors p-0 leading-none"
                                 style={{ lineHeight: 1, fontSize: "14px" }}>
                                 <span className="relative top-[-1px]">−</span>
                               </motion.button>
@@ -1453,17 +1490,19 @@ export default function Checkout() {
                           }`
                         )
                       }
-                      className="w-full bg-green-100 text-green-700 text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 hover:bg-green-200 transition-colors mt-auto cursor-pointer">
+                      className="w-full text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 transition-colors mt-auto cursor-pointer"
+                      style={{ backgroundColor: `${currentTheme.primary[2]}20`, color: currentTheme.primary[2] }}
+                    >
                       <span>See more like this</span>
                       <div className="flex items-center gap-0.5">
-                        <div className="w-px h-2 bg-green-300"></div>
+                        <div className="w-px h-2" style={{ backgroundColor: `${currentTheme.primary[2]}40` }}></div>
                         <svg
                           width="6"
                           height="6"
                           viewBox="0 0 8 8"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg">
-                          <path d="M0 0L8 4L0 8Z" fill="#16a34a" />
+                          <path d="M0 0L8 4L0 8Z" fill="currentColor" />
                         </svg>
                       </div>
                     </div>
@@ -1537,9 +1576,15 @@ export default function Checkout() {
       {/* Coupon Section */}
       {selectedCoupon ? (
         <div className="px-4 py-1.5 border-b border-neutral-200">
-          <div className="flex items-center justify-between bg-green-50 rounded-lg p-2 border border-green-200">
+          <div 
+             className="flex items-center justify-between rounded-lg p-2 border"
+             style={{ backgroundColor: `${currentTheme.accentColor}10`, borderColor: `${currentTheme.accentColor}20` }}
+          >
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+              <div 
+                 className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                 style={{ backgroundColor: currentTheme.accentColor }}
+              >
                 <svg
                   width="14"
                   height="14"
@@ -1556,17 +1601,18 @@ export default function Checkout() {
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-green-700 truncate">
+                <p className="text-xs font-semibold truncate" style={{ color: currentTheme.accentColor }}>
                   {selectedCoupon.code}
                 </p>
-                <p className="text-[10px] text-green-600 truncate">
+                <p className="text-[10px] truncate" style={{ color: currentTheme.accentColor }}>
                   {selectedCoupon.title}
                 </p>
               </div>
             </div>
             <button
               onClick={handleRemoveCoupon}
-              className="text-xs text-green-600 font-medium ml-2 flex-shrink-0">
+              className="text-xs font-medium ml-2 flex-shrink-0"
+              style={{ color: currentTheme.accentColor }}>
               Remove
             </button>
           </div>
@@ -1669,8 +1715,9 @@ export default function Checkout() {
             </div>
             <div className="flex flex-col items-end">
               <span
-                className={`text-xs font-medium ${deliveryCharge === 0 ? "text-green-600" : "text-neutral-900"
-                  }`}>
+                className="text-xs font-medium"
+                style={deliveryCharge === 0 ? { color: currentTheme.primary[2] } : { color: "#171717" }}
+              >
                 {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
               </span>
               {deliveryCharge > 0 && (
@@ -1702,11 +1749,14 @@ export default function Checkout() {
                 <span className="text-xs text-neutral-700">
                   Coupon discount
                 </span>
-                <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">
+                <span 
+                   className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                   style={{ backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor }}
+                >
                   {selectedCoupon.code}
                 </span>
               </div>
-              <span className="text-xs font-medium text-green-600">
+              <span className="text-xs font-medium" style={{ color: currentTheme.accentColor }}>
                 -₹{currentCouponDiscount.toLocaleString("en-IN")}
               </span>
             </div>
@@ -1830,10 +1880,11 @@ export default function Checkout() {
               setTipAmount(20);
               setShowCustomTipInput(false);
             }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs ${tipAmount === 20 && !showCustomTipInput
-              ? "border-green-600 bg-green-50 text-green-700"
-              : "border-neutral-300 bg-white text-neutral-700"
-              }`}>
+            className="flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs transition-colors"
+            style={tipAmount === 20 && !showCustomTipInput 
+              ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor } 
+              : { borderColor: "#D4D4D4", backgroundColor: "white", color: "#404040" }}
+          >
             😊 ₹20
           </button>
           <button
@@ -1841,10 +1892,11 @@ export default function Checkout() {
               setTipAmount(30);
               setShowCustomTipInput(false);
             }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs ${tipAmount === 30 && !showCustomTipInput
-              ? "border-green-600 bg-green-50 text-green-700"
-              : "border-neutral-300 bg-white text-neutral-700"
-              }`}>
+            className="flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs transition-colors"
+            style={tipAmount === 30 && !showCustomTipInput 
+              ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor } 
+              : { borderColor: "#D4D4D4", backgroundColor: "white", color: "#404040" }}
+          >
             🤩 ₹30
           </button>
           <button
@@ -1852,10 +1904,11 @@ export default function Checkout() {
               setTipAmount(50);
               setShowCustomTipInput(false);
             }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs ${tipAmount === 50 && !showCustomTipInput
-              ? "border-green-600 bg-green-50 text-green-700"
-              : "border-neutral-300 bg-white text-neutral-700"
-              }`}>
+            className="flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs transition-colors"
+            style={tipAmount === 50 && !showCustomTipInput 
+              ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor } 
+              : { borderColor: "#D4D4D4", backgroundColor: "white", color: "#404040" }}
+          >
             😍 ₹50
           </button>
           <button
@@ -1863,10 +1916,11 @@ export default function Checkout() {
               setShowCustomTipInput(true);
               setTipAmount(null);
             }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs ${showCustomTipInput
-              ? "border-green-600 bg-green-50 text-green-700"
-              : "border-neutral-300 bg-white text-neutral-700"
-              }`}>
+            className="flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs transition-colors"
+            style={showCustomTipInput 
+              ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor } 
+              : { borderColor: "#D4D4D4", backgroundColor: "white", color: "#404040" }}
+          >
             🎁 Custom
           </button>
         </div>
@@ -1890,7 +1944,8 @@ export default function Checkout() {
                 }
               }}
               placeholder="Enter custom tip amount"
-              className="flex-1 px-3 py-1.5 bg-white border-2 border-green-600 rounded-lg text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-green-500"
+              className="flex-1 px-3 py-1.5 bg-white border-2 rounded-lg text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1"
+              style={{ borderColor: currentTheme.accentColor, ringColor: currentTheme.accentColor }}
               min="0"
               step="1"
             />
@@ -1911,16 +1966,18 @@ export default function Checkout() {
       <div className="px-4 py-2 border-b border-neutral-200">
         <button
           onClick={() => setGiftPackaging(!giftPackaging)}
-          className={`w-full flex items-center justify-between rounded-lg p-2 transition-colors ${giftPackaging
-            ? "bg-green-50 border-2 border-green-600"
-            : "bg-neutral-50 border-2 border-transparent hover:bg-neutral-100"
-            }`}>
+          className="w-full flex items-center justify-between rounded-lg p-2 transition-colors border-2"
+          style={giftPackaging 
+            ? { backgroundColor: `${currentTheme.accentColor}10`, borderColor: currentTheme.accentColor } 
+            : { backgroundColor: "#F9F9F9", borderColor: "transparent" }}
+        >
           <div className="flex items-center gap-2">
             <div
-              className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${giftPackaging
-                ? "border-green-600 bg-green-600"
-                : "border-neutral-400 bg-white"
-                }`}>
+              className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
+              style={giftPackaging 
+                ? { borderColor: currentTheme.accentColor, backgroundColor: currentTheme.accentColor } 
+                : { borderColor: "#A3A3A3", backgroundColor: "white" }}
+            >
               {giftPackaging && (
                 <svg
                   width="12"
@@ -1953,8 +2010,9 @@ export default function Checkout() {
             </svg>
             <div className="text-left">
               <p
-                className={`text-xs font-semibold ${giftPackaging ? "text-green-700" : "text-neutral-900"
-                  }`}>
+                className="text-xs font-semibold"
+                style={{ color: giftPackaging ? currentTheme.accentColor : "#171717" }}
+              >
                 Gift Packaging
               </p>
               <p className="text-[10px] text-neutral-600">
@@ -1965,7 +2023,7 @@ export default function Checkout() {
             </div>
           </div>
           {giftPackaging && (
-            <span className="text-xs font-semibold text-green-600">₹30</span>
+            <span className="text-xs font-semibold" style={{ color: currentTheme.accentColor }}>₹30</span>
           )}
         </button>
       </div>
@@ -1991,7 +2049,7 @@ export default function Checkout() {
               ❤️
             </motion.span>
             <span className="text-[10px] font-medium">by</span>
-            <span className="text-[10px] font-semibold text-green-600">
+            <span className="text-[10px] font-bold" style={{ color: currentTheme.primary[2] }}>
               Speedoo
             </span>
           </div>
@@ -2042,7 +2100,7 @@ export default function Checkout() {
                   }
                 }}
                 placeholder="Enter 15-character GSTIN"
-                className="w-full px-4 py-3 bg-white border-2 border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full px-4 py-3 bg-white border-2 border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:border-0"
                 maxLength={15}
               />
               <p className="text-xs text-neutral-500 mt-1">
@@ -2057,7 +2115,9 @@ export default function Checkout() {
                   alert("Please enter a valid 15-character GSTIN");
                 }
               }}
-              className="w-full bg-green-600 text-white py-3 px-4 font-bold text-sm uppercase tracking-wide hover:bg-green-700 transition-colors rounded-lg">
+              className="w-full text-white py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors rounded-lg shadow-md"
+              style={{ backgroundColor: currentTheme.primary[2] }}
+            >
               Save GSTIN
             </button>
             {gstin && (
@@ -2162,24 +2222,34 @@ export default function Checkout() {
           {/* Online Payment Option */}
           <div
             onClick={() => setPaymentMethod("Online")}
-            className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === "Online"
-              ? "border-green-600 bg-green-50"
-              : "border-neutral-200 bg-white"
-              }`}>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === "Online" ? "bg-green-100 text-green-600" : "bg-neutral-100 text-neutral-500"
-              }`}>
+            className="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all"
+            style={paymentMethod === "Online" 
+              ? { borderColor: currentTheme.primary[2], backgroundColor: `${currentTheme.primary[2]}10` } 
+              : { borderColor: "#E5E5E5", backgroundColor: "white" }}
+          >
+            <div 
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              style={paymentMethod === "Online" 
+                ? { backgroundColor: `${currentTheme.primary[2]}20`, color: currentTheme.primary[2] } 
+                : { backgroundColor: "#F5F5F5", color: "#737373" }}
+            >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
                 <line x1="2" y1="10" x2="22" y2="10" />
               </svg>
             </div>
             <div>
-              <span className={`text-xs font-bold block ${paymentMethod === "Online" ? "text-green-700" : "text-neutral-900"}`}>Online Payment</span>
+              <span 
+                className="text-xs font-bold block transition-colors"
+                style={{ color: paymentMethod === "Online" ? currentTheme.primary[2] : "#171717" }}
+              >
+                Online Payment
+              </span>
               <span className="text-[10px] text-neutral-500">Secure payment via Razorpay</span>
             </div>
             {paymentMethod === "Online" && (
               <div className="ml-auto">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: currentTheme.primary[2] }}>
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
@@ -2189,24 +2259,34 @@ export default function Checkout() {
           {/* COD Option */}
           <div
             onClick={() => setPaymentMethod("COD")}
-            className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === "COD"
-              ? "border-green-600 bg-green-50"
-              : "border-neutral-200 bg-white"
-              }`}>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === "COD" ? "bg-green-100 text-green-600" : "bg-neutral-100 text-neutral-500"
-              }`}>
+            className="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all"
+            style={paymentMethod === "COD" 
+              ? { borderColor: currentTheme.primary[2], backgroundColor: `${currentTheme.primary[2]}10` } 
+              : { borderColor: "#E5E5E5", backgroundColor: "white" }}
+          >
+            <div 
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              style={paymentMethod === "COD" 
+                ? { backgroundColor: `${currentTheme.primary[2]}20`, color: currentTheme.primary[2] } 
+                : { backgroundColor: "#F5F5F5", color: "#737373" }}
+            >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
                 <line x1="1" y1="10" x2="23" y2="10" />
               </svg>
             </div>
             <div>
-              <span className={`text-xs font-bold block ${paymentMethod === "COD" ? "text-green-700" : "text-neutral-900"}`}>Cash on Delivery</span>
+              <span 
+                className="text-xs font-bold block transition-colors"
+                style={{ color: paymentMethod === "COD" ? currentTheme.primary[2] : "#171717" }}
+              >
+                Cash on Delivery
+              </span>
               <span className="text-[10px] text-neutral-500">Pay when you receive your order</span>
             </div>
             {paymentMethod === "COD" && (
               <div className="ml-auto">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: currentTheme.primary[2] }}>
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
@@ -2260,16 +2340,17 @@ export default function Checkout() {
                   return (
                     <div
                       key={coupon._id}
-                      className={`border-2 rounded-lg p-2.5 transition-all ${isSelected
-                        ? "border-green-600 bg-green-50"
-                        : meetsMinOrder
-                          ? "border-neutral-200 bg-white"
-                          : "border-neutral-200 bg-neutral-50 opacity-60"
-                        }`}>
+                      className="border-2 rounded-lg p-2.5 transition-all"
+                      style={isSelected 
+                        ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10` } 
+                        : meetsMinOrder 
+                          ? { borderColor: "#E5E5E5", backgroundColor: "white" } 
+                          : { borderColor: "#E5E5E5", backgroundColor: "#F5F5F5", opacity: 0.6 }}
+                      >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-bold text-green-600">
+                            <span className="text-xs font-bold" style={{ color: currentTheme.accentColor }}>
                               {coupon.code}
                             </span>
                             <span className="text-xs font-semibold text-neutral-900">
@@ -2286,7 +2367,7 @@ export default function Checkout() {
                           )}
                         </div>
                         {isSelected ? (
-                          <div className="flex items-center gap-1 text-green-600">
+                          <div className="flex items-center gap-1" style={{ color: currentTheme.accentColor }}>
                             <svg
                               width="16"
                               height="16"
@@ -2310,9 +2391,11 @@ export default function Checkout() {
                             }
                             disabled={!meetsMinOrder || isValidatingCoupon}
                             className={`px-3 py-1 rounded text-xs font-medium transition-colors ${meetsMinOrder
-                              ? "bg-green-600 text-white hover:bg-green-700"
+                              ? "text-white shadow-md"
                               : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-                              }`}>
+                              }`}
+                              style={meetsMinOrder && !isValidatingCoupon ? { backgroundColor: currentTheme.accentColor } : {}}
+                            >
                             {isValidatingCoupon ? "..." : "Apply"}
                           </button>
                         )}
@@ -2333,9 +2416,11 @@ export default function Checkout() {
             onClick={handlePlaceOrder}
             disabled={cart.items.length === 0}
             className={`w-full py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors ${cart.items.length > 0
-              ? "bg-green-600 text-white hover:bg-green-700"
+              ? "text-white shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"
               : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-              }`}>
+              }`}
+            style={cart.items.length > 0 ? { backgroundColor: currentTheme.primary[2] } : {}}
+          >
             Place Order
           </button>
         ) : (
@@ -2347,7 +2432,9 @@ export default function Checkout() {
                 },
               })
             }
-            className="w-full bg-green-600 text-white py-3 px-4 font-bold text-sm uppercase tracking-wide hover:bg-green-700 transition-colors">
+            className="w-full text-white py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"
+            style={{ backgroundColor: currentTheme.primary[2] }}
+          >
             Choose address at next step
           </button>
         )}

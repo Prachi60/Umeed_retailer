@@ -8,12 +8,14 @@ import {
   Category as ApiCategory,
 } from "../../services/api/customerProductService";
 import { useLocation as useLocationContext } from "../../hooks/useLocation";
+import { useThemeContext } from "../../context/ThemeContext";
 
 export default function CategoryPage() {
-  const { id } = useParams<{ id: string }>();
+   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { location: userLocation } = useLocationContext();
+  const { currentTheme } = useThemeContext();
 
   const [category, setCategory] = useState<ApiCategory | null>(null);
   const [subcategories, setSubcategories] = useState<ApiCategory[]>([]);
@@ -141,9 +143,10 @@ export default function CategoryPage() {
         </div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Oops! Something went wrong</h3>
         <p className="text-gray-600 mb-6 max-w-xs">{error}</p>
-        <button
+         <button
           onClick={() => window.location.reload()}
-          className="px-6 py-2 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors"
+          className="px-6 py-2 text-white rounded-full font-medium transition-colors"
+          style={{ backgroundColor: currentTheme.primary[2] }}
         >
           Try Refreshing
         </button>
@@ -287,23 +290,29 @@ export default function CategoryPage() {
                   setSelectedSubcategory(subcat.id || subcat._id);
                 }}
                 className={`w-full flex flex-col items-center justify-center py-2 relative transition-all duration-200 group ${
-                  isSelected ? "bg-green-50" : "hover:bg-neutral-50"
+                  isSelected ? "" : "hover:bg-neutral-50"
                 }`}
                 style={{
                   minHeight: "80px",
+                  ...(isSelected ? { backgroundColor: `${currentTheme.primary[2]}10` } : {})
                 }}>
                 {/* Active Indicator - curved blob on left */}
-                {isSelected && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-green-600 rounded-r-full"></div>
+                 {isSelected && (
+                  <div 
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 rounded-r-full"
+                    style={{ backgroundColor: currentTheme.primary[2] }}
+                  ></div>
                 )}
 
                 {/* Image Container */}
-                <div
+                 <div
                   className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl mb-1.5 flex-shrink-0 overflow-hidden transition-all duration-200 shadow-sm ${
                     isSelected
-                      ? "ring-2 ring-green-600 ring-offset-2 bg-white"
+                      ? "ring-2 ring-offset-2 bg-white"
                       : "bg-neutral-50 border border-neutral-100 group-hover:shadow-md"
-                  }`}>
+                  }`}
+                  style={isSelected ? { ringColor: currentTheme.primary[2] } : {}}
+                 >
                   {subcat.image ? (
                     <img
                       src={subcat.image}
@@ -325,10 +334,10 @@ export default function CategoryPage() {
                 </div>
 
                 {/* Text Label */}
-                <span
+                 <span
                   className={`text-[10px] text-center leading-tight px-1 transition-colors ${
                     isSelected
-                      ? "font-bold text-green-700"
+                      ? "font-bold"
                       : "text-neutral-500 group-hover:text-neutral-900"
                   }`}
                   style={{
@@ -337,7 +346,8 @@ export default function CategoryPage() {
                     display: "-webkit-box",
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: "vertical",
-                    overflow: "hidden"
+                    overflow: "hidden",
+                    ...(isSelected ? { color: currentTheme.primary[2] } : {})
                   }}>
                   {subcat.name}
                 </span>
@@ -439,11 +449,13 @@ export default function CategoryPage() {
                   <button
                     key={subId}
                     onClick={() => setSelectedSubcategory(subId)}
-                    className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors flex-shrink-0 whitespace-nowrap ${
+                    className={`flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors flex-shrink-0 whitespace-nowrap border ${
                       isSelected
-                        ? "bg-white border border-neutral-300 text-neutral-900"
-                        : "bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-50"
-                    }`}>
+                        ? "bg-white"
+                        : "bg-white border-neutral-300 text-neutral-700 hover:bg-neutral-50"
+                    }`}
+                    style={isSelected ? { borderColor: currentTheme.primary[2], color: currentTheme.primary[2] } : {}}
+                  >
                     <span className="text-sm flex-shrink-0">
                       {subcat.image ? (
                         <img
@@ -469,8 +481,8 @@ export default function CategoryPage() {
             <div className="px-3 md:px-6 lg:px-8 py-4 md:py-6">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-4">
                 {categoryProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
+                   <ProductCard
+                    key={product._id}
                     product={product}
                     showHeartIcon={false}
                     showStockInfo={false}
@@ -542,12 +554,13 @@ export default function CategoryPage() {
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                       />
                     </svg>
-                    <input
+                     <input
                       type="text"
                       placeholder="Search across filters..."
                       value={filterSearchQuery}
                       onChange={(e) => setFilterSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm text-neutral-700 placeholder:text-neutral-400"
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-sm text-neutral-700 placeholder:text-neutral-400"
+                      style={{ ringColor: currentTheme.primary[2] }}
                     />
                   </div>
                 </div>
@@ -556,22 +569,26 @@ export default function CategoryPage() {
                 <div className="flex flex-1 overflow-hidden min-h-0">
                   {/* Left Column - Filter Categories */}
                   <div className="w-24 border-r border-neutral-200 flex-shrink-0 bg-neutral-50">
-                    <button
+                     <button
                       onClick={() => setSelectedFilterCategory("Type")}
                       className={`w-full px-3 py-3 text-left text-sm font-medium transition-colors ${
                         selectedFilterCategory === "Type"
-                          ? "bg-green-50 text-green-700"
+                          ? ""
                           : "text-neutral-600 hover:bg-neutral-100"
-                      }`}>
+                      }`}
+                      style={selectedFilterCategory === "Type" ? { backgroundColor: `${currentTheme.primary[2]}10`, color: currentTheme.primary[2] } : {}}
+                    >
                       Type
                     </button>
-                    <button
+                     <button
                       onClick={() => setSelectedFilterCategory("Properties")}
                       className={`w-full px-3 py-3 text-left text-sm font-medium transition-colors ${
                         selectedFilterCategory === "Properties"
-                          ? "bg-green-50 text-green-700"
+                          ? ""
                           : "text-neutral-600 hover:bg-neutral-100"
-                      }`}>
+                      }`}
+                      style={selectedFilterCategory === "Properties" ? { backgroundColor: `${currentTheme.primary[2]}10`, color: currentTheme.primary[2] } : {}}
+                    >
                       Properties
                     </button>
                   </div>
@@ -596,8 +613,11 @@ export default function CategoryPage() {
                               ({option.count})
                             </span>
                             <div className="w-5 h-5 flex items-center justify-center flex-shrink-0 ml-2">
-                              {isChecked ? (
-                                <div className="w-5 h-5 border-2 border-green-600 bg-green-600 rounded-sm flex items-center justify-center">
+                               {isChecked ? (
+                                <div 
+                                  className="w-5 h-5 border-2 rounded-sm flex items-center justify-center"
+                                  style={{ borderColor: currentTheme.primary[2], backgroundColor: currentTheme.primary[2] }}
+                                >
                                   <svg
                                     className="w-3 h-3 text-white"
                                     fill="none"
@@ -624,18 +644,21 @@ export default function CategoryPage() {
 
                 {/* Footer Buttons */}
                 <div className="px-5 py-4 border-t border-neutral-200 flex gap-3 bg-white">
-                  <button
+                   <button
                     onClick={handleClearFilters}
-                    className="flex-1 px-4 py-2.5 border border-green-600 text-green-600 rounded-lg font-medium text-sm hover:bg-green-50 transition-colors bg-white">
+                    className="flex-1 px-4 py-2.5 border rounded-lg font-medium text-sm transition-colors bg-white"
+                    style={{ borderColor: currentTheme.primary[2], color: currentTheme.primary[2] }}
+                  >
                     Clear Filter
                   </button>
-                  <button
+                   <button
                     onClick={handleApplyFilters}
                     className={`flex-1 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${
                       selectedFilters.length > 0
-                        ? "bg-green-600 text-white hover:bg-green-700"
+                        ? "text-white"
                         : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
                     }`}
+                    style={selectedFilters.length > 0 ? { backgroundColor: currentTheme.primary[2] } : {}}
                     disabled={selectedFilters.length === 0}>
                     Apply
                   </button>

@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+/* Material Symbols configuration */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+@layer utilities {
+  .tonal-carving {
+    background: linear-gradient(135deg, rgba(57, 22, 72, 0.4) 0%, rgba(26, 4, 37, 0.6) 100%);
+  }
+  .glass-card {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    background: rgba(57, 22, 72, 0.4);
+    border: 1px solid rgba(89, 62, 99, 0.15);
+  }
+}
+
 /* Prevent font flash for Rubik Doodle Shadow */
 @font-face {
   font-family: 'Rubik Doodle Shadow';

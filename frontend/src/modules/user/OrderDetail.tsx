@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Button from "../../components/ui/button";
 import { useOrders } from "../../hooks/useOrders";
 import { OrderStatus } from "../../types/order";
+import { useThemeContext } from "../../context/ThemeContext";
 import GoogleMapsTracking from "../../components/GoogleMapsTracking";
 import { useDeliveryTracking } from "../../hooks/useDeliveryTracking";
 import DeliveryPartnerCard from "../../components/DeliveryPartnerCard";
@@ -223,41 +224,48 @@ const CircleSlashIcon = ({ className }: { className?: string }) => (
 );
 
 // Animated checkmark component
-const AnimatedCheckmark = ({ delay = 0 }) => (
-  <motion.svg
-    width="80"
-    height="80"
-    viewBox="0 0 80 80"
-    initial="hidden"
-    animate="visible"
-    className="mx-auto">
-    <motion.circle
-      cx="40"
-      cy="40"
-      r="36"
-      fill="none"
-      stroke="#22c55e"
-      strokeWidth="4"
-      initial={{ pathLength: 0, opacity: 0 }}
-      animate={{ pathLength: 1, opacity: 1 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
-    />
-    <motion.path
-      d="M24 40 L35 51 L56 30"
-      fill="none"
-      stroke="#22c55e"
-      strokeWidth="4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      initial={{ pathLength: 0, opacity: 0 }}
-      animate={{ pathLength: 1, opacity: 1 }}
-      transition={{ duration: 0.4, delay: delay + 0.4, ease: "easeOut" }}
-    />
-  </motion.svg>
-);
+const AnimatedCheckmark = ({ delay = 0 }) => {
+  const { currentTheme } = useThemeContext();
+  const brandPrimary = currentTheme.primary[2] || "#F57C00";
+  
+  return (
+    <motion.svg
+      width="80"
+      height="80"
+      viewBox="0 0 80 80"
+      initial="hidden"
+      animate="visible"
+      className="mx-auto">
+      <motion.circle
+        cx="40"
+        cy="40"
+        r="36"
+        fill="none"
+        stroke={brandPrimary}
+        strokeWidth="4"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      />
+      <motion.path
+        d="M24 40 L35 51 L56 30"
+        fill="none"
+        stroke={brandPrimary}
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{ duration: 0.4, delay: delay + 0.4, ease: "easeOut" }}
+      />
+    </motion.svg>
+  );
+};
 
 // Promotional banner carousel
 const PromoCarousel = () => {
+  const { currentTheme } = useThemeContext();
+  const brandPrimary = currentTheme.primary[2] || "#F57C00";
   const [currentSlide, setCurrentSlide] = useState(0);
   const promos = [
     {
@@ -320,7 +328,10 @@ const PromoCarousel = () => {
               <p className="text-xs text-gray-600 mt-1">
                 {promos[currentSlide].subtext}
               </p>
-              <button className="text-green-700 font-medium text-sm mt-2 flex items-center gap-1">
+              <button 
+                className="font-medium text-sm mt-2 flex items-center gap-1"
+                style={{ color: brandPrimary }}
+              >
                 Apply now <ChevronRightIcon className="w-4 h-4" />
               </button>
             </div>
@@ -338,8 +349,9 @@ const PromoCarousel = () => {
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentSlide ? "bg-green-600 w-4" : "bg-gray-300"
+              index === currentSlide ? "w-4" : "bg-gray-300"
             }`}
+            style={{ backgroundColor: index === currentSlide ? brandPrimary : undefined }}
           />
         ))}
       </div>
@@ -349,6 +361,9 @@ const PromoCarousel = () => {
 
 // Tip selection component
 const TipSection = () => {
+  const { currentTheme } = useThemeContext();
+  const brandPrimary = currentTheme.primary[2] || "#F57C00";
+  const lightPrimary = currentTheme.primary[0] || "#FFF3E0";
   const [selectedTip, setSelectedTip] = useState<number | "other" | null>(null);
   const [customTip, setCustomTip] = useState("");
   const tips = [20, 30, 50];
@@ -371,11 +386,12 @@ const TipSection = () => {
               setSelectedTip(tip);
               setCustomTip("");
             }}
-            className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all ${
-              selectedTip === tip
-                ? "border-green-600 bg-green-50 text-green-700"
-                : "border-gray-200 text-gray-700 hover:border-gray-300"
-            }`}
+            className="flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all"
+            style={{
+              borderColor: selectedTip === tip ? brandPrimary : "#E5E7EB",
+              backgroundColor: selectedTip === tip ? lightPrimary : "transparent",
+              color: selectedTip === tip ? brandPrimary : "#374151"
+            }}
             whileTap={{ scale: 0.95 }}>
             ₹{tip}
           </motion.button>
@@ -384,11 +400,12 @@ const TipSection = () => {
           onClick={() => {
             setSelectedTip("other");
           }}
-          className={`flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all ${
-            selectedTip === "other"
-              ? "border-green-600 bg-green-50 text-green-700"
-              : "border-gray-200 text-gray-700 hover:border-gray-300"
-          }`}
+          className="flex-1 py-2 px-3 rounded-lg border-2 text-sm font-medium transition-all"
+          style={{
+            borderColor: selectedTip === "other" ? brandPrimary : "#E5E7EB",
+            backgroundColor: selectedTip === "other" ? lightPrimary : "transparent",
+            color: selectedTip === "other" ? brandPrimary : "#374151"
+          }}
           whileTap={{ scale: 0.95 }}>
           Other
         </motion.button>
@@ -406,7 +423,8 @@ const TipSection = () => {
               placeholder="Enter custom amount"
               value={customTip}
               onChange={(e) => setCustomTip(e.target.value)}
-              className="mt-3 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="mt-3 w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+              style={{ caretColor: brandPrimary }}
             />
           </motion.div>
         )}
@@ -448,6 +466,7 @@ const SectionItem = ({
 );
 
 export default function OrderDetail() {
+  const { currentTheme } = useThemeContext();
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const confirmed = searchParams.get("confirmed") === "true";
@@ -712,7 +731,10 @@ export default function OrderDetail() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+          <div 
+            className="animate-spin rounded-full h-8 w-8 border-b-2"
+            style={{ borderColor: currentTheme.accentColor }}
+          ></div>
           <p className="text-sm text-neutral-500">Loading order details...</p>
         </div>
       </div>
@@ -741,58 +763,58 @@ export default function OrderDetail() {
     Placed: {
       title: "Order placed",
       subtitle: "Order will reach you shortly",
-      color: "bg-green-700",
+      color: currentTheme.accentColor,
     },
     Accepted: {
       title: "Preparing your order",
       subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      color: currentTheme.accentColor,
     },
     "On the way": {
       title: "Order picked up",
       subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      color: currentTheme.accentColor,
     },
     Delivered: {
       title: "Order delivered",
       subtitle: "Enjoy your meal!",
-      color: "bg-green-600",
+      color: currentTheme.accentColor,
     },
     // Backend status mappings
     Received: {
       title: "Order received",
       subtitle: "Processing your order",
-      color: "bg-green-700",
+      color: currentTheme.accentColor,
     },
     Pending: {
       title: "Order pending",
       subtitle: "Waiting for confirmation",
-      color: "bg-yellow-600",
+      color: currentTheme.accentColor,
     },
     Processed: {
       title: "Order processed",
       subtitle: "Preparing for delivery",
-      color: "bg-green-700",
+      color: currentTheme.accentColor,
     },
     Shipped: {
       title: "Order shipped",
       subtitle: "On the way to you",
-      color: "bg-blue-600",
+      color: currentTheme.accentColor,
     },
     "Out for Delivery": {
       title: "Out for delivery",
       subtitle: `Arriving in ${estimatedTime} mins`,
-      color: "bg-green-700",
+      color: currentTheme.accentColor,
     },
     Cancelled: {
       title: "Order cancelled",
       subtitle: "This order has been cancelled",
-      color: "bg-red-600",
+      color: currentTheme.accentColor,
     },
     Returned: {
       title: "Order returned",
       subtitle: "This order has been returned",
-      color: "bg-gray-600",
+      color: currentTheme.accentColor,
     },
   };
 
@@ -833,7 +855,10 @@ export default function OrderDetail() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.5 }}
                 className="mt-8">
-                <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />
+                <div 
+                  className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto"
+                  style={{ borderColor: currentTheme.accentColor }} 
+                />
                 <p className="text-sm text-gray-500 mt-3">
                   Loading order details...
                 </p>
@@ -843,9 +868,10 @@ export default function OrderDetail() {
         )}
       </AnimatePresence>
 
-      {/* Green Header */}
+      {/* Status Header */}
       <motion.div
-        className={`${currentStatus.color} text-white sticky top-0 z-40`}
+        className="text-white sticky top-0 z-40"
+        style={{ backgroundColor: currentStatus.color }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}>
         {/* Navigation bar */}
@@ -878,15 +904,15 @@ export default function OrderDetail() {
 
           {/* Status pill */}
           <motion.div
-            className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2"
+            className="inline-flex items-center gap-2 bg-purple-900/40 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}>
-            <span className="text-sm">{currentStatus.subtitle}</span>
+            <span className="text-sm font-medium">{currentStatus.subtitle}</span>
             {(orderStatus === "Accepted" || orderStatus === "On the way") && (
               <>
-                <span className="w-1 h-1 rounded-full bg-white" />
-                <span className="text-sm text-green-200">On time</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                <span className="text-sm">On time</span>
               </>
             )}
             <motion.button
@@ -1419,7 +1445,7 @@ export default function OrderDetail() {
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  className="flex-1 text-white"
                   onClick={handleSaveSpecialRequests}>
                   Save
                 </Button>

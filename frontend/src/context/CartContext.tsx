@@ -201,8 +201,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       // Find existing item - match by product ID and variant (if variant exists)
       const existingItem = validItems.find((item) => {
-        const itemProductId = item.product.id || item.product._id;
-        if (itemProductId !== productId) return false;
+        const itemProductId = String(item.product.id || item.product._id || '');
+        const targetPid = String(productId || '');
+        if (!targetPid || !itemProductId || itemProductId !== targetPid) return false;
 
         const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
         const itemVariantTitle = (item.product as any).variantTitle || (item.product as any).pack;
@@ -221,8 +222,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       if (existingItem) {
         return validItems.map((item) => {
-          const itemProductId = item.product.id || item.product._id;
-          if (itemProductId !== productId) return item;
+          const itemProductId = String(item.product.id || item.product._id || '');
+          const targetPid = String(productId || '');
+          if (itemProductId !== targetPid) return item;
 
           const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
           const itemVariantTitle = (item.product as any).variantTitle || (item.product as any).pack;
@@ -291,8 +293,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Find item matching product ID and variant
     const itemToRemove = items.find(item => {
       if (!item?.product) return false;
-      const itemProductId = item.product.id || item.product._id;
-      if (itemProductId !== productId) return false;
+      const itemProductId = String(item.product.id || item.product._id || '');
+      const targetPid = String(productId || '');
+      if (itemProductId !== targetPid) return false;
 
       if (variantId || variantTitle) {
         const itemVariantId = (item.product as any).variantId || (item.product as any).selectedVariant?._id;
@@ -357,8 +360,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Find item matching product ID and variant (if variant info provided)
     const itemToUpdate = items.find(item => {
       if (!item?.product) return false;
-      const itemProductId = item.product.id || item.product._id;
-      if (itemProductId !== productId) return false;
+      const itemProductId = String(item.product.id || item.product._id || '');
+      const targetPid = String(productId || '');
+      if (itemProductId !== targetPid) return false;
 
       // If variant info provided, match by variant
       if (variantId || variantTitle) {
@@ -376,8 +380,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const previousItems = [...items];
     setItems((prevItems) =>
       prevItems.filter(item => item?.product).map((item) => {
-        const itemProductId = item.product.id || item.product._id;
-        if (itemProductId !== productId) return item;
+        const itemProductId = String(item.product.id || item.product._id || '');
+        const targetPid = String(productId || '');
+        if (itemProductId !== targetPid) return item;
 
         // If variant info provided, match by variant
         if (variantId || variantTitle) {

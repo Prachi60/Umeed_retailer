@@ -288,21 +288,21 @@ export default function DeliverySignUp() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header Section */}
         <div
-          className="px-6 py-4 text-center border-b border-amber-500"
+          className="px-6 py-6 text-center border-b border-orange-500"
           style={{
             backgroundColor: "#FFC107",
           }}>
-          <div className="mb-0 -mt-4">
+          <div className="mb-4">
             <img
               src={speedooLogo}
               alt="Speedoo"
-              className="h-44 w-full max-w-xs mx-auto object-fill object-bottom"
+              className="h-32 w-full max-w-xs mx-auto object-contain"
             />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-1 -mt-12">
+          <h1 className="text-3xl font-extrabold text-white mb-2">
             Delivery Sign Up
           </h1>
-          <p className="text-purple-900/70 text-sm -mt-2">
+          <p className="text-purple-900 font-bold text-sm tracking-wide">
             Create your delivery partner account
           </p>
         </div>

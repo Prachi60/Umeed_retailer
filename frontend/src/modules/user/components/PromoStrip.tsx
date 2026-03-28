@@ -774,7 +774,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                 </div>
                 {/* Discounted Price - Bright Green Banner */}
                 <div
-                  className="bg-[#7B1FA2] rounded px-2 inline-block relative -mt-0.5 z-20 shadow-sm"
+                  className="bg-[#7A3E8E] rounded px-2 inline-block relative -mt-0.5 z-20 shadow-sm"
                   style={{
                     height: "fit-content",
                     lineHeight: "1",
@@ -871,7 +871,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                     <div
                       className="w-full flex justify-center sticky top-0 z-10"
                       style={{ paddingTop: "0", transform: "translateY(-1px)" }}>
-                      <div className="bg-[#7B1FA2] text-white text-[8px] font-black px-2 py-0.5 rounded-b shadow-sm tracking-tight text-center inline-block min-w-[60px]">
+                      <div className="bg-[#7A3E8E] text-white text-[8px] font-black px-2 py-0.5 rounded-b shadow-sm tracking-tight text-center inline-block min-w-[60px]">
                         {card.badge}
                       </div>
                     </div>

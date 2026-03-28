@@ -24,7 +24,8 @@ export default function DeliveryLogin() {
     removeAuthToken();
   }, []);
 
-  const handleMobileLogin = async () => {
+  const handleMobileLogin = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (mobileNumber.length !== 10) return;
 
     setLoading(true);
@@ -46,7 +47,6 @@ export default function DeliveryLogin() {
 
       setError(message);
 
-      // Check for 400 Bad Request specific to user not found (or based on message content)
       if (
         status === 400 &&
         (message.toLowerCase().includes("not found") ||
@@ -66,19 +66,13 @@ export default function DeliveryLogin() {
     try {
       const response = await verifyOTP(mobileNumber, otp, sessionId);
       if (response.success && response.data) {
-        // Update auth context
         login(response.data.token, {
           ...response.data.user,
           userType: "Delivery",
         });
-
-        // FCM token registration is handled globally by App.tsx when auth state changes
-        // No need to call registerFCMToken here - it would cause duplicate notifications
-
         navigate("/delivery");
       }
     } catch (err: any) {
-      // Also handle 401 Unauthorized for verify step
       const message =
         err.response?.data?.message || "Invalid OTP. Please try again.";
       setError(message);
@@ -88,65 +82,84 @@ export default function DeliveryLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-purple-50 flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-surface font-body text-on-surface selection:bg-[#f57c00] selection:text-white overflow-x-hidden relative">
+      {/* Background Layer with Atmosphere */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
+        <div className="absolute top-1/2 -right-24 w-80 h-80 bg-secondary/10 rounded-full blur-[100px]"></div>
+        <div className="absolute -bottom-24 left-1/2 w-64 h-64 bg-tertiary/10 rounded-full blur-[80px]"></div>
+        <img
+          alt="Atmospheric background"
+          className="w-full h-full object-cover opacity-20 mix-blend-overlay scale-110"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRpWBPRGcBhozHGyH9G2pdRuetNAxbtOkI1NGCXS21TnZclH0hTtNqg0dQfSl-pKF-_5spRZNewO77OZlkESkaKGpmw6Qzrcf3_CiCx-kmtfF1R0NheuJ5P8lEKcOdiVfZZ7mhD6vkS5NeGY3t5Y-hHO0YwjqamWyL0P2It7rp1P9GbX9xNR9dJdxi7QSA7LFx-mM02CtwLk3JshdHOvCJu-Fqy_2kXn-4x2sZt-EO3CvKX0jZygVotlr8A5seunp2jsz8n7bRtPw"
+        />
+      </div>
+
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-neutral-50 transition-colors"
-        aria-label="Back">
+        className="absolute top-6 left-6 z-20 p-2.5 rounded-full glass-card hover:bg-surface-variant transition-all hover:scale-110 group"
+        aria-label="Back"
+      >
         <svg
-          width="20"
-          height="20"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+          className="text-[#f57c00]"
+        >
           <path
-            d="M15 18L9 12L15 6"
+            d="M15 19l-7-7 7-7"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
         </svg>
       </button>
 
-      {/* Login Card */}
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-        {/* Header Section */}
-        <div
-          className="px-6 py-4 text-center border-b border-amber-500"
-          style={{
-            backgroundColor: "#FFC107",
-          }}>
-          <div className="mb-0 -mt-4">
-            <img
-              src={speedooLogo}
-              alt="Speedoo"
-              className="h-44 w-full max-w-xs mx-auto object-fill object-bottom"
-            />
+      {/* Main Content Shell */}
+      <main className="relative z-10 flex min-h-screen items-center justify-center p-6 sm:p-8">
+        <div className="glass-card w-full max-w-[420px] rounded-3xl p-8 md:p-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] border border-white/10 animate-slide-left">
+          {/* Logo Section */}
+          <div className="flex flex-col items-center mb-10">
+            <div className="w-20 h-20 mb-4 overflow-hidden rounded-2xl ring-2 ring-[#f57c00]/20 bg-surface flex items-center justify-center p-2">
+              <img
+                src={speedooLogo}
+                alt="Speedoo Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <h1 className="font-headline text-4xl font-extrabold tracking-tighter italic text-[#f57c00]">
+              Speedoo
+            </h1>
+            <p className="font-body text-sm text-on-surface-variant/80 mt-2 tracking-wide font-medium text-center">
+              Delivery Partner Portal
+            </p>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-1 -mt-12">
-            Delivery Login
-          </h1>
-          <p className="text-purple-900/70 text-sm -mt-2">
-            Access your delivery dashboard
-          </p>
-        </div>
 
-        {/* Login Form */}
-        <div className="p-6 space-y-4">
           {!showOTP ? (
-            /* Mobile Login Form */
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Mobile Number
+            <form onSubmit={handleMobileLogin} className="space-y-6">
+              <div className="space-y-2">
+                <label
+                  className="font-label text-xs uppercase tracking-[0.15em] font-bold text-on-surface-variant ml-1"
+                  htmlFor="phone"
+                >
+                  Phone Number
                 </label>
-                <div className="flex items-center bg-white border border-neutral-300 rounded-lg overflow-hidden focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-200 transition-all">
-                  <div className="px-3 py-2.5 text-sm font-medium text-neutral-600 border-r border-neutral-300 bg-neutral-50">
-                    +91
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-1 flex items-center pointer-events-none group-focus-within:text-[#f57c00] transition-colors">
+                    <div className="flex items-center bg-[#f57c00] rounded-xl px-3 py-2 ml-1 shadow-sm">
+                      <span className="text-sm font-extrabold text-black">
+                        +91
+                      </span>
+                    </div>
                   </div>
                   <input
+                    className="w-full bg-surface-container-lowest border border-white/10 rounded-2xl py-4 pl-20 pr-4 text-on-surface placeholder:text-on-surface-variant/30 focus:ring-2 focus:ring-[#f57c00]/50 focus:bg-surface-container-low transition-all duration-300 font-medium tracking-wide"
+                    id="phone"
+                    placeholder="Enter phone number"
                     type="tel"
                     value={mobileNumber}
                     onChange={(e) =>
@@ -154,8 +167,6 @@ export default function DeliveryLogin() {
                         e.target.value.replace(/\D/g, "").slice(0, 10)
                       )
                     }
-                    placeholder="Enter mobile number"
-                    className="flex-1 px-3 py-2.5 text-sm placeholder:text-neutral-400 focus:outline-none"
                     maxLength={10}
                     disabled={loading}
                   />
@@ -163,90 +174,103 @@ export default function DeliveryLogin() {
               </div>
 
               {error && (
-                <div className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-100 flex flex-col gap-2">
-                  <span>{error}</span>
+                <div className="text-xs text-error font-bold bg-error-container/20 p-3 rounded-xl border border-error/30 flex flex-col items-center gap-3 animate-fadeIn">
+                  <span className="text-center">{error}</span>
                   {isNotRegistered && (
                     <button
+                      type="button"
                       onClick={() => navigate("/delivery/signup")}
-                      className="text-xs font-bold text-white bg-red-500 hover:bg-red-600 py-1.5 px-3 rounded self-start transition-colors">
+                      className="bg-error text-white text-[10px] uppercase tracking-tighter font-black px-4 py-1.5 rounded-full hover:bg-error-dim transition-colors"
+                    >
                       Register Now
                     </button>
                   )}
                 </div>
               )}
 
-              <button
-                onClick={handleMobileLogin}
-                disabled={mobileNumber.length !== 10 || loading}
-                className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-colors ${mobileNumber.length === 10 && !loading
-                  ? "bg-[#7B1FA2] text-white hover:bg-purple-800 shadow-md"
-                  : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
-                  }`}>
-                {loading ? "Sending..." : "Continue"}
-              </button>
-            </div>
+              <div className="pt-2">
+                <button
+                  className="w-full bg-[#f57c00] text-white border-2 border-[#d66a00] font-headline font-extrabold text-lg py-4 rounded-2xl shadow-lg active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
+                  type="submit"
+                  disabled={mobileNumber.length !== 10 || loading}
+                >
+                  {loading ? "Sending..." : "Continue"}
+                </button>
+              </div>
+            </form>
           ) : (
-            /* OTP Verification Form */
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="text-center">
-                <p className="text-sm text-neutral-600 mb-2">
-                  Enter the 4-digit OTP sent to
+                <p className="font-body text-sm text-on-surface-variant mb-2">
+                  Enter 4-digit OTP sent to
                 </p>
-                <p className="text-sm font-semibold text-neutral-800">
+                <p className="font-headline font-bold text-on-surface tracking-widest text-lg">
                   +91 {mobileNumber}
                 </p>
               </div>
 
-              <OTPInput 
-                onComplete={handleOTPComplete} 
-                disabled={loading} 
-                variant="light" 
+              <OTPInput
+                onComplete={handleOTPComplete}
+                disabled={loading}
+                variant="dark"
               />
 
               {error && (
-                <div className="text-sm text-red-600 bg-red-50 p-2 rounded text-center">
+                <div className="text-xs text-error font-bold bg-error-container/20 p-3 rounded-xl border border-error/30 text-center animate-fadeIn">
                   {error}
                 </div>
               )}
 
-              <div className="flex gap-2">
+              <div className="flex gap-4 pt-2">
                 <button
                   onClick={() => {
                     setShowOTP(false);
                     setError("");
                   }}
                   disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors border border-neutral-300">
-                  Change Number
+                  className="flex-1 py-4 rounded-xl font-headline font-bold text-sm bg-surface-variant text-on-surface-variant hover:bg-surface-bright transition-colors border border-outline-variant/30"
+                >
+                  Back
                 </button>
                 <button
-                  onClick={handleMobileLogin}
+                  onClick={() => handleMobileLogin()}
                   disabled={loading}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#7B1FA2] text-white hover:bg-purple-800 transition-colors">
-                  {loading ? "Verifying..." : "Resend OTP"}
+                  className="flex-1 py-4 rounded-xl font-headline font-bold text-sm bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors border border-outline-variant/20"
+                >
+                  {loading ? "..." : "Resend"}
                 </button>
               </div>
             </div>
           )}
 
-          {/* Sign Up Link */}
-          <div className="text-center pt-4 border-t border-neutral-200">
-            <p className="text-sm text-neutral-600">
-              Don't have a delivery partner account?{" "}
-              <button
-                onClick={() => navigate("/delivery/signup")}
-                className="text-purple-700 hover:text-purple-800 font-semibold">
-                Sign Up
-              </button>
-            </p>
+          {/* Footer links inside card */}
+          <div className="mt-10 flex flex-col items-center gap-4">
+            <div className="flex items-center gap-3 w-full">
+              <div className="h-px bg-outline-variant/15 flex-grow"></div>
+              <span className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant/50 font-bold">
+                New Partner?
+              </span>
+              <div className="h-px bg-outline-variant/15 flex-grow"></div>
+            </div>
+            <button
+              onClick={() => navigate("/delivery/signup")}
+              className="text-[#f57c00] font-label text-xs font-bold tracking-widest uppercase hover:text-[#ff9100] transition-colors"
+            >
+              Join the Fleet
+            </button>
           </div>
         </div>
-      </div>
+      </main>
 
-      {/* Footer Text */}
-      <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Speedoo's Terms of Service and Privacy Policy
-      </p>
+      {/* Decorative Corner Element */}
+      <div className="fixed bottom-10 right-10 z-10 hidden lg:block opacity-60">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant/20 bg-surface-container/30 backdrop-blur-md">
+          <span className="w-2 h-2 rounded-full bg-[#f57c00] animate-pulse shadow-[0_0_8px_rgba(245,124,0,0.8)]"></span>
+          <span className="font-label text-[10px] uppercase tracking-widest font-bold">
+            Delivering Speedoo Excellence
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,20 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useOrders } from '../../hooks/useOrders';
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'Delivered':
-      return 'bg-green-100 text-green-700';
-    case 'On the way':
-      return 'bg-blue-100 text-blue-700';
-    case 'Accepted':
-      return 'bg-[#FFFDE7] text-[#FF8F00]';
-    case 'Placed':
-      return 'bg-neutral-100 text-neutral-700';
-    default:
-      return 'bg-neutral-100 text-neutral-700';
-  }
-};
+import { useThemeContext } from '../../context/ThemeContext';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -29,9 +15,29 @@ const formatDate = (dateString: string) => {
 
 export default function Orders() {
   const { orders } = useOrders();
+  const { currentTheme } = useThemeContext();
 
-  console.log('📋 Orders component - orders:', orders);
-  console.log('📋 Orders count:', orders.length);
+  const brandPrimary = currentTheme.primary[2] || '#F57C00';
+  const brandSecondary = currentTheme.accentColor || '#7A3E8E';
+
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case 'Delivered':
+        return { backgroundColor: `${brandSecondary}15`, color: brandSecondary };
+      case 'On the way':
+      case 'Accepted':
+      case 'Out for Delivery':
+        return { backgroundColor: `${brandPrimary}15`, color: brandPrimary };
+      case 'Placed':
+      case 'Received':
+        return { backgroundColor: '#F3F4F6', color: '#374151' };
+      case 'Cancelled':
+      case 'Returned':
+        return { backgroundColor: '#FEE2E2', color: '#B91C1C' };
+      default:
+        return { backgroundColor: '#F3F4F6', color: '#374151' };
+    }
+  };
 
   if (orders.length === 0) {
     return (
@@ -41,7 +47,8 @@ export default function Orders() {
         <p className="text-neutral-600 mb-6 md:mb-8 md:text-lg">Start shopping to see your orders here!</p>
         <Link
           to="/"
-          className="inline-block bg-gradient-to-r from-[#6D0736] via-[#943521] to-[#B95F15] text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:opacity-90 transition-all md:text-lg shadow-md"
+          className="inline-block text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:opacity-90 transition-all md:text-lg shadow-md"
+          style={{ backgroundColor: brandPrimary }}
         >
           Start Shopping
         </Link>
@@ -58,6 +65,7 @@ export default function Orders() {
       <div className="px-4 md:px-6 lg:px-8 space-y-4 md:space-y-6">
         {orders.map((order) => {
           const shortId = order.id.split('-').slice(-1)[0];
+          const statusStyle = getStatusStyles(order.status);
           return (
             <Link
               key={order.id}
@@ -72,9 +80,8 @@ export default function Orders() {
                   <div className="text-xs text-neutral-500">{formatDate(order.createdAt)}</div>
                 </div>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                    order.status
-                  )}`}
+                  className="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                  style={statusStyle}
                 >
                   {order.status}
                 </span>
