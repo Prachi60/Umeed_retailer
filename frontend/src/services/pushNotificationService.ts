@@ -182,12 +182,12 @@ export function setupForegroundNotificationHandler(handler?: (payload: any) => v
         // while the user is actively using the app.
         if (Notification.permission === 'granted' && payload.notification) {
             const { title, body } = payload.notification;
-            const notificationTitle = title || 'Speeddo Notification';
+            const notificationTitle = title || 'Speedoo Notification';
             const notificationOptions = {
                 body: body,
                 icon: '/favicon.ico',
                 badge: '/favicon.ico',
-                tag: payload.data?.type || 'speeddo-general',
+                tag: payload.data?.type || 'Speedoo-general',
                 data: payload.data
             };
 

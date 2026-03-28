@@ -62,7 +62,7 @@ const RazorpayCheckout: React.FC<RazorpayCheckoutProps> = ({
                     key: razorpayKey, // Get key from backend response
                     amount: amount * 100, // Amount in paise
                     currency: 'INR',
-                    name: 'Speeddo',
+                    name: 'Speedoo',
                     description: `Order #${orderId}`,
                     order_id: razorpayOrderId,
                     prefill: {
@@ -71,7 +71,7 @@ const RazorpayCheckout: React.FC<RazorpayCheckoutProps> = ({
                         contact: customerDetails.phone,
                     },
                     theme: {
-                        color: '#16a34a', // Speeddo green
+                        color: '#16a34a', // Speedoo green
                     },
                     handler: async function (response: any) {
                         try {

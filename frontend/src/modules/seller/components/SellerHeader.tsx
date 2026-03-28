@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import kosilLogo from "@assets/kosil1.png";
+import speedooLogo from "@assets/Speedoo_logo.png";
 import { useAuth } from "../../../context/AuthContext";
 
 interface SellerHeaderProps {
@@ -106,13 +106,13 @@ export default function SellerHeader({
               </svg>
             )}
           </button>
-          {/* Speeddo Logo */}
+          {/* Speedoo Logo */}
           <button
             onClick={handleLogoClick}
             className="hover:opacity-80 transition-opacity">
             <img
-              src={kosilLogo}
-              alt="Speeddo"
+              src={speedooLogo}
+              alt="Speedoo"
               className="h-10 sm:h-12 w-auto object-contain cursor-pointer"
               style={{ maxWidth: "200px" }}
             />

@@ -15,8 +15,8 @@ const featuredCards: FeaturedCard[] = [
   {
     id: 'newly-launched',
     type: 'newly-launched',
-    bgColor: 'bg-yellow-50',
-    borderColor: 'border-yellow-200',
+    bgColor: 'bg-[#FFF3E0]',
+    borderColor: 'border-[#FFCC80]',
   },
   {
     id: 'price-drop',
@@ -89,7 +89,7 @@ export default function FeaturedThisWeek() {
       <div className="px-4">
         <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-4 px-4 scroll-smooth">
           <div className="flex-shrink-0 w-[110px]">
-            <div className="bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-50 border-2 border-yellow-300 rounded-2xl overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="bg-gradient-to-br from-[#FFF3E0] via-[#FFE0B2] to-[#FFF3E0] border-2 border-[#F57C00] rounded-2xl overflow-hidden relative h-48 shadow-lg hover:shadow-xl transition-shadow">
               <div className="absolute top-0 left-0 right-0 z-20">
                 <div className="bg-gradient-to-r from-red-600 via-orange-500 to-red-600 rounded-b-3xl px-3 py-2 text-center shadow-lg relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
@@ -99,9 +99,9 @@ export default function FeaturedThisWeek() {
                   </div>
                 </div>
               </div>
-              <div className="absolute top-12 right-2 w-8 h-8 bg-yellow-200/30 rounded-full blur-sm"></div>
+              <div className="absolute top-12 right-2 w-8 h-8 bg-[#FFCC80]/30 rounded-full blur-sm"></div>
               <div className="absolute bottom-16 left-2 w-6 h-6 bg-orange-200/30 rounded-full blur-sm"></div>
-              <div className="relative h-32 mt-10 overflow-hidden bg-yellow-50">
+              <div className="relative h-32 mt-10 overflow-hidden bg-orange-50">
                 {newlyLaunchedProducts.map((product, idx) => (
                   <div
                     key={`${product.id || idx}-${product.imageUrl || product.name}`}
@@ -123,7 +123,7 @@ export default function FeaturedThisWeek() {
                 ))}
               </div>
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20">
-                <div className="bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 px-3 py-1 rounded-full flex items-center gap-1 shadow-lg border border-amber-900/30">
+                <div className="bg-gradient-to-r from-[#EF6C00] via-[#E65100] to-[#EF6C00] px-3 py-1 rounded-full flex items-center gap-1 shadow-lg border border-[#BF360C]/30">
                   <div className="w-1 h-1 bg-white rounded-sm rotate-45 shadow-sm"></div>
                   <span className="text-white text-[8px] font-black tracking-wide">For You</span>
                   <div className="w-1 h-1 bg-white rounded-sm rotate-45 shadow-sm"></div>
@@ -145,12 +145,12 @@ export default function FeaturedThisWeek() {
                   <span className="text-white text-[9px] font-black tracking-wide">Featured</span>
                 </div>
               </div>
-              <div className="absolute top-8 right-3 w-12 h-12 bg-yellow-400/20 rounded-full blur-md"></div>
+              <div className="absolute top-8 right-3 w-12 h-12 bg-[#F57C00]/20 rounded-full blur-md"></div>
               <div className="absolute bottom-8 left-3 w-10 h-10 bg-red-500/20 rounded-full blur-md"></div>
               <div className="flex items-center justify-center h-full px-2 relative z-10">
                 <div className="text-center">
                   <div
-                    className="text-yellow-400 text-3xl font-black mb-0.5 transform group-hover:scale-105 transition-transform"
+                    className="text-[#F57C00] text-3xl font-black mb-0.5 transform group-hover:scale-105 transition-transform"
                     style={{
                       textShadow: '2px 2px 0px #1e3a8a, 3px 3px 6px rgba(0,0,0,0.3)',
                       letterSpacing: '2px'
@@ -191,7 +191,7 @@ export default function FeaturedThisWeek() {
                 </h3>
               </div>
               <div className="absolute top-14 right-2 w-6 h-6 bg-white/10 rounded-full blur-sm"></div>
-              <div className="absolute bottom-10 left-2 w-5 h-5 bg-amber-300/20 rounded-full blur-sm"></div>
+              <div className="absolute bottom-10 left-2 w-5 h-5 bg-[#FFB74D]/20 rounded-full blur-sm"></div>
               <div className="flex items-center justify-center h-full pt-12 relative z-10">
                 <div className="text-5xl transform group-hover:scale-110 transition-transform drop-shadow-2xl">
                   🎂
@@ -219,7 +219,7 @@ export default function FeaturedThisWeek() {
                 </h3>
               </div>
               <div className="absolute top-14 right-2 w-8 h-8 bg-white/20 rounded-full blur-md"></div>
-              <div className="absolute bottom-10 left-2 w-6 h-6 bg-yellow-300/30 rounded-full blur-md"></div>
+              <div className="absolute bottom-10 left-2 w-6 h-6 bg-[#F57C00]/30 rounded-full blur-md"></div>
               <div className="flex items-center justify-center h-full pt-12 relative z-10 gap-1.5">
                 <div className="text-3xl transform group-hover:scale-110 transition-transform">🍎</div>
                 <div className="text-3xl transform group-hover:scale-110 transition-transform">🍌</div>

@@ -10,7 +10,7 @@ export interface Theme {
 
 export const themes: Record<string, Theme> = {
   all: {
-    primary: ['#FFFDE7', '#FFC107', '#FF8F00', '#FFB300'],
+    primary: ['#FFF3E0', '#FFB74D', '#F57C00', '#FF9800'],
     secondary: ['#7B1FA2', '#9C27B0', '#BA68C8', '#E1BEE7'],
     textColor: '#000000',
     accentColor: '#7B1FA2',
@@ -37,8 +37,8 @@ export const themes: Record<string, Theme> = {
     headerTextColor: '#0c4a6e',
   },
   electronics: {
-    primary: ['rgb(253, 224, 71)', 'rgb(253, 230, 138)', 'rgb(254, 240, 138)', 'rgb(254, 249, 195)'],
-    secondary: ['rgb(254, 249, 195)', 'rgb(254, 240, 138)', 'rgb(253, 230, 138)'],
+    primary: ['rgb(255, 126, 0)', 'rgb(255, 145, 36)', 'rgb(255, 163, 71)', 'rgb(255, 182, 107)'],
+    secondary: ['rgb(255, 230, 195)', 'rgb(255, 210, 170)', 'rgb(255, 190, 140)'],
     textColor: '#713f12',
     accentColor: '#854d0e',
     bannerText: 'ELECTRONICS',
@@ -127,9 +127,9 @@ export const themes: Record<string, Theme> = {
     headerTextColor: '#831843',
   },
   gold: {
-    primary: ['rgb(250, 204, 21)', 'rgb(253, 224, 71)', 'rgb(254, 240, 138)', 'rgb(254, 249, 195)'],
-    secondary: ['rgb(254, 249, 195)', 'rgb(254, 240, 138)', 'rgb(253, 224, 71)'],
-    textColor: '#854d0e',
+    primary: ['#F57C00', '#FB8C00', '#FF9800', '#FFA726'],
+    secondary: ['#FFCC80', '#FFE0B2', '#FFF3E0'],
+    textColor: '#9a3412',
     accentColor: '#a16207',
     bannerText: 'GOLD',
     saleText: 'SALE',

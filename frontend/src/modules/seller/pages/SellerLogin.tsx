@@ -6,6 +6,7 @@ import {
 } from "../../../services/api/auth/sellerAuthService";
 import OTPInput from "../../../components/OTPInput";
 import { useAuth } from "../../../context/AuthContext";
+import speedooLogo from "@assets/Speedoo_logo.png";
 
 export default function SellerLogin() {
   const navigate = useNavigate();
@@ -78,8 +79,8 @@ export default function SellerLogin() {
     }
   };
 
-  const handleSpeeddoLogin = () => {
-    // Handle Speeddo login logic here
+  const handleSpeedooLogin = () => {
+    // Handle Speedoo login logic here
     navigate("/seller");
   };
 
@@ -121,8 +122,8 @@ export default function SellerLogin() {
           }}>
           <div className="mb-0 -mt-4">
             <img
-              src="/assets/kosil1.png"
-              alt="Speeddo"
+              src={speedooLogo}
+              alt="Speedoo"
               className="h-44 w-full max-w-xs mx-auto object-fill object-bottom"
             />
           </div>
@@ -191,7 +192,11 @@ export default function SellerLogin() {
                 </p>
               </div>
 
-              <OTPInput onComplete={handleOTPComplete} disabled={loading} />
+              <OTPInput 
+                onComplete={handleOTPComplete} 
+                disabled={loading} 
+                variant="light" 
+              />
 
               {error && (
                 <div className="text-sm text-red-600 bg-red-50 p-2 rounded text-center">
@@ -259,7 +264,7 @@ export default function SellerLogin() {
 
       {/* Footer Text */}
       <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Speeddo's Terms of Service and Privacy Policy
+        By continuing, you agree to Speedoo's Terms of Service and Privacy Policy
       </p>
     </div>
   );

@@ -120,7 +120,7 @@ export default function BannerFormModal({
       if (imageFile) {
         setUploading(true);
         try {
-          const uploadResult = await uploadImage(imageFile, "kosil/banners");
+          const uploadResult = await uploadImage(imageFile, "Speedoo/banners");
           imageUrl = uploadResult.secureUrl;
         } catch (error: any) {
           setErrors({

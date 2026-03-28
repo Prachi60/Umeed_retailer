@@ -322,7 +322,7 @@ export default function Account() {
               ), onClick: () => setShowGstModal(true) },
               { id: 'about', label: 'About Us', icon: (
                 <><circle cx="12" cy="12" r="10" strokeWidth="2" /><line x1="12" y1="16" x2="12" y2="12" strokeWidth="2" /><line x1="12" y1="8" x2="12.01" y2="8" strokeWidth="2" /></>
-              ), onClick: () => (window.location.href = "https://about.speeddo.com") },
+              ), onClick: () => (window.location.href = "https://about.Speedoo.com") },
             ].map((item) => (
               <button
                 key={item.id}

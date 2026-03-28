@@ -254,7 +254,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {/* Sticky Header - Show on search page and other non-home pages, excluding account page */}
           {(showHeader || isSearchPage) && (
             <header 
-              className="sticky top-0 z-50 shadow-[0_8px_30px_rgba(255,193,7,0.12)] md:top-[60px] overflow-hidden"
+              className="sticky top-0 z-50 shadow-[0_8px_30px_rgba(245,124,0,0.12)] md:top-[60px] overflow-hidden"
               style={{
                 background: `linear-gradient(to bottom, ${currentTheme.primary[0]}, ${currentTheme.primary[1]})`,
                 borderBottomLeftRadius: '1.5rem',
@@ -402,8 +402,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       >
                         {isActive('/') ? (
                           <>
-                            <path d="M2 12L12 4L22 12" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="#FFC107" />
-                            <rect x="4" y="12" width="16" height="8" fill="#FFC107" stroke="#ffffff" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 12L12 4L22 12" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="#F57C00" />
+                            <rect x="4" y="12" width="16" height="8" fill="#F57C00" stroke="#ffffff" strokeWidth="2" strokeLinejoin="round" />
                           </>
                         ) : (
                           <>
@@ -451,7 +451,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       >
                         {isActive('/order-again') ? (
                           <>
-                            <path d="M5 8V6C5 4.34315 6.34315 3 8 3H16C17.6569 3 19 4.34315 19 6V8H21C21.5523 8 22 8.44772 22 9V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V9C2 8.44772 2.44772 8 3 8H5Z" fill="#FFC107" stroke="#ffffff" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M5 8V6C5 4.34315 6.34315 3 8 3H16C17.6569 3 19 4.34315 19 6V8H21C21.5523 8 22 8.44772 22 9V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V9C2 8.44772 2.44772 8 3 8H5Z" fill="#F57C00" stroke="#ffffff" strokeWidth="2" strokeLinejoin="round" />
                             <path d="M7 8V6C7 5.44772 7.44772 5 8 5H16C16.5523 5 17 5.44772 17 6V8" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" fill="none" />
                           </>
                         ) : (
@@ -501,10 +501,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       >
                         {isCategoriesActive ? (
                           <>
-                            <circle cx="7" cy="7" r="2.5" fill="#FFC107" stroke="#ffffff" strokeWidth="2" />
+                            <circle cx="7" cy="7" r="2.5" fill="#F57C00" stroke="#ffffff" strokeWidth="2" />
                             <circle cx="17" cy="7" r="2.5" fill="#ffffff" stroke="#ffffff" strokeWidth="2" />
                             <circle cx="7" cy="17" r="2.5" fill="#ffffff" stroke="#ffffff" strokeWidth="2" />
-                            <circle cx="17" cy="17" r="2.5" fill="#FFC107" stroke="#ffffff" strokeWidth="2" />
+                            <circle cx="17" cy="17" r="2.5" fill="#F57C00" stroke="#ffffff" strokeWidth="2" />
                           </>
                         ) : (
                           <>
@@ -554,8 +554,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       >
                         {isActive('/account') ? (
                           <>
-                            <circle cx="12" cy="8" r="4" fill="#FFC107" stroke="#ffffff" strokeWidth="2" />
-                            <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" fill="#FFC107" />
+                            <circle cx="12" cy="8" r="4" fill="#F57C00" stroke="#ffffff" strokeWidth="2" />
+                            <path d="M4 20c0-4 3.5-7 8-7s8 3 8 7" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" fill="#F57C00" />
                           </>
                         ) : (
                           <>

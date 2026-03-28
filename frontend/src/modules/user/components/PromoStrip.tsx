@@ -172,7 +172,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                     categoryId: category?._id || card.categoryId, // Use _id for fetching subcategories
                     slug: category?.slug || card.categoryId, // Use slug for navigation
                     imageUrl: category?.image,
-                    bgColor: "bg-yellow-50",
+                    bgColor: "bg-orange-50",
                   };
                 });
             }
@@ -229,7 +229,7 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                 badge: "Up to 50% OFF",
                 title: c.name,
                 categoryId: c.slug || c._id,
-                bgColor: c.color || "bg-yellow-50",
+                bgColor: c.color || "bg-orange-50",
               }));
           }
 
@@ -640,8 +640,8 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
               className="flex-shrink-0">
               <path
                 d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
-                fill="#FFD700"
-                stroke="#FFA500"
+                fill="#F57C00"
+                stroke="#E65100"
                 strokeWidth="0.5"
               />
             </svg>
@@ -682,8 +682,8 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
               style={{ transform: "scaleX(-1)" }}>
               <path
                 d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
-                fill="#FFD700"
-                stroke="#FFA500"
+                fill="#F57C00"
+                stroke="#E65100"
                 strokeWidth="0.5"
               />
             </svg>
@@ -824,9 +824,9 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                         const parent = target.parentElement;
                         if (parent && !parent.querySelector('.product-fallback')) {
                           const fallback = document.createElement('div');
-                          fallback.className = 'product-fallback w-full h-full bg-gradient-to-b from-yellow-100 to-yellow-50 flex items-center justify-center';
+                          fallback.className = 'product-fallback w-full h-full bg-gradient-to-b from-orange-100 to-orange-50 flex items-center justify-center';
                           const icon = document.createElement('div');
-                          icon.className = 'w-7 h-9 bg-yellow-200 rounded-sm relative';
+                          icon.className = 'w-7 h-9 bg-orange-200 rounded-sm relative';
                           icon.innerHTML = `
                             <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-blue-400 rounded-full"></div>
                             <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-white/80"></div>
@@ -837,8 +837,8 @@ export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
                       }}
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-b from-yellow-100 to-yellow-50 flex items-center justify-center">
-                      <div className="w-7 h-9 bg-yellow-200 rounded-sm relative">
+                    <div className="w-full h-full bg-gradient-to-b from-orange-100 to-orange-50 flex items-center justify-center">
+                      <div className="w-7 h-9 bg-orange-200 rounded-sm relative">
                         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-blue-400 rounded-full"></div>
                         <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/80"></div>
                       </div>

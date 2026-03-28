@@ -25,7 +25,7 @@ export default function DeliveryHeader({ userName }: DeliveryHeaderProps) {
         <h1 className={`text-xl font-bold text-center mb-3 transition-colors ${
           isOnline ? 'text-purple-600' : 'text-neutral-500'
         }`}>
-          Delivery App
+          Speedoo Delivery
         </h1>
         
         {/* User Info Bar */}

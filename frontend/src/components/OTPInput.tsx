@@ -4,9 +4,15 @@ interface OTPInputProps {
   length?: number;
   onComplete: (otp: string) => void;
   disabled?: boolean;
+  variant?: 'light' | 'dark';
 }
 
-export default function OTPInput({ length = 4, onComplete, disabled = false }: OTPInputProps) {
+export default function OTPInput({ 
+  length = 4, 
+  onComplete, 
+  disabled = false,
+  variant = 'dark' 
+}: OTPInputProps) {
   const [otp, setOtp] = useState<string[]>(Array(length).fill(''));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -65,6 +71,10 @@ export default function OTPInput({ length = 4, onComplete, disabled = false }: O
     }
   };
 
+  const inputClasses = variant === 'dark' 
+    ? "bg-white/10 text-white border-white/20 focus:border-white focus:ring-white/20"
+    : "bg-neutral-50 text-neutral-900 border-neutral-300 focus:border-purple-500 focus:ring-purple-200";
+
   return (
     <div className="flex gap-2 justify-center">
       {otp.map((digit, index) => (
@@ -79,7 +89,7 @@ export default function OTPInput({ length = 4, onComplete, disabled = false }: O
           onKeyDown={(e) => handleKeyDown(index, e)}
           onPaste={handlePaste}
           disabled={disabled}
-          className="w-12 h-12 text-center text-lg font-semibold border-2 border-neutral-300 rounded-lg focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-colors disabled:bg-neutral-100 disabled:cursor-not-allowed"
+          className={`w-12 h-12 text-center text-lg font-bold border rounded-xl outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm ${inputClasses}`}
         />
       ))}
     </div>

@@ -66,7 +66,7 @@ const faqData: FAQItem[] = [
     id: "10",
     question: "What if I receive a damaged or wrong item?",
     answer:
-      "If you receive a damaged or incorrect item, please contact our customer support immediately. We offer 48-hour replacement guarantee. You can report the issue through the order details page or contact us at help@speeddo.com.",
+      "If you receive a damaged or incorrect item, please contact our customer support immediately. We offer 48-hour replacement guarantee. You can report the issue through the order details page or contact us at help@Speedoo.com.",
   },
   {
     id: "11",
@@ -217,7 +217,7 @@ export default function FAQ() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <a
-                  href="mailto:help@speeddo.com"
+                  href="mailto:help@Speedoo.com"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#6D0736] via-[#943521] to-[#B95F15] text-white rounded-lg font-semibold hover:opacity-90 transition-all text-sm shadow-md">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path

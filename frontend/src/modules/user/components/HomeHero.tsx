@@ -357,7 +357,7 @@ export default function HomeHero({
         marginBottom: 0,
         borderBottomLeftRadius: '2.5rem',
         borderBottomRightRadius: '2.5rem',
-        boxShadow: '0 10px 40px rgba(255, 193, 7, 0.15)',
+        boxShadow: '0 10px 40px rgba(245, 124, 0, 0.15)',
       }}>
       {/* Premium Glow Overlay */}
       <div 
@@ -376,7 +376,7 @@ export default function HomeHero({
             <div className="flex-1 pr-2">
               {/* Service name - small, dark */}
               <div className="text-neutral-800 font-medium text-[10px] md:text-xs mb-0 leading-tight">
-                Speeddo
+                Speedoo
               </div>
               {/* Delivery time - large, bold, dark grey/black */}
               <div className="text-neutral-900 font-extrabold text-2xl md:text-xl mb-0 md:mb-0.5 leading-tight">

@@ -190,7 +190,7 @@ const ProductCard = memo(({
         </div>
 
         {/* Product Details */}
-        <div className="p-1.5 flex-1 flex flex-col min-h-0" style={{ background: '#fef9e7' }}>
+        <div className="p-1.5 flex-1 flex flex-col min-h-0" style={{ background: '#fff3e0' }}>
           {/* Light Grey Tags */}
           <div className="flex gap-0.5 mb-0.5">
             <div className="bg-neutral-200 text-neutral-700 text-[8px] font-medium px-1 py-0.5 rounded">
@@ -219,7 +219,7 @@ const ProductCard = memo(({
                   width="8"
                   height="8"
                   viewBox="0 0 24 24"
-                  fill={i < 4 ? '#fbbf24' : '#e5e7eb'}
+                  fill={i < 4 ? '#F57C00' : '#e5e7eb'}
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />

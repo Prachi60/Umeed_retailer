@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../context/CartContext";
 import { useOrders } from "../../hooks/useOrders";
@@ -53,8 +53,9 @@ export default function Checkout() {
   const { addOrder } = useOrders();
   const { location: userLocation } = useLocationContext();
   const { showToast: showGlobalToast } = useToast();
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [tipAmount, setTipAmount] = useState<number | null>(null);
   const [customTipAmount, setCustomTipAmount] = useState<number>(0);
   const [showCustomTipInput, setShowCustomTipInput] = useState(false);
@@ -109,18 +110,29 @@ export default function Checkout() {
 
   // Check if user has placeholder data (needs profile completion)
   const isPlaceholderUser =
-    user?.name === "User" || user?.email?.endsWith("@kosil.temp");
+    user?.name === "User" || user?.email?.endsWith("@Speedoo.temp");
 
-  // Redirect if empty
+  // Redirect if empty OR not authenticated
   useEffect(() => {
-    if (!cartLoading && cart.items.length === 0 && !showOrderSuccess) {
-      navigate("/");
+    if (!cartLoading && !showOrderSuccess) {
+      if (!isAuthenticated) {
+        // Encode current path to return after login
+        const redirectPath = encodeURIComponent(location.pathname + location.search);
+        navigate(`/login?redirect=${redirectPath}`);
+        return;
+      }
+      
+      if (cart.items.length === 0) {
+        navigate("/");
+      }
     }
-  }, [cart.items.length, cartLoading, navigate, showOrderSuccess]);
+  }, [cart.items.length, cartLoading, navigate, showOrderSuccess, isAuthenticated, location.pathname, location.search]);
 
-  // Load addresses and coupons
+  // Load addresses and coupons (only if authenticated)
   useEffect(() => {
     const fetchInitialData = async () => {
+      if (!isAuthenticated) return;
+      
       try {
         const [addressResponse, couponResponse] = await Promise.all([
           getAddresses(),
@@ -157,7 +169,7 @@ export default function Checkout() {
           setAvailableCoupons(couponResponse.data);
         }
       } catch (error) {
-        console.error("Error loading checkout data:", error);
+        alert("Error loading Speedoo data. Please check your connection.");
       }
     };
     fetchInitialData();
@@ -398,7 +410,7 @@ export default function Checkout() {
     if (!bypassProfileCheck && isPlaceholderUser) {
       setProfileFormData({
         name: user?.name === "User" ? "" : user?.name || "",
-        email: user?.email?.endsWith("@kosil.temp") ? "" : user?.email || "",
+        email: user?.email?.endsWith("@Speedoo.temp") ? "" : user?.email || "",
       });
       setShowProfileModal(true);
       return;
@@ -1967,7 +1979,7 @@ export default function Checkout() {
         </button>
       </div>
 
-      {/* Made with love by Speeddo */}
+      {/* Made with love by Speedoo */}
       <div className="px-4 py-2">
         <div className="w-full flex flex-col items-center justify-center">
           <div className="flex items-center gap-1.5 text-neutral-500">
@@ -1980,7 +1992,7 @@ export default function Checkout() {
             </motion.span>
             <span className="text-[10px] font-medium">by</span>
             <span className="text-[10px] font-semibold text-green-600">
-              Speeddo
+              Speedoo
             </span>
           </div>
         </div>
@@ -2134,7 +2146,7 @@ export default function Checkout() {
                 </h3>
                 <p>
                   For any cancellation requests or queries, please contact our
-                  customer support team at support@speeddo.com or call
+                  customer support team at support@Speedoo.com or call
                   +91-XXXXX-XXXXX
                 </p>
               </div>
