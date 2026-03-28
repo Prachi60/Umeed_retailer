@@ -1944,7 +1944,7 @@ export default function Checkout() {
               }}
               placeholder="Enter custom tip amount"
               className="flex-1 px-3 py-1.5 bg-white border-2 rounded-lg text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1"
-              style={{ borderColor: currentTheme.accentColor, ringColor: currentTheme.accentColor }}
+              style={{ borderColor: currentTheme.accentColor }}
               min="0"
               step="1"
             />

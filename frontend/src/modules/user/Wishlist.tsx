@@ -108,7 +108,6 @@ export default function Wishlist() {
                   >
                     {/* Remove Button */}
                     <motion.button
-                      whileHold={{ scale: 0.9 }}
                       whileTap={{ scale: 0.8 }}
                       onClick={() => handleRemove(product.id)}
                       className="absolute top-2 right-2 z-10 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 shadow-md border border-red-50 hover:bg-red-50 transition-colors"

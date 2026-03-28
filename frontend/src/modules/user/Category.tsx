@@ -311,7 +311,7 @@ export default function CategoryPage() {
                       ? "ring-2 ring-offset-2 bg-white"
                       : "bg-neutral-50 border border-neutral-100 group-hover:shadow-md"
                   }`}
-                  style={isSelected ? { ringColor: currentTheme.primary[2] } : {}}
+                  style={isSelected ? { backgroundColor: `${currentTheme.primary[2]}10`, borderColor: currentTheme.primary[2] } : {}}
                  >
                   {subcat.image ? (
                     <img
@@ -560,7 +560,7 @@ export default function CategoryPage() {
                       value={filterSearchQuery}
                       onChange={(e) => setFilterSearchQuery(e.target.value)}
                       className="w-full pl-10 pr-4 py-2.5 bg-white border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-sm text-neutral-700 placeholder:text-neutral-400"
-                      style={{ ringColor: currentTheme.primary[2] }}
+                      style={{ borderColor: currentTheme.primary[2] }}
                     />
                   </div>
                 </div>
