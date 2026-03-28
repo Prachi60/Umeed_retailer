@@ -1,7 +1,8 @@
+
 # Dependencies
 node_modules/
 
-# TypeScript build output
+# Build output
 dist/
 *.tsbuildinfo
 
@@ -29,6 +30,16 @@ Thumbs.db
 *.swp
 *.swo
 
-# Firebase
+# Firebase (sensitive)
 config/firebase-service-account.json
-*.json
+
+# Coverage & temp
+coverage/
+tmp/
+temp/
+
+# Cache
+.cache/
+
+# Security
+*.pem
