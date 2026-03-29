@@ -51,9 +51,7 @@
     "@types/range-parser": "^1.2.7",
     "@types/send": "^1.2.1",
     "@types/serve-static": "^2.2.0",
-    "@types/tough-cookie": "^4.0.5",
-    "@types/webidl-conversions": "^7.0.3",
-    "@types/whatwg-url": "^13.0.0",
+    "@types/node": "^20.19.37",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.8.0",
@@ -71,7 +69,5 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
-  "devDependencies": {
-    "@types/node": "^25.5.0"
-  }
+  "devDependencies": {}
 }

@@ -26,8 +26,8 @@ export const isOriginAllowed = (origin: string | undefined): boolean => {
     const frontendUrl = process.env.FRONTEND_URL || '';
     const allowedOrigins = frontendUrl
       .split(',')
-      .map((url) => url.trim().replace(/\/$/, '')) // Remove trailing slashes
-      .filter((url) => url.length > 0);
+      .map((url: string) => url.trim().replace(/\/$/, '')) // Remove trailing slashes
+      .filter((url: string) => url.length > 0);
 
     // Default production origins (explicitly include www.kosil.com)
     const defaultOrigins = [
