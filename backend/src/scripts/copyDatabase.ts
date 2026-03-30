@@ -80,7 +80,7 @@ async function copyDatabase() {
                     const { v, ns, ...indexSpec } = index;
                     await destCol.createIndex(indexSpec.key, indexSpec);
                     console.log(`  - Created index: ${index.name}`);
-                } catch (idxErr) {
+                } catch (idxErr: any) {
                     console.error(`  - Failed to create index ${index.name}:`, idxErr.message);
                 }
             }

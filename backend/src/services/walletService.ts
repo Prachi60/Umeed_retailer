@@ -105,7 +105,7 @@ export const calculateSellerEarnings = async (
   const commissions = await Commission.find(query);
 
   const totalEarnings = commissions.reduce(
-    (sum, c) => sum + c.commissionAmount,
+    (sum: number, c: any) => sum + c.commissionAmount,
     0
   );
   const totalOrders = commissions.length;

@@ -49,7 +49,7 @@ export async function findAvailableDeliveryBoys(): Promise<mongoose.Types.Object
             status: 'Active',
         }).select('_id');
 
-        return deliveryBoys.map(db => db._id);
+        return deliveryBoys.map((db: any) => db._id);
     } catch (error) {
         console.error('Error finding available delivery boys:', error);
         return [];
@@ -114,7 +114,7 @@ export async function findDeliveryBoysNearLocation(
         }
 
         // Get latest locations for these delivery boys from DeliveryTracking
-        const deliveryBoyIds = allDeliveryBoys.map(db => db._id);
+        const deliveryBoyIds = allDeliveryBoys.map((db: any) => db._id);
 
         // Get the most recent tracking record for each delivery boy
         const trackingRecords = await DeliveryTracking.aggregate([
@@ -159,7 +159,7 @@ export async function findDeliveryBoysNearLocation(
 
         // Also include delivery boys who don't have tracking data yet (they might be new)
         // but give them a default distance
-        const trackedIds = new Set(trackingRecords.map(r => r._id.toString()));
+        const trackedIds = new Set(trackingRecords.map((r: any) => r._id.toString()));
         for (const db of allDeliveryBoys) {
             if (!trackedIds.has(db._id.toString())) {
                 // Include untracked delivery boys with a default distance
@@ -291,7 +291,7 @@ export async function notifyDeliveryBoysOfNewOrder(
         }).distinct('deliveryBoy');
 
         if (busyDeliveryBoys.length > 0) {
-            const busyIdsSet = new Set(busyDeliveryBoys.map(id => id.toString()));
+            const busyIdsSet = new Set(busyDeliveryBoys.map((id: any) => id.toString()));
 
             const originalCount = nearbyDeliveryBoyIds.length;
             nearbyDeliveryBoyIds = nearbyDeliveryBoyIds.filter(id => !busyIdsSet.has(id.toString()));

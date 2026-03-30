@@ -60,9 +60,9 @@ export const creditWallet = async (
                 platformWallet.deliveryBoyPendingPayouts += amount;
             }
             if (session) {
-                await platformWallet.save({ session });
+                await (platformWallet as any).save({ session });
             } else {
-                await platformWallet.save();
+                await (platformWallet as any).save();
             }
         } catch (pwError) {
             console.error("Error updating platform wallet in creditWallet:", pwError);
@@ -143,9 +143,9 @@ export const debitWallet = async (
                 platformWallet.deliveryBoyPendingPayouts = Math.max(0, platformWallet.deliveryBoyPendingPayouts - amount);
             }
             if (session) {
-                await platformWallet.save({ session });
+                await (platformWallet as any).save({ session });
             } else {
-                await platformWallet.save();
+                await (platformWallet as any).save();
             }
         } catch (pwError) {
             console.error("Error updating platform wallet in debitWallet:", pwError);

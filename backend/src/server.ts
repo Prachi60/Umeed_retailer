@@ -28,7 +28,7 @@ const allowedOrigins = [
   "https://kosil.biz/",
   // Add more origins from environment variable if needed
   ...(process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL.split(",").map((url) => url.trim())
+    ? process.env.FRONTEND_URL.split(",").map((url: string) => url.trim())
     : []),
 ];
 
@@ -106,7 +106,7 @@ app.get("/", (_req: Request, res: Response) => {
 });
 
 // Debug middleware - log all incoming requests
-app.use((req: Request, _res: Response, next) => {
+app.use((req: Request, _res: Response, next: express.NextFunction) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });

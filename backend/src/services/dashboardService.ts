@@ -55,7 +55,7 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     ] = await Promise.all([
       Customer.countDocuments({ status: "Active" }).catch(() => 0),
       Category.countDocuments().catch(() => 0),
-      SubCategory.countDocuments().catch((err) => {
+      SubCategory.countDocuments().catch((err: any) => {
         console.error("Error counting subcategories:", err);
         return 0;
       }),
@@ -198,12 +198,12 @@ export const getSalesAnalytics = async (
     ]).catch(() => []),
   ]);
 
-  const thisPeriod = (thisPeriodData || []).map((item) => ({
+  const thisPeriod = (thisPeriodData || []).map((item: any) => ({
     date: item._id || "",
     value: item.total || 0,
   }));
 
-  const lastPeriod = (lastPeriodData || []).map((item) => ({
+  const lastPeriod = (lastPeriodData || []).map((item: any) => ({
     date: item._id || "",
     value: item.total || 0,
   }));

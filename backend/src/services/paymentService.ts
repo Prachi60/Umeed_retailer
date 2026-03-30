@@ -153,9 +153,9 @@ export const capturePayment = async (
             platformWallet.currentPlatformBalance += order.total;
 
             if (session) {
-                await platformWallet.save({ session });
+                await (platformWallet as any).save({ session });
             } else {
-                await platformWallet.save();
+                await (platformWallet as any).save();
             }
         } catch (pwError) {
             console.error("Error updating platform wallet in capturePayment:", pwError);
