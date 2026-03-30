@@ -499,7 +499,7 @@ export const distributeCommissions = async (orderId: string) => {
             const breakdown = await calculateOrderBreakdown(orderId, session);
 
             platformWallet.totalAdminEarning += breakdown.totalAdminEarning;
-            await platformWallet.save({ session });
+            await (platformWallet as any).save({ session });
         } catch (pwError) {
             console.error("Error updating platform wallet admin earnings in distributeCommissions:", pwError);
         }
@@ -554,11 +554,10 @@ export const processPendingCODPayouts = async (
 
         // Filter out commissions where order didn't match the populate criteria
         const validCommissions = pendingCommissions.filter(
-            (comm) => comm.order !== null,
+            (comm: any) => comm.order !== null,
         );
 
         const processedOrders = new Set<string>();
-        const PlatformWallet = (await import("../models/PlatformWallet")).default;
         let platformWallet = await PlatformWallet.findOne().session(session || null);
 
         for (const comm of validCommissions) {
@@ -600,7 +599,7 @@ export const processPendingCODPayouts = async (
                     if (platformWallet) {
                         const breakdown = await calculateOrderBreakdown(order._id.toString(), session);
 
-                        platformWallet.totalAdminEarning += breakdown.totalAdminEarning;
+                        (platformWallet as any).totalAdminEarning += breakdown.totalAdminEarning;
                     }
                 }
 
@@ -610,7 +609,7 @@ export const processPendingCODPayouts = async (
         }
 
         if (platformWallet) {
-            await platformWallet.save({ session });
+            await (platformWallet as any).save({ session });
         }
 
         console.log(
@@ -646,7 +645,7 @@ export const getCommissionSummary = async (
             paid: 0,
             pending: 0,
             count: commissions.length,
-            commissions: commissions.map((c) => ({
+            commissions: commissions.map((c: any) => ({
                 id: c._id,
                 orderId: c.order,
                 amount: c.commissionAmount,
@@ -658,7 +657,7 @@ export const getCommissionSummary = async (
             })),
         };
 
-        commissions.forEach((c) => {
+        commissions.forEach((c: any) => {
             // For Sellers, earning is Order Amount - Commission Amount
             // For Delivery Boys, earning is the Commission Amount itself
             const earningAmount =

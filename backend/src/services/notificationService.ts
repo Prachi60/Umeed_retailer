@@ -74,19 +74,19 @@ export const sendBroadcastNotification = async (
   switch (recipientType) {
     case "Admin":
       const admins = await Admin.find().select("_id");
-      userIds = admins.map((a) => a._id.toString());
+      userIds = admins.map((a: any) => a._id.toString());
       break;
     case "Seller":
       const sellers = await Seller.find().select("_id");
-      userIds = sellers.map((s) => s._id.toString());
+      userIds = sellers.map((s: any) => s._id.toString());
       break;
     case "Customer":
       const customers = await Customer.find().select("_id");
-      userIds = customers.map((c) => c._id.toString());
+      userIds = customers.map((c: any) => c._id.toString());
       break;
     case "Delivery":
       const deliveries = await Delivery.find().select("_id");
-      userIds = deliveries.map((d) => d._id.toString());
+      userIds = deliveries.map((d: any) => d._id.toString());
       break;
   }
 

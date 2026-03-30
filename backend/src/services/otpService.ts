@@ -131,7 +131,7 @@ async function sendSmsViaApi(mobile: string, message: string): Promise<void> {
 
   const response = await axios.get<SmsIndiaHubResponse>(SMS_INDIA_HUB_API_URL, {
     params,
-    paramsSerializer: (params) => {
+    paramsSerializer: (params: any) => {
       return Object.keys(params)
         .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
         .join('&');

@@ -39,7 +39,7 @@ const calculateETA = (distanceInMeters: number): number => {
 export const initializeSocket = (httpServer: HttpServer) => {
     const io = new SocketIOServer(httpServer, {
         cors: {
-            origin: (origin, callback) => {
+            origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
                 // Allow requests with no origin (like mobile apps or server-to-server)
                 if (!origin) return callback(null, true);
 
@@ -49,8 +49,8 @@ export const initializeSocket = (httpServer: HttpServer) => {
                     const frontendUrl = process.env.FRONTEND_URL || "";
                     const allowedOrigins = frontendUrl
                         .split(",")
-                        .map((url) => url.trim())
-                        .filter((url) => url.length > 0);
+                        .map((url: string) => url.trim())
+                        .filter((url: string) => url.length > 0);
 
                     // Default production origins if FRONTEND_URL not set
                     const defaultOrigins = [
@@ -118,7 +118,7 @@ export const initializeSocket = (httpServer: HttpServer) => {
     });
 
     // Authentication middleware
-    io.use((socket, next) => {
+    io.use((socket: any, next: (err?: Error) => void) => {
         const token = socket.handshake.auth.token;
 
         if (!token) {
@@ -135,7 +135,7 @@ export const initializeSocket = (httpServer: HttpServer) => {
         }
     });
 
-    io.on('connection', (socket) => {
+    io.on('connection', (socket: any) => {
         console.log('✅ Socket connected:', socket.id, 'User:', (socket as any).user?.userId || 'Unauthenticated');
 
         // Customer subscribes to order tracking
@@ -337,17 +337,17 @@ export const initializeSocket = (httpServer: HttpServer) => {
         });
 
         // Handle disconnection
-        socket.on('disconnect', (reason) => {
+        socket.on('disconnect', (reason: string) => {
             console.log('❌ Socket disconnected:', socket.id, 'Reason:', reason);
         });
 
         // Error handling
-        socket.on('error', (error) => {
+        socket.on('error', (error: any) => {
             console.error('Socket error:', error);
         });
 
         // Handle connection errors
-        socket.on('connect_error', (error) => {
+        socket.on('connect_error', (error: any) => {
             console.error('Socket connection error:', error.message);
         });
     });
