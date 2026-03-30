@@ -69,7 +69,7 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen w-full relative overflow-hidden flex flex-col justify-end p-8 pb-16">
+    <div className="h-screen w-full relative overflow-hidden flex flex-col justify-end p-8 pb-16 bg-neutral-950">
       {/* Full-screen Background Video */}
       <video
         ref={videoRef}
@@ -78,11 +78,12 @@ export default function Login() {
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-0 transition-opacity duration-1000"
+        onCanPlay={(e) => (e.currentTarget.style.opacity = "1")}
       />
 
       {/* Subtle Bottom Gradient for text readability */}
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent z-10 pointer-events-none" />
 
       {/* Back Button */}
       <button
