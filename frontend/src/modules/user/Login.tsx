@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import videoSrc from "../../assets/login/Mobile_Responsive_Logo_Video_Creation.mp4";
+import videoSrc from "@assets/login/Mobile_Responsive_Logo_Video_Creation.mp4";
 import {
   sendOTP,
   verifyOTP,
