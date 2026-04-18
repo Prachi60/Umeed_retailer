@@ -8,7 +8,7 @@ import OTPInput from "../../../components/OTPInput";
 import { useAuth } from "../../../context/AuthContext";
 import { removeAuthToken } from "../../../services/api/config";
 import speedooLogo from "@assets/Speedoo_logo.png";
-import videoSrc from "@assets/login/LatestLoginVideo2.mp4";
+import videoSrc from "@assets/login/loginvideo.mp4";
 
 export default function DeliveryLogin() {
   const navigate = useNavigate();

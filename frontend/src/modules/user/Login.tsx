@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import speedooLogo from "@assets/Speedoo_logo.png";
-import videoSrc from "@assets/login/LatestLoginVideo2.mp4";
+import videoSrc from "@assets/login/loginvideo.mp4";
 import {
   sendOTP,
   verifyOTP,

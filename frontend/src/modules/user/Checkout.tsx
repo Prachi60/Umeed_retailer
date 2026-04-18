@@ -2404,10 +2404,10 @@ export default function Checkout() {
             onClick={handlePlaceOrder}
             disabled={cart.items.length === 0}
             className={`w-full py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors ${cart.items.length > 0
-              ? "text-white shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"
+              ? "text-black shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"
               : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
               }`}
-            style={cart.items.length > 0 ? { backgroundColor: currentTheme.primary[2] } : {}}
+            style={cart.items.length > 0 ? { backgroundColor: "#FFD814" } : {}}
           >
             Place Order
           </button>
@@ -2420,8 +2420,8 @@ export default function Checkout() {
                 },
               })
             }
-            className="w-full text-white py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"
-            style={{ backgroundColor: currentTheme.primary[2] }}
+            className="w-full text-black py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"
+            style={{ backgroundColor: "#FFD814" }}
           >
             Choose address at next step
           </button>
