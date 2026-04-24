@@ -77,25 +77,6 @@ export default function Account() {
   if (!user) {
     return (
       <div className="pb-24 md:pb-8 bg-white min-h-screen">
-        <div className="bg-[#9048A5] sticky top-0 z-10 shadow-sm">
-          <div className="px-4 py-3 flex items-center gap-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="text-white p-1 rounded-full hover:bg-black/10 transition-colors"
-              aria-label="Back">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M15 18L9 12L15 6"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <h1 className="text-lg font-bold text-white tracking-tight">Account</h1>
-          </div>
-        </div>
         <div className="bg-gradient-to-b from-purple-50 to-white pb-6 md:pb-8 pt-8">
           <div className="px-4 md:px-6 lg:px-8">
             <div className="flex flex-col items-center mb-4 md:mb-6">

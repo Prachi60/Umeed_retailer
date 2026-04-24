@@ -5,6 +5,7 @@ import { getProducts } from '../../../services/api/customerProductService';
 
 import { getTheme } from '../../../utils/themes';
 import { useCart } from '../../../context/CartContext';
+import { useThemeContext } from '../../../context/ThemeContext';
 import { Product } from '../../../types/domain';
 import { useWishlist } from '../../../hooks/useWishlist';
 import { calculateProductPrice } from '../../../utils/priceUtils';
@@ -284,7 +285,7 @@ const ProductCard = memo(({
 ProductCard.displayName = 'ProductCard';
 
 export default function LowestPricesEver({ activeTab = 'all', products: adminProducts }: LowestPricesEverProps) {
-  const theme = getTheme(activeTab);
+  const { currentTheme: theme } = useThemeContext();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { cart } = useCart();
   const [fontLoaded, setFontLoaded] = useState(false);

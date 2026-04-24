@@ -199,16 +199,27 @@ export default function Checkout() {
                 (product.categoryId as any).id;
           }
 
+          const params: any = { limit: 10 };
+          if (userLocation?.latitude && userLocation?.longitude) {
+            params.latitude = userLocation.latitude;
+            params.longitude = userLocation.longitude;
+          }
+
           if (catId) {
-            response = await getProducts({ category: catId, limit: 10 });
+            response = await getProducts({ ...params, category: catId });
           } else {
-            response = await getProducts({ limit: 10, sort: "popular" });
+            response = await getProducts({ ...params, sort: "popular" });
           }
         } else {
-          response = await getProducts({ limit: 10, sort: "popular" });
+          const params: any = { limit: 10, sort: "popular" };
+          if (userLocation?.latitude && userLocation?.longitude) {
+            params.latitude = userLocation.latitude;
+            params.longitude = userLocation.longitude;
+          }
+          response = await getProducts(params);
         }
 
-        if (response && response.data) {
+        if (response && response.success && response.data) {
           // Filter out items already in cart
           const itemsInCartIds = new Set(
             (cart?.items || [])
@@ -908,7 +919,10 @@ export default function Checkout() {
         </div>
       )}
       {/* Header */}
-      <div className="bg-[#9048A5] sticky top-0 z-[60] shadow-sm">
+      <div 
+        className="sticky top-0 z-[60] shadow-sm"
+        style={{ backgroundColor: currentTheme.primary[2] }}
+      >
         <div className="px-4 py-3 flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -1243,13 +1257,14 @@ export default function Checkout() {
       </div>
 
       {/* You might also like */}
-      <div className="px-4 md:px-6 lg:px-8 py-2.5 md:py-3 border-b border-neutral-200">
-        <h2 className="text-sm font-semibold text-neutral-900 mb-2">
-          You might also like
-        </h2>
-        <div
-          className="flex gap-2 overflow-x-auto scrollbar-hide pb-3"
-          style={{ scrollSnapType: "x mandatory" }}>
+      {similarProducts.length > 0 && (
+        <div className="px-4 md:px-6 lg:px-8 py-2.5 md:py-3 border-b border-neutral-200">
+          <h2 className="text-sm font-semibold text-neutral-900 mb-2">
+            You might also like
+          </h2>
+          <div
+            className="flex gap-2 overflow-x-auto scrollbar-hide pb-3"
+            style={{ scrollSnapType: "x mandatory" }}>
           {similarProducts.map((product) => {
             // Get price details
             const { displayPrice, mrp, discount, hasDiscount } =
@@ -1472,12 +1487,11 @@ export default function Checkout() {
 
                     {/* Bottom Link */}
                     <div
-                      onClick={() =>
-                        navigate(
-                          `/category/${product.categoryId || product.category || "all"
-                          }`
-                        )
-                      }
+                      onClick={() => {
+                        const catId = product.categoryId || product.category;
+                        const finalCatId = typeof catId === "object" ? (catId?._id || catId?.id) : catId;
+                        navigate(`/category/${finalCatId || "all"}`);
+                      }}
                       className="w-full text-[8px] font-medium py-0.5 rounded-lg flex items-center justify-between px-1 transition-colors mt-auto cursor-pointer"
                       style={{ backgroundColor: `${currentTheme.primary[2]}20`, color: currentTheme.primary[2] }}
                     >
@@ -1501,6 +1515,7 @@ export default function Checkout() {
           })}
         </div>
       </div>
+    )}
 
       {/* Get FREE delivery banner */}
       {deliveryCharge > 0 && (
@@ -1778,30 +1793,7 @@ export default function Checkout() {
             </div>
           )}
 
-          {/* Gift Packaging */}
-          {giftPackaging && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                  />
-                </svg>
-                <span className="text-xs text-neutral-700">Gift Packaging</span>
-              </div>
-              <span className="text-xs font-medium text-neutral-900">
-                ₹{giftPackagingFee}
-              </span>
-            </div>
-          )}
+
 
           {/* Grand total */}
           <div className="pt-2 border-t border-neutral-200 flex items-center justify-between">
@@ -1815,206 +1807,7 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* Add GSTIN */}
-      <div className="px-4 py-2 border-b border-neutral-200">
-        <button
-          onClick={() => setShowGstinSheet(true)}
-          className="w-full flex items-center justify-between bg-neutral-50 rounded-lg p-2 hover:bg-neutral-100 transition-colors">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-              <span className="text-blue-600 font-bold text-sm">%</span>
-            </div>
-            <div className="text-left">
-              <p className="text-xs font-semibold text-neutral-900">
-                Add GSTIN
-              </p>
-              <p className="text-[10px] text-neutral-600">
-                {gstin
-                  ? `GSTIN: ${gstin}`
-                  : "Claim GST input credit up to 18% on your order"}
-              </p>
-            </div>
-          </div>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M9 18l6-6-6-6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-      </div>
 
-      {/* Tip your delivery partner */}
-      <div className="px-4 py-2 border-b border-neutral-200">
-        <h3 className="text-sm font-bold text-neutral-900 mb-0.5">
-          Tip your delivery partner
-        </h3>
-        <p className="text-xs text-neutral-600 mb-2">
-          Your kindness means a lot! 100% of your tip will go directly to your
-          delivery partner.
-        </p>
-
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1.5">
-          <button
-            onClick={() => {
-              setTipAmount(20);
-              setShowCustomTipInput(false);
-            }}
-            className="flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs transition-colors"
-            style={tipAmount === 20 && !showCustomTipInput 
-              ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor } 
-              : { borderColor: "#D4D4D4", backgroundColor: "white", color: "#404040" }}
-          >
-            😊 ₹20
-          </button>
-          <button
-            onClick={() => {
-              setTipAmount(30);
-              setShowCustomTipInput(false);
-            }}
-            className="flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs transition-colors"
-            style={tipAmount === 30 && !showCustomTipInput 
-              ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor } 
-              : { borderColor: "#D4D4D4", backgroundColor: "white", color: "#404040" }}
-          >
-            🤩 ₹30
-          </button>
-          <button
-            onClick={() => {
-              setTipAmount(50);
-              setShowCustomTipInput(false);
-            }}
-            className="flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs transition-colors"
-            style={tipAmount === 50 && !showCustomTipInput 
-              ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor } 
-              : { borderColor: "#D4D4D4", backgroundColor: "white", color: "#404040" }}
-          >
-            😍 ₹50
-          </button>
-          <button
-            onClick={() => {
-              setShowCustomTipInput(true);
-              setTipAmount(null);
-            }}
-            className="flex-shrink-0 px-3 py-1.5 rounded-lg border-2 font-medium text-xs transition-colors"
-            style={showCustomTipInput 
-              ? { borderColor: currentTheme.accentColor, backgroundColor: `${currentTheme.accentColor}10`, color: currentTheme.accentColor } 
-              : { borderColor: "#D4D4D4", backgroundColor: "white", color: "#404040" }}
-          >
-            🎁 Custom
-          </button>
-        </div>
-
-        {/* Custom Tip Input */}
-        {showCustomTipInput && (
-          <div className="mt-2 flex items-center gap-2">
-            <input
-              type="number"
-              value={customTipAmount || ""}
-              onChange={(e) => {
-                const val = Number(e.target.value);
-                if (val >= 0) {
-                  setCustomTipAmount(val);
-                }
-              }}
-              onBlur={(e) => {
-                const val = Number(e.target.value);
-                if (val < 0) {
-                  setCustomTipAmount(0);
-                }
-              }}
-              placeholder="Enter custom tip amount"
-              className="flex-1 px-3 py-1.5 bg-white border-2 rounded-lg text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-1"
-              style={{ borderColor: currentTheme.accentColor }}
-              min="0"
-              step="1"
-            />
-            <button
-              onClick={() => {
-                setShowCustomTipInput(false);
-                setCustomTipAmount(0);
-                setTipAmount(null);
-              }}
-              className="px-3 py-1.5 text-xs font-medium text-neutral-700 hover:text-neutral-900">
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Gift Packaging */}
-      <div className="px-4 py-2 border-b border-neutral-200">
-        <button
-          onClick={() => setGiftPackaging(!giftPackaging)}
-          className="w-full flex items-center justify-between rounded-lg p-2 transition-colors border-2"
-          style={giftPackaging 
-            ? { backgroundColor: `${currentTheme.accentColor}10`, borderColor: currentTheme.accentColor } 
-            : { backgroundColor: "#F9F9F9", borderColor: "transparent" }}
-        >
-          <div className="flex items-center gap-2">
-            <div
-              className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-              style={giftPackaging 
-                ? { borderColor: currentTheme.accentColor, backgroundColor: currentTheme.accentColor } 
-                : { borderColor: "#A3A3A3", backgroundColor: "white" }}
-            >
-              {giftPackaging && (
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M20 6L9 17l-5-5"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              )}
-            </div>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2z"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-              />
-            </svg>
-            <div className="text-left">
-              <p
-                className="text-xs font-semibold"
-                style={{ color: giftPackaging ? currentTheme.accentColor : "#171717" }}
-              >
-                Gift Packaging
-              </p>
-              <p className="text-[10px] text-neutral-600">
-                {giftPackaging
-                  ? "Add ₹30 for gift packaging"
-                  : "Add ₹30 for elegant gift packaging"}
-              </p>
-            </div>
-          </div>
-          {giftPackaging && (
-            <span className="text-xs font-semibold" style={{ color: currentTheme.accentColor }}>₹30</span>
-          )}
-        </button>
-      </div>
 
       {/* Cancellation Policy */}
       <div className="px-4 py-2">
@@ -2044,83 +1837,7 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* GSTIN Sheet Modal */}
-      <Sheet open={showGstinSheet} onOpenChange={setShowGstinSheet}>
-        <SheetContent side="bottom" className="max-h-[50vh]">
-          <SheetHeader className="text-left">
-            <div className="flex items-center justify-between mb-2">
-              <SheetTitle className="text-base font-bold text-neutral-900">
-                Add GSTIN
-              </SheetTitle>
-              <SheetClose onClick={() => setShowGstinSheet(false)}>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M18 6L6 18M6 6l12 12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </SheetClose>
-            </div>
-          </SheetHeader>
 
-          <div className="px-4 pb-4 mt-4">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-neutral-900 mb-2">
-                GSTIN Number
-              </label>
-              <input
-                type="text"
-                value={gstin}
-                onChange={(e) => {
-                  const value = e.target.value
-                    .toUpperCase()
-                    .replace(/[^A-Z0-9]/g, "");
-                  if (value.length <= 15) {
-                    setGstin(value);
-                  }
-                }}
-                placeholder="Enter 15-character GSTIN"
-                className="w-full px-4 py-3 bg-white border-2 border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:border-0"
-                maxLength={15}
-              />
-              <p className="text-xs text-neutral-500 mt-1">
-                Format: 15 characters (e.g., 27AAAAA0000A1Z5)
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                if (gstin.length === 15) {
-                  setShowGstinSheet(false);
-                } else {
-                  alert("Please enter a valid 15-character GSTIN");
-                }
-              }}
-              className="w-full text-white py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors rounded-lg shadow-md"
-              style={{ backgroundColor: currentTheme.primary[2] }}
-            >
-              Save GSTIN
-            </button>
-            {gstin && (
-              <button
-                onClick={() => {
-                  setGstin("");
-                  setShowGstinSheet(false);
-                }}
-                className="w-full mt-2 bg-neutral-100 text-neutral-700 py-2 px-4 font-medium text-sm hover:bg-neutral-200 transition-colors rounded-lg">
-                Remove GSTIN
-              </button>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
 
       {/* Cancellation Policy Sheet Modal */}
       <Sheet
@@ -2407,7 +2124,7 @@ export default function Checkout() {
               ? "text-black shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"
               : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
               }`}
-            style={cart.items.length > 0 ? { backgroundColor: "#FFD814" } : {}}
+            style={cart.items.length > 0 ? { backgroundColor: currentTheme.accentColor } : {}}
           >
             Place Order
           </button>
@@ -2421,7 +2138,7 @@ export default function Checkout() {
               })
             }
             className="w-full text-black py-3 px-4 font-bold text-sm uppercase tracking-wide transition-colors shadow-[0_-4px_10px_rgba(0,0,0,0.1)]"
-            style={{ backgroundColor: "#FFD814" }}
+            style={{ backgroundColor: currentTheme.accentColor }}
           >
             Choose address at next step
           </button>

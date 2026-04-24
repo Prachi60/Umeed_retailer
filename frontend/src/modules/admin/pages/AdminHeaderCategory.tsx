@@ -121,7 +121,7 @@ export default function AdminHeaderCategory() {
         name: headerCategoryName,
         iconLibrary: selectedIconLibrary,
         iconName: headerCategoryIcon,
-        slug: selectedTheme, // Use theme as slug for color mapping
+        theme: selectedTheme, // Use separate theme field
         relatedCategory: selectedCategory,
         status: selectedStatus,
       };
@@ -148,7 +148,7 @@ export default function AdminHeaderCategory() {
     setSelectedIconLibrary(category.iconLibrary);
     setHeaderCategoryIcon(category.iconName);
     setSelectedCategory(category.relatedCategory || '');
-    setSelectedTheme(category.slug);
+    setSelectedTheme(category.theme || 'all');
     setSelectedStatus(category.status);
     setIconSearchTerm('');
   };
@@ -281,7 +281,15 @@ export default function AdminHeaderCategory() {
                     teal: 'Teal',
                     dark: 'Dark',
                     hotpink: 'Hot Pink',
-                    gold: 'Gold'
+                    gold: 'Gold',
+                    skyblue: 'Bright Sky Blue',
+                    lime: 'Lime Green',
+                    rose: 'Rose Pink',
+                    indigo: 'Indigo Blue',
+                    silver: 'Silver Grey',
+                    charcoal: 'Charcoal Grey',
+                    forest: 'Forest Green',
+                    cheeryred: 'Cheery Red'
                   };
 
                   const displayColor = colorNames[themeKey] || themeKey;
@@ -424,9 +432,9 @@ export default function AdminHeaderCategory() {
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-neutral-100 text-neutral-800 capitalize border border-neutral-200">
                           <div
                             className="w-2 h-2 rounded-full mr-1.5"
-                            style={{ background: themes[category.slug]?.primary[0] || '#ccc' }}
+                            style={{ background: themes[category.theme || 'all']?.primary[0] || '#ccc' }}
                           />
-                          {category.slug}
+                          {category.theme || 'all'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm">

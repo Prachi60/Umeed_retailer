@@ -10,18 +10,20 @@ import { getCategories } from "../../../services/api/customerProductService";
 import { Category } from "../../../types/domain";
 import { getHeaderCategoriesPublic } from "../../../services/api/headerCategoryService";
 import { getIconByName } from "../../../utils/iconLibrary";
+import { useThemeContext } from "../../../context/ThemeContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface HomeHeroProps {
   activeTab?: string;
-  onTabChange?: (tabId: string) => void;
+  onTabChange?: (tabId: string, theme?: string) => void;
 }
 
 interface Tab {
   id: string;
   label: string;
   icon: React.ReactNode;
+  theme: string;
 }
 
 const ALL_TAB: Tab = {
@@ -50,6 +52,7 @@ const ALL_TAB: Tab = {
       />
     </svg>
   ),
+  theme: "all",
 };
 
 export default function HomeHero({
@@ -67,6 +70,7 @@ export default function HomeHero({
             id: c.slug,
             label: c.name,
             icon: getIconByName(c.iconName),
+            theme: c.theme || "all",
           }));
           setTabs([ALL_TAB, ...mapped]);
         }
@@ -336,11 +340,12 @@ export default function HomeHero({
   }, [activeTab]);
 
   const handleTabClick = (tabId: string) => {
-    onTabChange?.(tabId);
+    const tab = tabs.find(t => t.id === tabId);
+    onTabChange?.(tabId, tab?.theme);
     // Don't scroll - keep page at current position
   };
 
-  const theme = getTheme(activeTab || "all");
+  const { currentTheme: theme } = useThemeContext();
   const heroGradient = `linear-gradient(to bottom, ${theme.primary[0]}, ${theme.primary[1]} 40%, ${theme.primary[2]})`;
 
   // Helper to convert RGB to RGBA

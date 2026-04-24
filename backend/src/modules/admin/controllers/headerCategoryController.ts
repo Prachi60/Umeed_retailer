@@ -43,17 +43,28 @@ export const createHeaderCategory = async (req: Request, res: Response) => {
       name,
       iconLibrary,
       iconName,
-      slug,
       relatedCategory,
       status,
       order,
+      theme,
     } = req.body;
+
+    // Check if category with this name already exists
+    const nameExists = await HeaderCategory.findOne({ name });
+    if (nameExists) {
+      return res
+        .status(400)
+        .json({ message: "Header category with this name already exists" });
+    }
+
+    // Generate slug from name
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
     const categoryExists = await HeaderCategory.findOne({ slug });
     if (categoryExists) {
       return res
         .status(400)
-        .json({ message: "Header category already exists" });
+        .json({ message: "A category with a similar name already exists (slug conflict)" });
     }
 
     const category = await HeaderCategory.create({
@@ -61,6 +72,7 @@ export const createHeaderCategory = async (req: Request, res: Response) => {
       iconLibrary,
       iconName,
       slug,
+      theme: theme || "all",
       relatedCategory,
       status,
       order,
@@ -84,28 +96,39 @@ export const updateHeaderCategory = async (req: Request, res: Response) => {
       name,
       iconLibrary,
       iconName,
-      slug,
       relatedCategory,
       status,
       order,
+      theme,
     } = req.body;
     const category = await HeaderCategory.findById(req.params.id);
 
     if (category) {
-      // Check if slug is being updated and if it's already taken
-      if (slug && slug !== category.slug) {
-        const slugExists = await HeaderCategory.findOne({ slug });
+      // Check if name is being updated and if it's already taken
+      if (name && name !== category.name) {
+        const nameExists = await HeaderCategory.findOne({ name });
+        if (nameExists) {
+          return res
+            .status(400)
+            .json({ message: "Header category with this name already exists" });
+        }
+        
+        // Update slug if name changes
+        category.slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        
+        // Check if new slug conflicts
+        const slugExists = await HeaderCategory.findOne({ slug: category.slug, _id: { $ne: category._id } });
         if (slugExists) {
           return res
             .status(400)
-            .json({ message: "Theme/Slug already used by another category" });
+            .json({ message: "A category with a similar name already exists (slug conflict)" });
         }
       }
 
       category.name = name || category.name;
       category.iconLibrary = iconLibrary || category.iconLibrary;
       category.iconName = iconName || category.iconName;
-      category.slug = slug || category.slug;
+      category.theme = theme || category.theme;
       category.relatedCategory = relatedCategory; // Allow clearing it (undefined or null or empty string)
       category.status = status || category.status;
       category.order = order !== undefined ? order : category.order;

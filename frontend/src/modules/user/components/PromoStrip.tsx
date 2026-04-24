@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, useEffect, useCallback } from "react";
 import { gsap } from "gsap";
 import { Link, useNavigate } from "react-router-dom";
-import { getTheme } from "../../../utils/themes";
+import { useThemeContext } from "../../../context/ThemeContext";
 import { getHomeContent } from "../../../services/api/customerHomeService";
 import { getSubcategories } from "../../../services/api/categoryService";
 import { apiCache } from "../../../utils/apiCache";
@@ -43,7 +43,7 @@ interface PromoStripProps {
 
 export default function PromoStrip({ activeTab = "all" }: PromoStripProps) {
   const { location } = useLocation();
-  const theme = getTheme(activeTab);
+  const { currentTheme: theme } = useThemeContext();
   const navigate = useNavigate();
   const [categoryCards, setCategoryCards] = useState<PromoCard[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);

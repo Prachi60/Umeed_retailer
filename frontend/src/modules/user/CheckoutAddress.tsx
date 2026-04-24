@@ -277,7 +277,10 @@ export default function CheckoutAddress() {
   return (
     <div className="pb-24 bg-white min-h-screen">
       {/* Header */}
-      <div className="bg-[#9048A5] sticky top-0 z-50 shadow-sm">
+      <div 
+        className="sticky top-0 z-50 shadow-sm"
+        style={{ backgroundColor: currentTheme.primary[2] }}
+      >
         <div className="px-4 py-3 flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
