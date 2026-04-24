@@ -160,7 +160,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = async (product: Product, sourceElement?: HTMLElement | null) => {
     // Get consistent product ID - MongoDB returns _id, frontend expects id
-    const productId = product._id || product.id;
+    const productId = String(product._id || product.id || '');
 
     // Prevent concurrent operations on the same product
     if (pendingOperationsRef.current.has(productId)) {

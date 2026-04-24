@@ -227,12 +227,18 @@ export default function Checkout() {
               .filter(Boolean)
           );
           const filtered = response.data
-            .filter((p: any) => !itemsInCartIds.has(p.id || p._id))
+            .filter((p: any) => {
+              const pid = String(p._id || p.id || "");
+              // Only show products available in the user's area and not already in cart
+              return pid && !itemsInCartIds.has(pid) && p.isAvailable !== false;
+            })
             .map((p: any) => {
               const { displayPrice, mrp } = calculateProductPrice(p);
+              const pid = String(p._id || p.id || "");
               return {
                 ...p,
-                id: p._id || p.id,
+                id: pid,
+                _id: pid,
                 name: p.productName || p.name || "Product",
                 imageUrl: p.mainImage || p.imageUrl || p.mainImageUrl || "",
                 price: displayPrice,

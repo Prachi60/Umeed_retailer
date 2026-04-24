@@ -51,7 +51,8 @@ const calculateCartTotal = async (cartId: any, nearbySellerIds: mongoose.Types.O
         const product = item.product as any;
         if (product && product.status === 'Active' && product.publish) {
             // Check if seller is in range
-            const isAvailable = nearbySellerIds.some(id => id.toString() === product.seller.toString());
+            const sellerId = product.seller?._id || product.seller;
+            const isAvailable = sellerId && nearbySellerIds.some(id => id.toString() === sellerId.toString());
             if (isAvailable) {
                 const price = calculateItemPrice(product, item.variation);
                 total += price * item.quantity;
@@ -86,8 +87,9 @@ const calculateDeliveryStuff = async (total: number, items: any[], userLat: numb
                     // Get all sellers involved in the cart
                     const sellerIds = new Set<string>();
                     items.forEach((item: any) => {
-                        if (item.product?.seller) {
-                            sellerIds.add(item.product.seller.toString());
+                        const sId = item.product?.seller?._id || item.product?.seller;
+                        if (sId) {
+                            sellerIds.add(sId.toString());
                         }
                     });
 
@@ -179,7 +181,8 @@ export const getCart = async (req: Request, res: Response) => {
         for (const item of (cart.items as any)) {
             const product = item.product;
             if (product && product.status === 'Active' && product.publish) {
-                const isAvailable = nearbySellerIds.some(id => id.toString() === product.seller.toString());
+                const sId = product.seller?._id || product.seller;
+                const isAvailable = sId && nearbySellerIds.some(id => id.toString() === sId.toString());
                 if (isAvailable) {
                     filteredItems.push(item);
                     const price = calculateItemPrice(product, item.variation);
@@ -253,7 +256,8 @@ export const addToCart = async (req: Request, res: Response) => {
         }
 
         const nearbySellerIds = await findSellersWithinRange(userLat, userLng);
-        const isAvailable = nearbySellerIds.some(id => id.toString() === (seller._id || seller).toString());
+        const sellerId = seller?._id || seller;
+        const isAvailable = sellerId && nearbySellerIds.some(id => id.toString() === sellerId.toString());
 
         if (!isAvailable) {
             return res.status(403).json({
@@ -305,7 +309,8 @@ export const addToCart = async (req: Request, res: Response) => {
 
         const filteredItems = (updatedCart?.items as any[] || []).filter(item => {
             const prod = item.product;
-            return prod && nearbySellerIds.some(id => id.toString() === prod.seller.toString());
+            const prodSellerId = prod?.seller?._id || prod?.seller;
+            return prod && prodSellerId && nearbySellerIds.some(id => id.toString() === prodSellerId.toString());
         });
 
         // Calculate fees
@@ -368,7 +373,8 @@ export const updateCartItem = async (req: Request, res: Response) => {
 
         // Verify item is still available at location
         const product = cartItem.product as any;
-        const isAvailable = product && nearbySellerIds.some(id => id.toString() === product.seller.toString());
+        const sellerId = product?.seller?._id || product?.seller;
+        const isAvailable = product && sellerId && nearbySellerIds.some(id => id.toString() === sellerId.toString());
 
         if (!isAvailable) {
             return res.status(403).json({
@@ -459,7 +465,8 @@ export const removeFromCart = async (req: Request, res: Response) => {
         const filteredItems = (updatedCart?.items as any[] || []).filter(item => {
             const prod = item.product;
             if (nearbySellerIds.length > 0) {
-                return prod && nearbySellerIds.some(id => id.toString() === prod.seller.toString());
+                const sellerId = prod?.seller?._id || prod?.seller;
+                return prod && sellerId && nearbySellerIds.some(id => id.toString() === sellerId.toString());
             }
             return true; // If no location provided for removal, just return all (though getCart will filter)
         });
