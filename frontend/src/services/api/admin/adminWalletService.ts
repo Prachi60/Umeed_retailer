@@ -168,10 +168,38 @@ export const getSellerWalletStats = async (
 };
 
 /**
+ * Get Delivery Boy Transactions
+ */
+export const getDeliveryBoyTransactions = async (
+  deliveryBoyId: string,
+  params?: { page?: number; limit?: number; type?: string }
+): Promise<ApiResponse<SellerTransaction[]>> => {
+  const response = await api.get<ApiResponse<SellerTransaction[]>>(
+    `/admin/wallet/delivery-boy/${deliveryBoyId}`,
+    { params }
+  );
+  return response.data;
+};
+
+/**
+ * Get Delivery Boy Wallet Stats (Summary)
+ */
+export const getDeliveryBoyWalletStats = async (
+  deliveryBoyId: string
+): Promise<ApiResponse<{ totalEarned: number; totalWithdrawn: number; currentBalance: number }>> => {
+  const response = await api.get<ApiResponse<{ totalEarned: number; totalWithdrawn: number; currentBalance: number }>>(
+    `/admin/wallet/delivery-boy/${deliveryBoyId}/stats`
+  );
+  return response.data;
+};
+
+/**
  * Manual Fund Transfer (Admin Adjustment)
  */
 export const manualFundTransfer = async (data: {
-  sellerId: string;
+  userId?: string;
+  sellerId?: string; // legacy support
+  userType?: "SELLER" | "DELIVERY_BOY";
   amount: number;
   type: "Credit" | "Debit";
   description: string;

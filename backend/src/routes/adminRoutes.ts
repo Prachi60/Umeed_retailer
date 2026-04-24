@@ -243,6 +243,8 @@ router.get("/wallet/earnings", walletController.getAdminEarnings);
 router.get("/wallet/transactions", walletController.getWalletTransactions);
 router.get("/wallet/seller/:sellerId", walletController.getSellerTransactions);
 router.get("/wallet/seller/:sellerId/stats", walletController.getSellerWalletStats);
+router.get("/wallet/delivery-boy/:deliveryBoyId", walletController.getDeliveryBoyTransactions);
+router.get("/wallet/delivery-boy/:deliveryBoyId/stats", walletController.getDeliveryBoyWalletStats);
 router.post("/wallet/fund-transfer", walletController.manualFundTransfer);
 router.get("/wallet/withdrawals", withdrawalController.getAllWithdrawals);
 router.post("/wallet/withdrawal/process", walletController.processWithdrawalWrapper);

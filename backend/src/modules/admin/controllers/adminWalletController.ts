@@ -275,15 +275,74 @@ export const getSellerTransactions = asyncHandler(async (req: Request, res: Resp
 });
 
 /**
+ * Get Delivery Boy Transactions
+ */
+export const getDeliveryBoyTransactions = asyncHandler(async (req: Request, res: Response) => {
+  const { deliveryBoyId } = req.params;
+  const { page = 1, limit = 50, type } = req.query;
+
+  const query: any = {
+    userType: 'DELIVERY_BOY'
+  };
+
+  if (deliveryBoyId !== 'all') {
+    query.userId = deliveryBoyId;
+  }
+
+  if (type && type !== 'all') {
+    query.type = (type as string).charAt(0).toUpperCase() + (type as string).slice(1).toLowerCase();
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const transactions = await WalletTransaction.find(query)
+    .populate('relatedOrder', 'orderNumber')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(Number(limit));
+
+  const total = await WalletTransaction.countDocuments(query);
+
+  const formattedTransactions = transactions.map((t: any) => {
+    const isOrder = t.relatedOrder || t.description.includes('Order #');
+    const orderNumber = t.relatedOrder ? t.relatedOrder.orderNumber : (t.description.includes('Order #') ? t.description.split('#')[1] : undefined);
+    
+    return {
+      id: t._id,
+      amount: t.amount,
+      transactionType: t.type.toLowerCase(),
+      date: t.createdAt,
+      type: t.type,
+      status: t.status,
+      description: t.description,
+      orderId: orderNumber,
+      productName: isOrder ? 'Order Commission' : t.type
+    };
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: formattedTransactions,
+    pagination: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      pages: Math.ceil(total / Number(limit))
+    }
+  });
+});
+
+/**
  * Manual Fund Transfer (Credit/Debit)
  */
 export const manualFundTransfer = asyncHandler(async (req: Request, res: Response) => {
-  const { sellerId, amount, type, description } = req.body;
+  const { sellerId, userId, userType = 'SELLER', amount, type, description } = req.body;
+  const targetId = userId || sellerId;
 
-  if (!sellerId || !amount || !type || !description) {
+  if (!targetId || !amount || !type || !description) {
     return res.status(400).json({
       success: false,
-      message: 'All fields (sellerId, amount, type, description) are required'
+      message: 'All fields (userId/sellerId, amount, type, description) are required'
     });
   }
 
@@ -291,29 +350,37 @@ export const manualFundTransfer = asyncHandler(async (req: Request, res: Respons
   session.startTransaction();
 
   try {
-    const Seller = mongoose.model('Seller');
-    const seller = await Seller.findById(sellerId).session(session);
+    let userModel;
+    if (userType === 'SELLER') {
+      userModel = mongoose.model('Seller');
+    } else if (userType === 'DELIVERY_BOY') {
+      userModel = mongoose.model('Delivery');
+    } else {
+      throw new Error('Invalid user type');
+    }
 
-    if (!seller) {
-      throw new Error('Seller not found');
+    const user = await userModel.findById(targetId).session(session);
+
+    if (!user) {
+      throw new Error(`${userType === 'SELLER' ? 'Seller' : 'Delivery boy'} not found`);
     }
 
     const amountNum = Number(amount);
     if (type === 'Credit') {
-      seller.balance = (seller.balance || 0) + amountNum;
+      user.balance = (user.balance || 0) + amountNum;
     } else {
-      if ((seller.balance || 0) < amountNum) {
-        throw new Error('Insufficient balance in seller wallet');
+      if ((user.balance || 0) < amountNum) {
+        throw new Error(`Insufficient balance in ${userType.toLowerCase()} wallet`);
       }
-      seller.balance = (seller.balance || 0) - amountNum;
+      user.balance = (user.balance || 0) - amountNum;
     }
 
-    await seller.save({ session });
+    await user.save({ session });
 
     // Create transaction record
     const transaction = await WalletTransaction.create([{
-      userId: sellerId,
-      userType: 'SELLER',
+      userId: targetId,
+      userType,
       amount: amountNum,
       type,
       description,
@@ -371,6 +438,53 @@ export const getSellerWalletStats = asyncHandler(async (req: Request, res: Respo
     currentBalance = seller?.balance || 0;
   } else {
     const result = await mongoose.model('Seller').aggregate([
+      { $group: { _id: null, totalBalance: { $sum: '$balance' } } }
+    ]);
+    currentBalance = result[0]?.totalBalance || 0;
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      totalEarned: currentBalance + (stats[0]?.totalWithdrawn || 0),
+      totalWithdrawn: stats[0]?.totalWithdrawn || 0,
+      currentBalance
+    }
+  });
+});
+
+/**
+ * Get Delivery Boy Wallet Stats
+ */
+export const getDeliveryBoyWalletStats = asyncHandler(async (req: Request, res: Response) => {
+  const { deliveryBoyId } = req.params;
+
+  const query: any = { userType: 'DELIVERY_BOY' };
+  if (deliveryBoyId !== 'all') {
+    query.userId = new mongoose.Types.ObjectId(deliveryBoyId);
+  }
+
+  const stats = await WalletTransaction.aggregate([
+    { $match: query },
+    {
+      $group: {
+        _id: null,
+        totalEarned: {
+          $sum: { $cond: [{ $eq: ['$type', 'Credit'] }, '$amount', 0] }
+        },
+        totalWithdrawn: {
+          $sum: { $cond: [{ $eq: ['$type', 'Debit'] }, '$amount', 0] }
+        }
+      }
+    }
+  ]);
+
+  let currentBalance = 0;
+  if (deliveryBoyId !== 'all') {
+    const delivery = await mongoose.model('Delivery').findById(deliveryBoyId).select('balance');
+    currentBalance = delivery?.balance || 0;
+  } else {
+    const result = await mongoose.model('Delivery').aggregate([
       { $group: { _id: null, totalBalance: { $sum: '$balance' } } }
     ]);
     currentBalance = result[0]?.totalBalance || 0;
