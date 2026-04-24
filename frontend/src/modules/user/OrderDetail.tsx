@@ -598,6 +598,14 @@ export default function OrderDetail() {
     }
   }, [socketOrderStatus, orderStatus, id, fetchOrderById]);
 
+  // Sync instructions from order
+  useEffect(() => {
+    if (order) {
+      if (order.deliveryInstructions) setDeliveryInstructions(order.deliveryInstructions);
+      if (order.specialRequests) setSpecialRequests(order.specialRequests);
+    }
+  }, [order]);
+
   // Simulate order status progression
   useEffect(() => {
     if (confirmed && order) {
@@ -1018,29 +1026,7 @@ export default function OrderDetail() {
 
       {/* Scrollable Content */}
       <div className="px-4 py-4 space-y-4 pb-24">
-        {/* Payment Pending */}
-        <motion.div
-          className="bg-white rounded-xl p-4 shadow-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-gray-900">
-                Payment of ₹{order.totalAmount?.toFixed(0) || "0"} pending
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                Pay now, or pay to the delivery partner using Cash/UPI
-              </p>
-            </div>
-            <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-6">
-              Pay now <ChevronRightIcon className="w-4 h-4 ml-1" />
-            </Button>
-          </div>
-        </motion.div>
 
-        {/* Promo Carousel */}
-        <PromoCarousel />
 
         {/* Delivery Partner Assignment - Only show if no partner assigned yet */}
         {!order?.deliveryPartner && (
@@ -1062,33 +1048,7 @@ export default function OrderDetail() {
           </motion.div>
         )}
 
-        {/* Tip Section */}
-        <TipSection />
 
-        {/* Delivery Partner Safety */}
-        <motion.button
-          className="w-full bg-white rounded-xl p-4 shadow-sm flex items-center gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          whileTap={{ scale: 0.99 }}>
-          <ShieldIcon className="w-6 h-6 text-gray-600" />
-          <span className="flex-1 text-left font-medium text-gray-900">
-            Learn about delivery partner safety
-          </span>
-          <ChevronRightIcon className="w-5 h-5 text-gray-400" />
-        </motion.button>
-
-        {/* Delivery Details Banner */}
-        <motion.div
-          className="bg-yellow-50 rounded-xl p-4 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65 }}>
-          <p className="text-yellow-800 font-medium">
-            All your delivery details in one place 👇
-          </p>
-        </motion.div>
 
         {/* Contact & Address Section */}
         <motion.div
@@ -1098,23 +1058,20 @@ export default function OrderDetail() {
           transition={{ delay: 0.7 }}>
           <SectionItem
             icon={PhoneIcon}
-            title={`${order.address?.name || "Customer"}, ${order.address?.phone || "9XXXXXXXX"
-              }`}
+            title={`${order.customerName || order.address?.name || order.deliveryAddress?.name || "Customer"}, ${order.customerPhone || order.address?.phone || order.deliveryAddress?.phone || "Mobile Unavailable"}`}
             subtitle="Delivery partner may call this number"
           />
           <SectionItem
             icon={HomeIcon}
-            title="Delivery at Home"
+            title="Delivery Address"
             subtitle={
-              order.address
-                ? `${order.address.address}, ${order.address.city}`
-                : "Add delivery address"
+              order.deliveryAddress?.address || order.address?.address || "Address Unavailable"
             }
           />
           <SectionItem
             icon={MessageSquareIcon}
-            title="Add delivery instructions"
-            subtitle=""
+            title={order.deliveryInstructions || "Add delivery instructions"}
+            subtitle={order.deliveryInstructions ? "Tap to edit" : "Share details to help partner"}
             onClick={() => setShowInstructionsModal(true)}
           />
         </motion.div>
@@ -1176,8 +1133,8 @@ export default function OrderDetail() {
 
           <SectionItem
             icon={ChefHatIcon}
-            title="Add special requests"
-            subtitle=""
+            title={order.specialRequests || "Add special requests"}
+            subtitle={order.specialRequests ? "Tap to edit" : "Add preferences for store"}
             onClick={() => setShowSpecialRequestsModal(true)}
           />
         </motion.div>

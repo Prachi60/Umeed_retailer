@@ -39,6 +39,8 @@ export interface Order {
   gstin?: string;
   couponCode?: string;
   giftPackaging?: boolean;
+  deliveryInstructions?: string;
+  specialRequests?: string;
 }
 
 

@@ -24,7 +24,7 @@ export const createOrder = async (req: Request, res: Response) => {
             session = null;
         }
 
-        const { items, address, paymentMethod, fees } = req.body;
+        const { items, address, paymentMethod, fees, deliveryInstructions } = req.body;
         const userId = req.user!.userId;
 
         // Log incoming request for debugging
@@ -138,6 +138,7 @@ export const createOrder = async (req: Request, res: Response) => {
             paymentMethod: paymentMethod || 'Online',
             paymentStatus: (paymentMethod === 'COD') ? 'Pending' : 'Pending', // For Online it would be Paid after gateway, for COD it's always Pending until delivery
             status: 'Received',
+            deliveryInstructions: deliveryInstructions || '',
             subtotal: 0,
             tax: 0,
             shipping: fees?.deliveryFee || 0,
