@@ -27,6 +27,7 @@ interface Seller {
   _id: string;
   sellerName: string;
   storeName: string;
+  balance: number;
 }
 
 interface WalletStats {
@@ -79,6 +80,7 @@ export default function AdminSellerTransaction() {
               _id: seller._id,
               sellerName: seller.sellerName,
               storeName: seller.storeName,
+              balance: seller.balance || 0,
             }))
           );
         }
@@ -404,8 +406,28 @@ export default function AdminSellerTransaction() {
                   onChange={e => setModalData({...modalData, sellerId: e.target.value})}
                   className="w-full px-4 py-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition-all">
                   <option value="">Choose a seller...</option>
-                  {sellers.map(s => <option key={s._id} value={s._id}>{s.storeName} ({s.sellerName})</option>)}
+                  {sellers.map(s => (
+                    <option key={s._id} value={s._id}>
+                      {s.storeName} (Bal: ₹{s.balance.toLocaleString()})
+                    </option>
+                  ))}
                 </select>
+                {modalData.sellerId && (
+                  <div className="mt-2 flex items-center justify-between px-2">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-neutral-400 uppercase font-bold">Total Cash Held by Admin</span>
+                      <span className="text-sm font-bold text-teal-600">
+                        ₹{sellers.find(s => s._id === modalData.sellerId)?.balance.toLocaleString() || "0"}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] text-neutral-400 uppercase font-bold">Status</span>
+                      <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">
+                        Available for Withdrawal
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
