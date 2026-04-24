@@ -224,12 +224,26 @@ export const getHomeContent = async (req: Request, res: Response) => {
     }
 
     // 1. Featured / Bestsellers - Get bestseller cards from admin configuration
-    const bestsellerCards = await BestsellerCard.find({
-      isActive: true,
-    })
+    const bestsellerQuery: any = { isActive: true };
+    
+    // If headerCategorySlug is provided, filter bestsellers by categories belonging to that header category
+    if (headerCategorySlug && headerCategorySlug !== "all") {
+      const headerCategory = await HeaderCategory.findOne({
+        slug: headerCategorySlug,
+        status: "Published",
+      }).lean();
+
+      if (headerCategory) {
+        const categoriesInHeader = await Category.find({ headerCategoryId: headerCategory._id }).select("_id").lean();
+        const categoryIds = categoriesInHeader.map(c => c._id);
+        bestsellerQuery.category = { $in: categoryIds };
+      }
+    }
+
+    const bestsellerCards = await BestsellerCard.find(bestsellerQuery)
       .populate("category", "name slug image")
       .sort({ order: 1 })
-      .limit(6)
+      .limit(10) // Increased limit to show more items per category page
       .lean();
 
     // For each bestseller card, get 4 products from the associated category
@@ -304,17 +318,37 @@ export const getHomeContent = async (req: Request, res: Response) => {
         match: {
           status: "Active",
           publish: true,
-          // Removed location filter to show preview images irrespective of radius
         },
       })
       .sort({ order: 1 })
       .lean();
 
-    // Filter out any products that were null (due to match condition)
-    const validLowestPricesProducts = lowestPricesProducts
+    // If headerCategorySlug is provided, filter lowest prices by categories belonging to that header category
+    let headerCategoryId: mongoose.Types.ObjectId | null = null;
+    if (headerCategorySlug && headerCategorySlug !== "all") {
+      const headerCategory = await HeaderCategory.findOne({
+        slug: headerCategorySlug,
+        status: "Published",
+      }).lean();
+      if (headerCategory) {
+        headerCategoryId = headerCategory._id as mongoose.Types.ObjectId;
+      }
+    }
+
+    // Filter out any products that were null (due to match condition) and handle header category filtering
+    const validLowestPricesProducts = await Promise.all(lowestPricesProducts
       .filter((item: any) => item.product !== null)
-      .map((item: any) => {
+      .map(async (item: any) => {
         const product = item.product;
+        
+        // If we have a header category filter, check if this product's category belongs to it
+        if (headerCategoryId) {
+          const category = await Category.findById(product.category).select("headerCategoryId").lean();
+          if (!category || category.headerCategoryId?.toString() !== headerCategoryId.toString()) {
+            return null;
+          }
+        }
+
         // Check if the product's seller is within range
         const isAvailable =
           nearbySellerIds && nearbySellerIds.length > 0 && product.seller
@@ -344,12 +378,24 @@ export const getHomeContent = async (req: Request, res: Response) => {
           isAvailable,
           seller: product.seller,
         };
-      });
+      })).then(results => results.filter(item => item !== null));
 
     // 3. Categories for Tiles (Grocery, Snacks, etc)
-    const categories = await Category.find({
-      status: "Active",
-    })
+    const categoryQueryForTiles: any = { status: "Active" };
+    
+    // If headerCategorySlug is provided, filter categories by that header category
+    if (headerCategorySlug && headerCategorySlug !== "all") {
+      const headerCategory = await HeaderCategory.findOne({
+        slug: headerCategorySlug,
+        status: "Published",
+      }).lean();
+
+      if (headerCategory) {
+        categoryQueryForTiles.headerCategoryId = headerCategory._id;
+      }
+    }
+
+    const categories = await Category.find(categoryQueryForTiles)
       .select("name image icon color slug")
       .sort({ order: 1 });
 
