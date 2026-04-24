@@ -322,12 +322,14 @@ export const updateOrderStatus = asyncHandler(
 
         // Log transaction
         await WalletTransaction.create({
-          sellerId,
+          userId: sellerId,
+          userType: 'SELLER',
           amount: netEarning,
           type: 'Credit',
-          description: `Earnings from Order #${order.orderId}`,
-          reference: `ORD-${order.orderId}-${Date.now()}`,
-          status: 'Completed'
+          description: `Earnings from Order #${order.orderNumber}`,
+          reference: `ORD-${order.orderNumber}-${Date.now()}`,
+          status: 'Completed',
+          relatedOrder: order._id
         });
       }
     }

@@ -214,3 +214,174 @@ export const processWithdrawalWrapper = asyncHandler(async (req: Request, res: R
     });
   }
 });
+
+/**
+ * Get Seller Transactions
+ */
+export const getSellerTransactions = asyncHandler(async (req: Request, res: Response) => {
+  const { sellerId } = req.params;
+  const { page = 1, limit = 50, type } = req.query;
+
+  const query: any = {
+    userType: 'SELLER'
+  };
+
+  if (sellerId !== 'all') {
+    query.userId = sellerId;
+  }
+
+  if (type && type !== 'all') {
+    // Capitalize first letter to match model (Credit/Debit)
+    query.type = (type as string).charAt(0).toUpperCase() + (type as string).slice(1).toLowerCase();
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const transactions = await WalletTransaction.find(query)
+    .populate('relatedOrder', 'orderNumber')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(Number(limit));
+
+  const total = await WalletTransaction.countDocuments(query);
+
+  const formattedTransactions = transactions.map((t: any) => {
+    const isOrder = t.relatedOrder || t.description.includes('Order #');
+    const orderNumber = t.relatedOrder ? t.relatedOrder.orderNumber : (t.description.includes('Order #') ? t.description.split('#')[1] : undefined);
+    
+    return {
+      id: t._id,
+      amount: t.amount,
+      transactionType: t.type.toLowerCase(), // frontend expects 'credit'/'debit'
+      date: t.createdAt,
+      type: t.type,
+      status: t.status,
+      description: t.description,
+      orderId: orderNumber,
+      productName: isOrder ? 'Order Sale' : t.type
+    };
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: formattedTransactions,
+    pagination: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      pages: Math.ceil(total / Number(limit))
+    }
+  });
+});
+
+/**
+ * Manual Fund Transfer (Credit/Debit)
+ */
+export const manualFundTransfer = asyncHandler(async (req: Request, res: Response) => {
+  const { sellerId, amount, type, description } = req.body;
+
+  if (!sellerId || !amount || !type || !description) {
+    return res.status(400).json({
+      success: false,
+      message: 'All fields (sellerId, amount, type, description) are required'
+    });
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const Seller = mongoose.model('Seller');
+    const seller = await Seller.findById(sellerId).session(session);
+
+    if (!seller) {
+      throw new Error('Seller not found');
+    }
+
+    const amountNum = Number(amount);
+    if (type === 'Credit') {
+      seller.balance = (seller.balance || 0) + amountNum;
+    } else {
+      if ((seller.balance || 0) < amountNum) {
+        throw new Error('Insufficient balance in seller wallet');
+      }
+      seller.balance = (seller.balance || 0) - amountNum;
+    }
+
+    await seller.save({ session });
+
+    // Create transaction record
+    const transaction = await WalletTransaction.create([{
+      userId: sellerId,
+      userType: 'SELLER',
+      amount: amountNum,
+      type,
+      description,
+      status: 'Completed',
+      reference: `ADJ-${Date.now()}`
+    }], { session });
+
+    await session.commitTransaction();
+
+    return res.status(201).json({
+      success: true,
+      message: `Fund ${type.toLowerCase()}ed successfully`,
+      data: transaction[0]
+    });
+  } catch (error: any) {
+    await session.abortTransaction();
+    return res.status(400).json({
+      success: false,
+      message: error.message || 'Failed to process fund transfer'
+    });
+  } finally {
+    session.endSession();
+  }
+});
+
+/**
+ * Get Seller Wallet Stats
+ */
+export const getSellerWalletStats = asyncHandler(async (req: Request, res: Response) => {
+  const { sellerId } = req.params;
+
+  const query: any = { userType: 'SELLER' };
+  if (sellerId !== 'all') {
+    query.userId = new mongoose.Types.ObjectId(sellerId);
+  }
+
+  const stats = await WalletTransaction.aggregate([
+    { $match: query },
+    {
+      $group: {
+        _id: null,
+        totalEarned: {
+          $sum: { $cond: [{ $eq: ['$type', 'Credit'] }, '$amount', 0] }
+        },
+        totalWithdrawn: {
+          $sum: { $cond: [{ $eq: ['$type', 'Debit'] }, '$amount', 0] }
+        }
+      }
+    }
+  ]);
+
+  let currentBalance = 0;
+  if (sellerId !== 'all') {
+    const seller = await mongoose.model('Seller').findById(sellerId).select('balance');
+    currentBalance = seller?.balance || 0;
+  } else {
+    const result = await mongoose.model('Seller').aggregate([
+      { $group: { _id: null, totalBalance: { $sum: '$balance' } } }
+    ]);
+    currentBalance = result[0]?.totalBalance || 0;
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      totalEarned: currentBalance + (stats[0]?.totalWithdrawn || 0),
+      totalWithdrawn: stats[0]?.totalWithdrawn || 0,
+      currentBalance
+    }
+  });
+});

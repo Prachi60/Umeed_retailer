@@ -55,6 +55,8 @@ export interface SellerTransaction {
   type: string;
   status: string;
   description: string;
+  orderId?: string;
+  productName?: string;
 }
 
 // API METHODS
@@ -144,11 +146,39 @@ export const processWithdrawal = async (
 
 export const getSellerTransactions = async (
   sellerId: string,
-  params?: { page?: number; limit?: number }
-): Promise<ApiResponse<any[]>> => {
-  const response = await api.get<ApiResponse<any[]>>(
+  params?: { page?: number; limit?: number; type?: string }
+): Promise<ApiResponse<SellerTransaction[]>> => {
+  const response = await api.get<ApiResponse<SellerTransaction[]>>(
     `/admin/wallet/seller/${sellerId}`,
     { params }
+  );
+  return response.data;
+};
+
+/**
+ * Get Seller Wallet Stats (Summary)
+ */
+export const getSellerWalletStats = async (
+  sellerId: string
+): Promise<ApiResponse<{ totalEarned: number; totalWithdrawn: number; currentBalance: number }>> => {
+  const response = await api.get<ApiResponse<{ totalEarned: number; totalWithdrawn: number; currentBalance: number }>>(
+    `/admin/wallet/seller/${sellerId}/stats`
+  );
+  return response.data;
+};
+
+/**
+ * Manual Fund Transfer (Admin Adjustment)
+ */
+export const manualFundTransfer = async (data: {
+  sellerId: string;
+  amount: number;
+  type: "Credit" | "Debit";
+  description: string;
+}): Promise<ApiResponse<any>> => {
+  const response = await api.post<ApiResponse<any>>(
+    "/admin/wallet/fund-transfer",
+    data
   );
   return response.data;
 };

@@ -762,6 +762,9 @@ export default function OrderDetail() {
     );
   }
 
+  const isPartnerAssigned = !!(order?.deliveryBoy || order?.deliveryPartner);
+  const displayEta = routeInfo ? Math.ceil(routeInfo.durationValue / 60) : (eta || estimatedTime);
+
   const statusConfig: Record<
     string,
     { title: string; subtitle: string; color: string }
@@ -772,13 +775,13 @@ export default function OrderDetail() {
       color: currentTheme.accentColor,
     },
     Accepted: {
-      title: "Preparing your order",
-      subtitle: `Arriving in ${estimatedTime} mins`,
+      title: isPartnerAssigned ? "Preparing your order" : "Searching for delivery partner...",
+      subtitle: isPartnerAssigned ? `Arriving in ${displayEta} mins` : "",
       color: currentTheme.accentColor,
     },
     "On the way": {
       title: "Order picked up",
-      subtitle: `Arriving in ${estimatedTime} mins`,
+      subtitle: `Arriving in ${displayEta} mins`,
       color: currentTheme.accentColor,
     },
     Delivered: {
@@ -798,18 +801,18 @@ export default function OrderDetail() {
       color: currentTheme.accentColor,
     },
     Processed: {
-      title: "Order processed",
-      subtitle: "Preparing for delivery",
+      title: isPartnerAssigned ? "Preparing your order" : "Searching for delivery partner...",
+      subtitle: isPartnerAssigned ? `Arriving in ${displayEta} mins` : "",
       color: currentTheme.accentColor,
     },
     Shipped: {
       title: "Order shipped",
-      subtitle: "On the way to you",
+      subtitle: isPartnerAssigned ? `Arriving in ${displayEta} mins` : "On the way to you",
       color: currentTheme.accentColor,
     },
     "Out for Delivery": {
       title: "Out for delivery",
-      subtitle: `Arriving in ${estimatedTime} mins`,
+      subtitle: `Arriving in ${displayEta} mins`,
       color: currentTheme.accentColor,
     },
     Cancelled: {
@@ -916,12 +919,6 @@ export default function OrderDetail() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}>
             <span className="text-sm font-medium">{currentStatus.subtitle}</span>
-            {(orderStatus === "Accepted" || orderStatus === "On the way") && (
-              <>
-                <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                <span className="text-sm">On time</span>
-              </>
-            )}
             <motion.button
               onClick={handleRefresh}
               className="ml-1"
@@ -1005,7 +1002,7 @@ export default function OrderDetail() {
       )}
 
       {/* Delivery Partner Card */}
-      {(order?.deliveryPartner || order?.deliveryOtp) && (
+      {isPartnerAssigned && (
         <DeliveryPartnerCard
           partner={{
             name: order?.deliveryPartner?.name || "Delivery Partner",
@@ -1029,7 +1026,7 @@ export default function OrderDetail() {
 
 
         {/* Delivery Partner Assignment - Only show if no partner assigned yet */}
-        {!order?.deliveryPartner && (
+        {!isPartnerAssigned && (
           <motion.div
             className="bg-white rounded-xl p-4 shadow-sm"
             initial={{ opacity: 0, y: 20 }}
@@ -1040,9 +1037,7 @@ export default function OrderDetail() {
                 <span className="text-2xl">👨‍🍳</span>
               </div>
               <p className="font-semibold text-gray-900">
-                {order?.status === "Placed" || order?.status === "Accepted"
-                  ? "Assigning delivery partner shortly"
-                  : "Preparing your order"}
+                Assigning delivery partner shortly
               </p>
             </div>
           </motion.div>
@@ -1160,12 +1155,16 @@ export default function OrderDetail() {
             </div>
             <ChevronRightIcon className="w-5 h-5 text-gray-400" />
           </div>
-          <SectionItem
-            icon={CircleSlashIcon}
-            title="Cancel order"
-            subtitle=""
-            onClick={() => setShowCancelModal(true)}
-          />
+          {(orderStatus === "Placed" ||
+            orderStatus === "Received" ||
+            orderStatus === "Pending") && (
+            <SectionItem
+              icon={CircleSlashIcon}
+              title="Cancel order"
+              subtitle=""
+              onClick={() => setShowCancelModal(true)}
+            />
+          )}
         </motion.div>
 
         {/* Quick Actions */}
@@ -1267,7 +1266,7 @@ export default function OrderDetail() {
                 Share details to help the delivery partner find you
               </p>
               <textarea
-                className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-600"
                 rows={4}
                 maxLength={200}
                 placeholder="e.g., Ring the bell, Leave at door, etc."
@@ -1285,7 +1284,7 @@ export default function OrderDetail() {
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
                   onClick={handleSaveInstructions}>
                   Save
                 </Button>
@@ -1351,7 +1350,7 @@ export default function OrderDetail() {
                 ))}
               </div>
               <Button
-                className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+                className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white"
                 onClick={() => setShowItemsModal(false)}>
                 Close
               </Button>
@@ -1382,7 +1381,7 @@ export default function OrderDetail() {
                 Let the store know if you have any special preferences
               </p>
               <textarea
-                className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-600"
                 rows={4}
                 maxLength={200}
                 placeholder="e.g., No onions, Extra napkins, etc."
@@ -1400,7 +1399,7 @@ export default function OrderDetail() {
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1 text-white"
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
                   onClick={handleSaveSpecialRequests}>
                   Save
                 </Button>
