@@ -499,3 +499,40 @@ export const getDeliveryBoyWalletStats = asyncHandler(async (req: Request, res: 
     }
   });
 });
+
+/**
+ * Get Seller Settlement Stats (Aggregated)
+ */
+export const getSellerSettlementStats = asyncHandler(async (_req: Request, res: Response) => {
+  const [sellerTxs, cashCollections, deliveryBoys] = await Promise.all([
+    WalletTransaction.aggregate([
+      { $match: { userType: 'SELLER', status: 'Completed' } },
+      {
+        $group: {
+          _id: null,
+          totalEarnings: { $sum: { $cond: [{ $eq: ['$type', 'Credit'] }, '$amount', 0] } },
+          totalPaid: { $sum: { $cond: [{ $eq: ['$type', 'Debit'] }, '$amount', 0] } }
+        }
+      }
+    ]),
+    mongoose.model('CashCollection').aggregate([
+      { $group: { _id: null, totalCollected: { $sum: '$amount' } } }
+    ]),
+    mongoose.model('Delivery').aggregate([
+      { $group: { _id: null, totalCashInHand: { $sum: '$cashCollected' } } }
+    ])
+  ]);
+
+  const stats = {
+    totalSellerEarnings: sellerTxs[0]?.totalEarnings || 0,
+    codReceived: cashCollections[0]?.totalCollected || 0,
+    alreadyPaid: sellerTxs[0]?.totalPaid || 0,
+    availableToSettle: (cashCollections[0]?.totalCollected || 0) - (sellerTxs[0]?.totalPaid || 0),
+    pendingCOD: deliveryBoys[0]?.totalCashInHand || 0
+  };
+
+  return res.status(200).json({
+    success: true,
+    data: stats
+  });
+});

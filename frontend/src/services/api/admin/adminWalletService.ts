@@ -210,3 +210,19 @@ export const manualFundTransfer = async (data: {
   );
   return response.data;
 };
+
+export interface SellerSettlementStats {
+  totalSellerEarnings: number;
+  codReceived: number;
+  alreadyPaid: number;
+  availableToSettle: number;
+  pendingCOD: number;
+}
+
+/**
+ * Get Seller Settlement Stats (Aggregated)
+ */
+export const getSellerSettlementStats = async (): Promise<ApiResponse<SellerSettlementStats>> => {
+  const response = await api.get<ApiResponse<SellerSettlementStats>>("/admin/wallet/seller-settlement-stats");
+  return response.data;
+};

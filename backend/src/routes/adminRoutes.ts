@@ -246,6 +246,7 @@ router.get("/wallet/seller/:sellerId/stats", walletController.getSellerWalletSta
 router.get("/wallet/delivery-boy/:deliveryBoyId", walletController.getDeliveryBoyTransactions);
 router.get("/wallet/delivery-boy/:deliveryBoyId/stats", walletController.getDeliveryBoyWalletStats);
 router.post("/wallet/fund-transfer", walletController.manualFundTransfer);
+router.get("/wallet/seller-settlement-stats", walletController.getSellerSettlementStats);
 router.get("/wallet/withdrawals", withdrawalController.getAllWithdrawals);
 router.post("/wallet/withdrawal/process", walletController.processWithdrawalWrapper);
 
