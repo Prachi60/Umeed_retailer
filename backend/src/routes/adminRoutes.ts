@@ -263,6 +263,7 @@ router.patch("/taxes/:id/status", taxController.updateTaxStatus);
 router.delete("/taxes/:id", taxController.deleteTax);
 
 // ==================== Cash Collection Routes ====================
+router.get("/cash-collections/summary", cashCollectionController.getCashCollectionSummary);
 router.get("/cash-collections", cashCollectionController.getCashCollections);
 router.get(
   "/cash-collections/:id",

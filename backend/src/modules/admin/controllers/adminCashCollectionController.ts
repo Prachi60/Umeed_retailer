@@ -3,6 +3,7 @@ import { asyncHandler } from "../../../utils/asyncHandler";
 import CashCollection from "../../../models/CashCollection";
 import Delivery from "../../../models/Delivery";
 import Order from "../../../models/Order";
+import { IDelivery } from "../../../models/Delivery";
 
 /**
  * Get all cash collections
@@ -81,6 +82,40 @@ export const getCashCollections = asyncHandler(
 );
 
 /**
+ * Get cash collection summary statistics
+ */
+export const getCashCollectionSummary = asyncHandler(
+    async (req: Request, res: Response) => {
+        const [submittedResult, pendingResult, agentsWithPending] = await Promise.all([
+            // Calculate total submitted
+            CashCollection.aggregate([
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]),
+            // Calculate total pending from delivery agents
+            Delivery.aggregate([
+                { $group: { _id: null, total: { $sum: "$cashCollected" } } }
+            ]),
+            // Count agents with pending cash
+            Delivery.countDocuments({ cashCollected: { $gt: 0 }, status: "Active" })
+        ]);
+
+        const totalSubmitted = submittedResult[0]?.total || 0;
+        const pendingAmount = pendingResult[0]?.total || 0;
+        const totalCollected = totalSubmitted + pendingAmount;
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                totalCollected,
+                totalSubmitted,
+                pendingAmount,
+                agentsWithPending
+            }
+        });
+    }
+);
+
+/**
  * Get cash collection by ID
  */
 export const getCashCollectionById = asyncHandler(
@@ -112,12 +147,12 @@ export const getCashCollectionById = asyncHandler(
  */
 export const createCashCollection = asyncHandler(
     async (req: Request, res: Response) => {
-        const { deliveryBoyId, orderId, amount, remark } = req.body;
+        const { deliveryBoyId, orderId, referenceId, amount, remark } = req.body;
 
-        if (!deliveryBoyId || !orderId || !amount) {
+        if (!deliveryBoyId || !amount) {
             return res.status(400).json({
                 success: false,
-                message: "Delivery boy ID, order ID, and amount are required",
+                message: "Delivery boy ID and amount are required",
             });
         }
 
@@ -130,19 +165,20 @@ export const createCashCollection = asyncHandler(
             });
         }
 
-        // Verify order exists
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: "Order not found",
-            });
+        // Verify order exists if provided and is a valid ObjectId
+        let validOrderId = null;
+        if (orderId && /^[0-9a-fA-F]{24}$/.test(orderId)) {
+            const order = await Order.findById(orderId);
+            if (order) {
+                validOrderId = orderId;
+            }
         }
 
         // Create cash collection
         const collection = await CashCollection.create({
             deliveryBoy: deliveryBoyId,
-            order: orderId,
+            order: validOrderId,
+            referenceId: referenceId || (orderId && !validOrderId ? orderId : null),
             amount,
             remark,
             collectedBy: req.user?.userId,

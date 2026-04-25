@@ -2,7 +2,8 @@ import { Schema, model, Document, Types } from "mongoose";
 
 export interface ICashCollection extends Document {
     deliveryBoy: Types.ObjectId;
-    order: Types.ObjectId;
+    order?: Types.ObjectId;
+    referenceId?: string;
     amount: number;
     remark?: string;
     collectedBy: Types.ObjectId;
@@ -21,7 +22,11 @@ const cashCollectionSchema = new Schema<ICashCollection>(
         order: {
             type: Schema.Types.ObjectId,
             ref: "Order",
-            required: [true, "Order is required"],
+            required: false,
+        },
+        referenceId: {
+            type: String,
+            trim: true,
         },
         amount: {
             type: Number,

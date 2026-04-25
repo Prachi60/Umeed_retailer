@@ -104,10 +104,30 @@ export const getAllDeliveryBoys = asyncHandler(
       Delivery.countDocuments(query),
     ]);
 
+    // Fetch total submitted for each delivery boy
+    const deliveryBoyIds = deliveryBoys.map(db => db._id);
+    const submissionStats = await CashCollection.aggregate([
+      { $match: { deliveryBoy: { $in: deliveryBoyIds } } },
+      { $group: { _id: "$deliveryBoy", totalSubmitted: { $sum: "$amount" } } }
+    ]);
+
+    const statsMap = submissionStats.reduce((acc: any, stat: any) => {
+      acc[stat._id.toString()] = stat.totalSubmitted;
+      return acc;
+    }, {});
+
+    const enrichedDeliveryBoys = deliveryBoys.map(db => {
+      const dbObj = db.toObject();
+      return {
+        ...dbObj,
+        totalSubmitted: statsMap[db._id.toString()] || 0
+      };
+    });
+
     return res.status(200).json({
       success: true,
       message: "Delivery boys fetched successfully",
-      data: deliveryBoys,
+      data: enrichedDeliveryBoys,
       pagination: {
         page: parseInt(page as string),
         limit: parseInt(limit as string),

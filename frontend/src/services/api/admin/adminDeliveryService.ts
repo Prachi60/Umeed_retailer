@@ -94,9 +94,17 @@ export interface CashCollection {
 
 export interface CreateCashCollectionData {
   deliveryBoyId: string;
-  orderId: string;
+  orderId?: string;
+  referenceId?: string;
   amount: number;
   remark?: string;
+}
+
+export interface CashCollectionSummary {
+  totalCollected: number;
+  totalSubmitted: number;
+  pendingAmount: number;
+  agentsWithPending: number;
 }
 
 export interface GetDeliveryParams {
@@ -204,6 +212,13 @@ export const getCashCollections = async (
   const response = await api.get<ApiResponse<CashCollection[]>>(
     "/admin/cash-collections",
     { params }
+  );
+  return response.data;
+};
+
+export const getCashCollectionSummary = async (): Promise<ApiResponse<CashCollectionSummary>> => {
+  const response = await api.get<ApiResponse<CashCollectionSummary>>(
+    "/admin/cash-collections/summary"
   );
   return response.data;
 };
