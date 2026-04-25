@@ -9,6 +9,7 @@ import BestsellerCard from "../../../models/BestsellerCard";
 import LowestPricesProduct from "../../../models/LowestPricesProduct";
 import PromoStrip from "../../../models/PromoStrip";
 import Banner from "../../../models/Banner";
+import FAQ from "../../../models/FAQ";
 import mongoose from "mongoose";
 import { cache } from "../../../utils/cache";
 import { findSellersWithinRange } from "../../../utils/locationHelper";
@@ -968,3 +969,24 @@ async function getCategoryIdByName(name: string) {
   });
   return cat ? cat._id : null;
 }
+// Get Public FAQs
+export const getPublicFAQs = async (_req: Request, res: Response) => {
+    try {
+        const faqs = await FAQ.find({ status: "Active" }).sort({ order: 1 }).lean();
+        
+        return res.status(200).json({
+            success: true,
+            data: faqs.map(f => ({
+                id: f._id.toString(),
+                question: f.question,
+                answer: f.answer
+            }))
+        });
+    } catch (error: any) {
+        return res.status(500).json({
+            success: false,
+            message: "Error fetching FAQs",
+            error: error.message
+        });
+    }
+};

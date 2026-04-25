@@ -1,90 +1,30 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-
-interface FAQItem {
-  id: string;
-  question: string;
-  answer: string;
-}
-
-const faqData: FAQItem[] = [
-  {
-    id: "1",
-    question: "How do I place an order?",
-    answer:
-      "To place an order, simply browse our products, add items to your cart, and proceed to checkout. You'll need to provide your delivery address and payment details. Once confirmed, your order will be processed and delivered to you.",
-  },
-  {
-    id: "2",
-    question: "What are the delivery charges?",
-    answer:
-      "Delivery charges vary based on your location and order value. We offer free delivery on orders above ₹199. For orders below this threshold, a nominal delivery fee applies. You can check the exact charges during checkout.",
-  },
-  {
-    id: "3",
-    question: "How long does delivery take?",
-    answer:
-      "We typically deliver within 17-20 minutes for most locations. Delivery time may vary based on your location, order size, and current demand. You'll receive real-time updates about your order status.",
-  },
-  {
-    id: "4",
-    question: "Can I cancel my order?",
-    answer:
-      "Yes, you can cancel your order before it's confirmed by the seller. Once confirmed, cancellation may not be possible. Please check our cancellation policy for more details. Refunds are processed within 5-7 business days.",
-  },
-  {
-    id: "5",
-    question: "What payment methods do you accept?",
-    answer:
-      "We accept various payment methods including credit/debit cards, UPI, net banking, and digital wallets. Cash on delivery (COD) is also available for select locations.",
-  },
-  {
-    id: "6",
-    question: "How do I track my order?",
-    answer:
-      "You can track your order in real-time through the Orders section in your account. We also send SMS and email notifications with order updates. For detailed tracking, visit the order details page.",
-  },
-  {
-    id: "7",
-    question: "What is your return policy?",
-    answer:
-      "Most products are returnable within 2 days of delivery. Some items like perishables may not be returnable. Please check the product details for specific return policies. Returns are subject to our terms and conditions.",
-  },
-  {
-    id: "8",
-    question: "How do I apply a coupon code?",
-    answer:
-      'During checkout, you\'ll see an option to "See all coupons". Click on it, browse available coupons, and click "Apply" on the coupon you want to use. The discount will be automatically applied to your order.',
-  },
-  {
-    id: "9",
-    question: "Can I modify my delivery address?",
-    answer:
-      "Yes, you can modify your delivery address before placing the order. You can also save multiple addresses in your Address Book for quick selection during checkout.",
-  },
-  {
-    id: "10",
-    question: "What if I receive a damaged or wrong item?",
-    answer:
-      "If you receive a damaged or incorrect item, please contact our customer support immediately. We offer 48-hour replacement guarantee. You can report the issue through the order details page or contact us at help@Speedoo.com.",
-  },
-  {
-    id: "11",
-    question: "How do I add items to my wishlist?",
-    answer:
-      "Simply click the heart icon on any product to add it to your wishlist. You can access your wishlist from the Account page. Items in your wishlist can be easily added to cart when you're ready to purchase.",
-  },
-  {
-    id: "12",
-    question: "Is my personal information secure?",
-    answer:
-      "Yes, we take your privacy seriously. All personal information is encrypted and stored securely. We never share your data with third parties without your consent. Please review our Privacy Policy for more details.",
-  },
-];
+import { useState, useEffect } from "react";
+import { getPublicFAQs, FAQItem } from "../../services/api/customer/customerContentService";
 
 export default function FAQ() {
   const navigate = useNavigate();
+  const [faqs, setFaqs] = useState<FAQItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await getPublicFAQs();
+        if (response.success) {
+          setFaqs(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching FAQs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const toggleItem = (id: string) => {
     const newOpenItems = new Set(openItems);
@@ -145,46 +85,57 @@ export default function FAQ() {
       {/* FAQ Content */}
       <div className="px-4 md:px-6 lg:px-8 py-6">
         <div className="max-w-3xl mx-auto">
-          <div className="space-y-3">
-            {faqData.map((item) => {
-              const isOpen = openItems.has(item.id);
-              return (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-lg border border-neutral-200 overflow-hidden transition-all">
-                  <button
-                    onClick={() => toggleItem(item.id)}
-                    className="w-full flex items-center justify-between px-4 py-4 hover:bg-neutral-50 transition-colors text-left">
-                    <span className="text-sm md:text-base font-semibold text-neutral-900 pr-4">
-                      {item.question}
-                    </span>
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className={`flex-shrink-0 text-neutral-500 transition-transform ${isOpen ? "rotate-180" : ""
-                        }`}>
-                      <path
-                        d="M6 9l6 6 6-6"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                  {isOpen && (
-                    <div className="px-4 pb-4 pt-0">
-                      <p className="text-sm md:text-base text-neutral-600 leading-relaxed">
-                        {item.answer}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-10 h-10 border-4 border-[#7A3E8E] border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-neutral-500 font-medium">Loading questions...</p>
+            </div>
+          ) : faqs.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-neutral-400 italic">No questions found at the moment.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {faqs.map((item) => {
+                const isOpen = openItems.has(item.id);
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-lg border border-neutral-200 overflow-hidden transition-all">
+                    <button
+                      onClick={() => toggleItem(item.id)}
+                      className="w-full flex items-center justify-between px-4 py-4 hover:bg-neutral-50 transition-colors text-left">
+                      <span className="text-sm md:text-base font-semibold text-neutral-900 pr-4">
+                        {item.question}
+                      </span>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className={`flex-shrink-0 text-neutral-500 transition-transform ${isOpen ? "rotate-180" : ""
+                          }`}>
+                        <path
+                          d="M6 9l6 6 6-6"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                    {isOpen && (
+                      <div className="px-4 pb-4 pt-0">
+                        <p className="text-sm md:text-base text-neutral-600 leading-relaxed">
+                          {item.answer}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Contact Support Section */}
           <div className="mt-8 bg-gradient-to-br from-[#FFFDE7] to-[#FFF9C4] rounded-lg p-6 border border-[#FFECB3]">
