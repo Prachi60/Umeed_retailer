@@ -252,7 +252,6 @@ export const verifyAdminPayout = async (req: Request, res: Response) => {
         // Update Platform Wallet
         const platformWallet = await PlatformWallet.findOne().session(session);
         if (platformWallet) {
-            platformWallet.totalPlatformEarning += amount;
             platformWallet.currentPlatformBalance += amount;
             platformWallet.pendingFromDeliveryBoy = Math.max(0, platformWallet.pendingFromDeliveryBoy - amount);
             await platformWallet.save({ session });

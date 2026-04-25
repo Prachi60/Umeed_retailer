@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import CashCollection from "../../../models/CashCollection";
 import Delivery from "../../../models/Delivery";
@@ -156,49 +157,83 @@ export const createCashCollection = asyncHandler(
             });
         }
 
-        // Verify delivery boy exists
-        const deliveryBoy = await Delivery.findById(deliveryBoyId);
-        if (!deliveryBoy) {
-            return res.status(404).json({
-                success: false,
-                message: "Delivery boy not found",
-            });
-        }
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
-        // Verify order exists if provided and is a valid ObjectId
-        let validOrderId = null;
-        if (orderId && /^[0-9a-fA-F]{24}$/.test(orderId)) {
-            const order = await Order.findById(orderId);
-            if (order) {
-                validOrderId = orderId;
+        try {
+            // Verify delivery boy exists
+            const deliveryBoy = await Delivery.findById(deliveryBoyId).session(session);
+            if (!deliveryBoy) {
+                throw new Error("Delivery boy not found");
             }
+
+            // Verify order exists if provided and is a valid ObjectId
+            let validOrderId = null;
+            if (orderId && /^[0-9a-fA-F]{24}$/.test(orderId)) {
+                const order = await Order.findById(orderId).session(session);
+                if (order) {
+                    validOrderId = orderId;
+                }
+            }
+
+            // Create cash collection
+            const collection = await CashCollection.create([{
+                deliveryBoy: deliveryBoyId,
+                order: validOrderId,
+                referenceId: referenceId || (orderId && !validOrderId ? orderId : null),
+                amount,
+                remark,
+                collectedBy: req.user?.userId,
+                collectedAt: new Date(),
+            }], { session });
+
+            // Update delivery boy's cash collected (Gross) and pending admin payout (Net)
+            deliveryBoy.cashCollected = Math.max(0, (deliveryBoy.cashCollected || 0) - amount);
+            deliveryBoy.pendingAdminPayout = Math.max(0, (deliveryBoy.pendingAdminPayout || 0) - amount);
+            await deliveryBoy.save({ session });
+
+            // Update Platform Wallet tracking
+            try {
+                const PlatformWallet = (await import('../../../models/PlatformWallet')).default;
+                const wallet = await PlatformWallet.getWallet();
+                
+                wallet.currentPlatformBalance += amount;
+                wallet.pendingFromDeliveryBoy = Math.max(0, wallet.pendingFromDeliveryBoy - amount);
+                
+                await (wallet as any).save({ session });
+            } catch (pwError) {
+                console.error("Error updating platform wallet in createCashCollection:", pwError);
+            }
+
+            // Process pending payouts to sellers
+            try {
+                const { processPendingCODPayouts } = await import('../../../services/commissionService');
+                await processPendingCODPayouts(deliveryBoyId, amount, session);
+            } catch (payoutError) {
+                console.error("Error processing payouts in createCashCollection:", payoutError);
+            }
+
+            await session.commitTransaction();
+
+            const populatedCollection = await CashCollection.findById(collection[0]._id)
+                .populate("deliveryBoy", "name mobile")
+                .populate("order", "orderNumber total")
+                .populate("collectedBy", "name");
+
+            return res.status(201).json({
+                success: true,
+                message: "Cash collection created successfully",
+                data: populatedCollection,
+            });
+        } catch (error: any) {
+            await session.abortTransaction();
+            return res.status(500).json({
+                success: false,
+                message: error.message || "Failed to create cash collection",
+            });
+        } finally {
+            session.endSession();
         }
-
-        // Create cash collection
-        const collection = await CashCollection.create({
-            deliveryBoy: deliveryBoyId,
-            order: validOrderId,
-            referenceId: referenceId || (orderId && !validOrderId ? orderId : null),
-            amount,
-            remark,
-            collectedBy: req.user?.userId,
-            collectedAt: new Date(),
-        });
-
-        // Update delivery boy's cash collected
-        deliveryBoy.cashCollected = (deliveryBoy.cashCollected || 0) - amount;
-        await deliveryBoy.save();
-
-        const populatedCollection = await CashCollection.findById(collection._id)
-            .populate("deliveryBoy", "name mobile")
-            .populate("order", "orderNumber total")
-            .populate("collectedBy", "name");
-
-        return res.status(201).json({
-            success: true,
-            message: "Cash collection created successfully",
-            data: populatedCollection,
-        });
     }
 );
 

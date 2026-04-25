@@ -148,9 +148,14 @@ export const capturePayment = async (
         // Update Platform Wallet tracking
         try {
             const PlatformWallet = (await import('../models/PlatformWallet')).default;
+            const { calculateOrderBreakdown } = await import('./commissionService');
+            
             const platformWallet = await PlatformWallet.getWallet();
+            const breakdown = await calculateOrderBreakdown(orderId, session);
+
             platformWallet.totalPlatformEarning += order.total;
             platformWallet.currentPlatformBalance += order.total;
+            platformWallet.totalAdminEarning += breakdown.totalAdminEarning;
 
             if (session) {
                 await (platformWallet as any).save({ session });

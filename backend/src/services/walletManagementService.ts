@@ -137,6 +137,8 @@ export const debitWallet = async (
         // Update Platform Wallet tracking
         try {
             const platformWallet = await PlatformWallet.getWallet();
+            platformWallet.currentPlatformBalance = Math.max(0, platformWallet.currentPlatformBalance - amount);
+            
             if (userType === 'SELLER') {
                 platformWallet.sellerPendingPayouts = Math.max(0, platformWallet.sellerPendingPayouts - amount);
             } else {

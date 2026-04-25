@@ -954,6 +954,7 @@ export const processCODOrderDelivery = async (
 
             // 2. Update Platform Wallet
             const wallet = await (PlatformWallet as any).getWallet();
+            wallet.totalPlatformEarning += order.total;
             wallet.pendingFromDeliveryBoy += breakdown.amountDeliveryBoyOwesAdmin;
             await wallet.save({ session });
 

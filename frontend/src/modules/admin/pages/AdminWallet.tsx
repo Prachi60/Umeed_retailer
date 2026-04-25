@@ -153,28 +153,28 @@ export default function AdminWallet() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard
-          title="Total Platform Earning"
+          title="Total Sales Volume (GMV)"
           value={`₹${stats?.totalGMV?.toLocaleString('en-IN') || '0'}`}
           icon={TrendingUpIcon}
-          color="text-blue-600"
-          bg="bg-blue-50"
-          label="Total money collected"
+          color="text-teal-600"
+          bg="bg-teal-50"
+          label="Total value of all orders"
         />
         <StatsCard
-          title="Total Admin Earning"
+          title="Total Admin Profits"
           value={`₹${stats?.totalAdminEarnings?.toLocaleString('en-IN') || '0'}`}
           icon={DollarSignIcon}
           color="text-purple-600"
           bg="bg-purple-50"
-          label="Net profit for platform"
+          label="Total commissions & fees earned"
         />
         <StatsCard
-          title="Current Platform Balance"
+          title="Available Cash Balance"
           value={`₹${stats?.currentAccountBalance?.toLocaleString('en-IN') || '0'}`}
           icon={WalletIcon}
           color="text-emerald-600"
           bg="bg-emerald-50"
-          label="Available for business"
+          label="Actual cash held by platform"
         />
         <StatsCard
           title="Pending from Delivery Boys"
@@ -188,8 +188,8 @@ export default function AdminWallet() {
           title="Seller Pending Payouts"
           value={`₹${stats?.sellerPendingPayouts?.toLocaleString('en-IN') || '0'}`}
           icon={CreditCardIcon}
-          color="text-blue-600"
-          bg="bg-blue-50"
+          color="text-teal-600"
+          bg="bg-teal-50"
           label="Owed to sellers"
         />
         <StatsCard
@@ -214,7 +214,7 @@ export default function AdminWallet() {
           <TabButton
             active={activeTab === 'earnings'}
             onClick={() => setActiveTab('earnings')}
-            label="Admin Earnings"
+            label="Admin Profits"
             icon={TrendingUpIcon}
           />
           <TabButton
@@ -393,7 +393,7 @@ function TabButton({ active, onClick, label, icon: Icon, badge }: any) {
     <button
       onClick={onClick}
       className={`flex items-center gap-2 px-6 py-4 font-medium text-sm transition relative whitespace-nowrap ${active
-        ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
+        ? 'text-teal-600 border-b-2 border-teal-600 bg-teal-50/50'
         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
         }`}
     >
@@ -411,7 +411,7 @@ function TabButton({ active, onClick, label, icon: Icon, badge }: any) {
 function LoadingSpinner() {
   return (
     <div className="flex items-center justify-center py-12">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
     </div>
   );
 }

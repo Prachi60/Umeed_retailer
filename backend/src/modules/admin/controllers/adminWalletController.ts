@@ -11,22 +11,56 @@ import { approveWithdrawal, rejectWithdrawal, completeWithdrawal } from './admin
  * Get Financial Dashboard Stats
  */
 export const getFinancialDashboard = asyncHandler(async (_req: Request, res: Response) => {
-  const wallet = await PlatformWallet.getWallet();
+  const [
+    sellerStats,
+    deliveryStats,
+    riderPayoutStats,
+    commissionStats,
+    orderStats,
+    wallet
+  ] = await Promise.all([
+    // Total Seller Balances (Pending Payouts)
+    mongoose.model('Seller').aggregate([{ $group: { _id: null, total: { $sum: '$balance' } } }]),
+    // Total Delivery Boy Balances (Pending Payouts)
+    mongoose.model('Delivery').aggregate([{ $group: { _id: null, total: { $sum: '$balance' } } }]),
+    // Total Cash Collected by Delivery Boys (Gross amount they hold)
+    mongoose.model('Delivery').aggregate([{ $group: { _id: null, total: { $sum: '$cashCollected' } } }]),
+    // Total Admin Profits (Realized & Pending Commissions)
+    Commission.aggregate([{ $match: { status: { $ne: 'Cancelled' } } }, { $group: { _id: null, total: { $sum: '$commissionAmount' } } }]),
+    // Total Sales Volume (GMV)
+    mongoose.model('Order').aggregate([
+      { $match: { status: { $in: ['Delivered', 'Completed'] } } },
+      { $group: { _id: null, total: { $sum: '$total' } } }
+    ]),
+    // Current Liquid Cash (Keep wallet as primary for this as it tracks inflow/outflow)
+    PlatformWallet.getWallet()
+  ]);
 
-  // We still calculate some things on the fly or just use wallet
-  // It's better to use wallet for consistency with our new sync logic
+  const stats = {
+    totalGMV: orderStats[0]?.total || 0,
+    currentAccountBalance: wallet.currentPlatformBalance,
+    totalAdminEarnings: commissionStats[0]?.total || 0,
+    sellerPendingPayouts: sellerStats[0]?.total || 0,
+    deliveryPendingPayouts: deliveryStats[0]?.total || 0,
+    pendingFromDeliveryBoy: riderPayoutStats[0]?.total || 0,
+    pendingWithdrawalsCount: await WithdrawRequest.countDocuments({ status: 'Pending' })
+  };
+
+  // Optional: Sync the platform wallet counters with these real numbers
+  try {
+    wallet.totalPlatformEarning = stats.totalGMV;
+    wallet.totalAdminEarning = stats.totalAdminEarnings;
+    wallet.sellerPendingPayouts = stats.sellerPendingPayouts;
+    wallet.deliveryBoyPendingPayouts = stats.deliveryPendingPayouts;
+    wallet.pendingFromDeliveryBoy = stats.pendingFromDeliveryBoy;
+    await wallet.save();
+  } catch (err) {
+    console.error("Sync error in financial dashboard:", err);
+  }
 
   return res.status(200).json({
     success: true,
-    data: {
-      totalGMV: wallet.totalPlatformEarning,
-      currentAccountBalance: wallet.currentPlatformBalance,
-      totalAdminEarnings: wallet.totalAdminEarning,
-      sellerPendingPayouts: wallet.sellerPendingPayouts,
-      deliveryPendingPayouts: wallet.deliveryBoyPendingPayouts,
-      pendingFromDeliveryBoy: wallet.pendingFromDeliveryBoy,
-      pendingWithdrawalsCount: await WithdrawRequest.countDocuments({ status: 'Pending' })
-    }
+    data: stats
   });
 });
 
@@ -504,62 +538,46 @@ export const getDeliveryBoyWalletStats = asyncHandler(async (req: Request, res: 
  * Get Seller Settlement Stats (Aggregated)
  */
 export const getSellerSettlementStats = asyncHandler(async (_req: Request, res: Response) => {
-  const [sellerTxs, deliveryBoys] = await Promise.all([
+  const [sellerStats, deliveryStats, riderPayoutStats] = await Promise.all([
+    // Actual sum of all seller balances
+    mongoose.model('Seller').aggregate([{ $group: { _id: null, totalBalance: { $sum: '$balance' } } }]),
+    // Specific Breakdown of seller transactions for context
     WalletTransaction.aggregate([
       { $match: { userType: 'SELLER', status: 'Completed' } },
       {
-        $lookup: {
-          from: 'orders',
-          localField: 'relatedOrder',
-          foreignField: '_id',
-          as: 'orderInfo'
-        }
+        $lookup: { from: 'orders', localField: 'relatedOrder', foreignField: '_id', as: 'orderInfo' }
       },
       {
-        $addFields: {
-          paymentMethod: { $arrayElemAt: ['$orderInfo.paymentMethod', 0] }
-        }
+        $addFields: { paymentMethod: { $arrayElemAt: ['$orderInfo.paymentMethod', 0] } }
       },
       {
         $group: {
           _id: null,
           totalEarnings: { $sum: { $cond: [{ $eq: ['$type', 'Credit'] }, '$amount', 0] } },
           onlineEarnings: { 
-            $sum: { 
-              $cond: [
-                { $and: [{ $eq: ['$type', 'Credit'] }, { $ne: ['$paymentMethod', 'COD'] }] }, 
-                '$amount', 
-                0
-              ] 
-            } 
+            $sum: { $cond: [{ $and: [{ $eq: ['$type', 'Credit'] }, { $ne: ['$paymentMethod', 'COD'] }] }, '$amount', 0] } 
           },
           codEarnings: { 
-            $sum: { 
-              $cond: [
-                { $and: [{ $eq: ['$type', 'Credit'] }, { $eq: ['$paymentMethod', 'COD'] }] }, 
-                '$amount', 
-                0
-              ] 
-            } 
+            $sum: { $cond: [{ $and: [{ $eq: ['$type', 'Credit'] }, { $eq: ['$paymentMethod', 'COD'] }] }, '$amount', 0] } 
           },
           totalPaid: { $sum: { $cond: [{ $eq: ['$type', 'Debit'] }, '$amount', 0] } }
         }
       }
     ]),
-    mongoose.model('Delivery').aggregate([
-      { $group: { _id: null, totalCashInHand: { $sum: '$cashCollected' } } }
-    ])
+    // Gross amount held by Riders
+    mongoose.model('Delivery').aggregate([{ $group: { _id: null, totalPending: { $sum: '$cashCollected' } } }])
   ]);
 
-  const txStats = sellerTxs[0] || { totalEarnings: 0, onlineEarnings: 0, codEarnings: 0, totalPaid: 0 };
+  const txStats = deliveryStats[0] || { totalEarnings: 0, onlineEarnings: 0, codEarnings: 0, totalPaid: 0 };
+  const currentBalance = sellerStats[0]?.totalBalance || 0;
   
   const stats = {
-    totalSellerEarnings: txStats.totalEarnings,
+    totalSellerEarnings: currentBalance + txStats.totalPaid, // Cumulative historic earnings
     onlineEarnings: txStats.onlineEarnings,
-    codCollected: txStats.codEarnings, // This is the NET amount collected and credited to sellers
+    codCollected: txStats.codEarnings,
     alreadyPaid: txStats.totalPaid,
-    availableToSettle: txStats.totalEarnings - txStats.totalPaid,
-    pendingCOD: deliveryBoys[0]?.totalCashInHand || 0 // This is the GROSS amount still with delivery boys
+    availableToSettle: currentBalance, // Current sum of all seller balances
+    pendingCOD: riderPayoutStats[0]?.totalPending || 0 // Matches Admin Wallet dashboard
   };
 
   return res.status(200).json({
