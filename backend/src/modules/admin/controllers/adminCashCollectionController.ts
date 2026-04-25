@@ -149,10 +149,10 @@ export const createCashCollection = asyncHandler(
     async (req: Request, res: Response) => {
         const { deliveryBoyId, orderId, referenceId, amount, remark } = req.body;
 
-        if (!deliveryBoyId || !amount) {
+        if (!deliveryBoyId || amount === undefined || amount <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Delivery boy ID and amount are required",
+                message: "A valid positive amount is required",
             });
         }
 

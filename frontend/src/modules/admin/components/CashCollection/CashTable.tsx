@@ -132,7 +132,8 @@ export default function CashTable({ agents, onCollect, onView }: CashTableProps)
                     <div className="flex justify-end gap-2">
                       <Button
                         size="sm"
-                        className="h-8 rounded-lg bg-purple-600 hover:bg-purple-700 text-white border-none"
+                        className="h-8 rounded-lg text-white border-none bg-teal-600 hover:bg-teal-700"
+                        style={{ backgroundColor: '#0d9488' }}
                         onClick={() => onCollect(agent)}
                         disabled={agent.pending <= 0}
                       >
@@ -141,7 +142,8 @@ export default function CashTable({ agents, onCollect, onView }: CashTableProps)
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-8 rounded-lg border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+                        className="h-8 rounded-lg border-teal-600 text-teal-600 hover:bg-teal-50"
+                        style={{ borderColor: '#0d9488', color: '#0d9488' }}
                         onClick={() => onView(agent)}
                       >
                         View
@@ -170,7 +172,8 @@ export default function CashTable({ agents, onCollect, onView }: CashTableProps)
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-lg h-9 w-9 p-0"
+                className="rounded-lg h-9 w-9 p-0 border-teal-600 text-teal-600 hover:bg-teal-50"
+                style={{ borderColor: '#0d9488', color: '#0d9488' }}
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
               >
@@ -182,7 +185,8 @@ export default function CashTable({ agents, onCollect, onView }: CashTableProps)
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-lg h-9 w-9 p-0"
+                className="rounded-lg h-9 w-9 p-0 border-teal-600 text-teal-600 hover:bg-teal-50"
+                style={{ borderColor: '#0d9488', color: '#0d9488' }}
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
               >

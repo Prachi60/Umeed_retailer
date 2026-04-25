@@ -112,7 +112,16 @@ const SettleModal: React.FC<SettleModalProps> = ({
                   <input
                     type="number"
                     value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (parseFloat(val) < 0) return;
+                      setFormData({ ...formData, amount: val });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === '-' || e.key === 'e') {
+                        e.preventDefault();
+                      }
+                    }}
                     placeholder="0.00"
                     max={availableAmount}
                     min={0.01}

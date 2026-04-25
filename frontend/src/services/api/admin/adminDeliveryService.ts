@@ -84,8 +84,9 @@ export interface CashCollection {
   _id: string;
   deliveryBoyId: string;
   deliveryBoyName: string;
-  orderId: string;
-  total: number;
+  orderId?: string;
+  referenceId?: string;
+  total?: number;
   amount: number;
   remark?: string;
   collectedAt: string;

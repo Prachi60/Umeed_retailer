@@ -99,13 +99,23 @@ export default function CollectModal({ open, onOpenChange, agent, onConfirm }: C
               <Input
                 id="amount"
                 type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
                 className={cn(
                   "pl-8 h-12 text-lg font-bold transition-all",
-                  error ? "border-red-300 focus-visible:ring-red-100" : "border-neutral-200 focus-visible:ring-purple-100"
+                  error ? "border-red-300 focus-visible:ring-red-100" : "border-neutral-200 focus-visible:ring-teal-100"
                 )}
                 value={amount}
+                onKeyDown={(e) => {
+                  if (e.key === '-' || e.key === 'e') {
+                    e.preventDefault();
+                  }
+                }}
                 onChange={(e) => {
-                  setAmount(e.target.value)
+                  const val = e.target.value;
+                  if (parseFloat(val) < 0) return;
+                  setAmount(val)
                   setError("")
                 }}
               />
@@ -160,7 +170,8 @@ export default function CollectModal({ open, onOpenChange, agent, onConfirm }: C
             Cancel
           </Button>
           <Button
-            className="flex-1 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold py-6 border-none"
+            className="flex-1 rounded-xl text-white font-bold py-6 border-none bg-teal-600 hover:bg-teal-700"
+            style={{ backgroundColor: '#0d9488' }}
             onClick={handleConfirm}
           >
             Confirm Collection

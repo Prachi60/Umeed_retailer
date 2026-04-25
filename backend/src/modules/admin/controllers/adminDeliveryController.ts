@@ -104,23 +104,34 @@ export const getAllDeliveryBoys = asyncHandler(
       Delivery.countDocuments(query),
     ]);
 
-    // Fetch total submitted for each delivery boy
+    // Fetch total submitted and last submission date for each delivery boy
     const deliveryBoyIds = deliveryBoys.map(db => db._id);
     const submissionStats = await CashCollection.aggregate([
       { $match: { deliveryBoy: { $in: deliveryBoyIds } } },
-      { $group: { _id: "$deliveryBoy", totalSubmitted: { $sum: "$amount" } } }
+      { 
+        $group: { 
+          _id: "$deliveryBoy", 
+          totalSubmitted: { $sum: "$amount" },
+          lastCollectionDate: { $max: "$collectedAt" }
+        } 
+      }
     ]);
 
     const statsMap = submissionStats.reduce((acc: any, stat: any) => {
-      acc[stat._id.toString()] = stat.totalSubmitted;
+      acc[stat._id.toString()] = {
+        totalSubmitted: stat.totalSubmitted,
+        lastCollectionDate: stat.lastCollectionDate
+      };
       return acc;
     }, {});
 
     const enrichedDeliveryBoys = deliveryBoys.map(db => {
       const dbObj = db.toObject();
+      const stats = statsMap[db._id.toString()] || { totalSubmitted: 0, lastCollectionDate: null };
       return {
         ...dbObj,
-        totalSubmitted: statsMap[db._id.toString()] || 0
+        totalSubmitted: stats.totalSubmitted,
+        lastCollectionDate: stats.lastCollectionDate
       };
     });
 

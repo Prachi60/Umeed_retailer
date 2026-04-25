@@ -12,6 +12,7 @@ import { useToast } from "../../../context/ToastContext";
 import SummaryCards from "../components/CashCollection/SummaryCards";
 import CashTable from "../components/CashCollection/CashTable";
 import CollectModal from "../components/CashCollection/CollectModal";
+import HistoryModal from "../components/CashCollection/HistoryModal";
 import RecentCollections from "../components/CashCollection/RecentCollections";
 import Button from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -33,6 +34,7 @@ export default function AdminCashCollection() {
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<any>(null);
 
   // Filters
@@ -66,7 +68,7 @@ export default function AdminCashCollection() {
           collected: (agent.cashCollected || 0) + (agent.totalSubmitted || 0),
           submitted: agent.totalSubmitted || 0,
           pending: agent.cashCollected || 0,
-          lastSubmission: agent.updatedAt ? new Date(agent.updatedAt).toLocaleDateString() : "N/A",
+          lastSubmission: agent.lastCollectionDate ? new Date(agent.lastCollectionDate).toLocaleDateString() : "No Submissions",
           status: agent.cashCollected > 0 ? (agent.totalSubmitted > 0 ? "Partial" : "Pending") : "Settled"
         }));
         setAgents(transformedAgents);
@@ -163,7 +165,8 @@ export default function AdminCashCollection() {
           </div>
 
           <Button 
-            className="rounded-xl bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2 px-6 shadow-md transition-all active:scale-95 border-none"
+            className="rounded-xl text-white flex items-center gap-2 px-6 shadow-md transition-all active:scale-95 border-none bg-teal-600 hover:bg-teal-700"
+            style={{ backgroundColor: '#0d9488' }} // teal-600
             onClick={handleExport}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -181,7 +184,10 @@ export default function AdminCashCollection() {
           <CashTable 
             agents={agents} 
             onCollect={handleCollect}
-            onView={(agent) => showToast(`Viewing details for ${agent.name}`, "info")}
+            onView={(agent) => {
+              setSelectedAgent(agent);
+              setIsHistoryOpen(true);
+            }}
           />
         </div>
         
@@ -198,12 +204,18 @@ export default function AdminCashCollection() {
         onConfirm={handleConfirmCollection}
       />
 
+      <HistoryModal 
+        open={isHistoryOpen}
+        onOpenChange={setIsHistoryOpen}
+        agent={selectedAgent}
+      />
+
       {/* Loading Overlay */}
       {loading && (
         <div className="fixed inset-0 bg-white/60 backdrop-blur-[2px] z-[60] flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm font-bold text-purple-900 uppercase tracking-widest animate-pulse">Synchronizing Ledger...</p>
+            <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-bold text-teal-900 uppercase tracking-widest animate-pulse">Synchronizing Ledger...</p>
           </div>
         </div>
       )}

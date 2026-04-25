@@ -339,10 +339,10 @@ export const manualFundTransfer = asyncHandler(async (req: Request, res: Respons
   const { sellerId, userId, userType = 'SELLER', amount, type, description } = req.body;
   const targetId = userId || sellerId;
 
-  if (!targetId || !amount || !type || !description) {
+  if (!targetId || amount === undefined || Number(amount) <= 0 || !type || !description) {
     return res.status(400).json({
       success: false,
-      message: 'All fields (userId/sellerId, amount, type, description) are required'
+      message: 'All fields (userId/sellerId, amount, type, description) are required and amount must be positive'
     });
   }
 
