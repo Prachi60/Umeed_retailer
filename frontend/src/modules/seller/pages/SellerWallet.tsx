@@ -94,21 +94,49 @@ export default function SellerWallet() {
         </div>
       </div>
 
-      {/* Balance Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="m-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg"
-      >
-        <p className="text-sm opacity-90 mb-1">Wallet Balance</p>
-        <h1 className="text-4xl font-bold mb-4">₹{balance.toFixed(2)}</h1>
-        <button
-          onClick={() => setShowWithdrawModal(true)}
-          className="bg-white text-blue-600 px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition-all shadow-md"
+      {/* Balance Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 m-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg flex flex-col justify-between"
         >
-          Request Withdrawal
-        </button>
-      </motion.div>
+          <div>
+            <p className="text-xs font-medium opacity-80 uppercase tracking-wider mb-1">Withdrawable Balance</p>
+            <h1 className="text-4xl font-bold mb-4">₹{balance.toFixed(2)}</h1>
+          </div>
+          <button
+            onClick={() => setShowWithdrawModal(true)}
+            className="w-full bg-white text-blue-600 py-3 rounded-xl font-bold hover:bg-blue-50 transition-all shadow-md mt-auto"
+          >
+            Request Withdrawal
+          </button>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col"
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending Settlement</p>
+            <div className="group relative">
+              <svg className="w-4 h-4 text-gray-300 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <div className="absolute left-0 bottom-full mb-2 w-48 p-2 bg-gray-900 text-white text-[10px] rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                Earnings from COD orders currently being held by delivery partners. Will move to balance once settled with Admin.
+              </div>
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">₹{(commissions.pending || 0).toFixed(2)}</h2>
+          <div className="mt-auto">
+            <div className="flex items-center gap-2 text-orange-600 bg-orange-50 px-3 py-2 rounded-lg border border-orange-100">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <p className="text-xs font-semibold uppercase tracking-tight">Held by Riders</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
 
 
       {/* Tabs */}
@@ -307,6 +335,7 @@ export default function SellerWallet() {
                 >
                   <option value="Bank Transfer">Bank Transfer</option>
                   <option value="UPI">UPI</option>
+                  <option value="Cash">Cash</option>
                 </select>
               </div>
               <div className="flex gap-3">

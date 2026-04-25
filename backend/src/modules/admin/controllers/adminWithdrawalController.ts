@@ -1,20 +1,62 @@
 import { Request, Response } from 'express';
 import WithdrawRequest from '../../../models/WithdrawRequest';
+import WalletTransaction from '../../../models/WalletTransaction';
+import PlatformWallet from '../../../models/PlatformWallet';
 import mongoose from 'mongoose';
 
 /**
- * Get all withdrawal requests
+ * Get withdrawal statistics
  */
+export const getWithdrawalStats = async (req: Request, res: Response) => {
+    try {
+        const stats = await WithdrawRequest.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalRequests: { $sum: 1 },
+                    pendingRequests: { $sum: { $cond: [{ $eq: ['$status', 'Pending'] }, 1, 0] } },
+                    approvedAmount: { $sum: { $cond: [{ $in: ['$status', ['Approved', 'Completed']] }, '$amount', 0] } },
+                    rejectedRequests: { $sum: { $cond: [{ $eq: ['$status', 'Rejected'] }, 1, 0] } }
+                }
+            }
+        ]);
+
+        const data = stats[0] || {
+            totalRequests: 0,
+            pendingRequests: 0,
+            approvedAmount: 0,
+            rejectedRequests: 0
+        };
+
+        return res.status(200).json({
+            success: true,
+            data
+        });
+    } catch (error: any) {
+        console.error('Error getting withdrawal stats:', error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to get withdrawal statistics',
+        });
+    }
+};
+
 /**
  * Get all withdrawal requests
  */
 export const getAllWithdrawals = async (req: Request, res: Response) => {
     try {
-        const { status, userType, page = 1, limit = 20 } = req.query;
+        const { status, userType, search, startDate, endDate, page = 1, limit = 20 } = req.query;
 
         const query: any = {};
-        if (status) query.status = status;
-        if (userType) query.userType = userType;
+        if (status && status !== 'all') query.status = status;
+        if (userType && userType !== 'all') query.userType = userType;
+        
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) query.createdAt.$gte = new Date(startDate as string);
+            if (endDate) query.createdAt.$lte = new Date(endDate as string);
+        }
 
         const skip = (Number(page) - 1) * Number(limit);
 
@@ -37,8 +79,8 @@ export const getAllWithdrawals = async (req: Request, res: Response) => {
         });
 
         const [sellers, deliveryBoys] = await Promise.all([
-            mongoose.model('Seller').find({ _id: { $in: sellerIds } }).select('sellerName storeName email mobile accountNumber bankName ifscCode'),
-            mongoose.model('Delivery').find({ _id: { $in: deliveryIds } }).select('name firstName lastName email mobile accountNumber bankName ifscCode')
+            mongoose.model('Seller').find({ _id: { $in: sellerIds } }).select('sellerName storeName email mobile accountNumber bankName ifscCode balance'),
+            mongoose.model('Delivery').find({ _id: { $in: deliveryIds } }).select('name firstName lastName email mobile accountNumber bankName ifscCode balance')
         ]);
 
         const sellerMap = new Map(sellers.map(s => [s._id.toString(), s]));
@@ -54,6 +96,7 @@ export const getAllWithdrawals = async (req: Request, res: Response) => {
 
             // Return request with manually populated user
             const requestObj = r.toObject();
+            requestObj.availableBalance = user?.balance || 0;
             requestObj.userId = user || r.userId; // Fallback to ID if not found
             return requestObj;
         });
@@ -80,15 +123,20 @@ export const getAllWithdrawals = async (req: Request, res: Response) => {
 };
 
 /**
- * Approve withdrawal request
+ * Approve withdrawal request (Unified Approve & Complete)
  */
 export const approveWithdrawal = async (req: Request, res: Response) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         const { id } = req.params;
+        const { transactionReference, remarks } = req.body;
         const adminId = (req as any).user!.userId;
 
-        const request = await WithdrawRequest.findById(id);
+        const request = await WithdrawRequest.findById(id).session(session);
         if (!request) {
+            await session.abortTransaction();
             return res.status(404).json({
                 success: false,
                 message: 'Withdrawal request not found',
@@ -96,28 +144,83 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
         }
 
         if (request.status !== 'Pending') {
+            await session.abortTransaction();
             return res.status(400).json({
                 success: false,
                 message: `Cannot approve ${request.status.toLowerCase()} request`,
             });
         }
 
-        request.status = 'Approved';
+        // Validate available balance
+        let userModel;
+        if (request.userType === 'SELLER') {
+            userModel = mongoose.model('Seller');
+        } else {
+            userModel = mongoose.model('Delivery');
+        }
+
+        const user = await userModel.findById(request.userId).session(session);
+        if (!user || user.balance < request.amount) {
+            await session.abortTransaction();
+            return res.status(400).json({
+                success: false,
+                message: 'Insufficient user balance to approve this withdrawal',
+            });
+        }
+
+        // Deduct from user balance
+        user.balance -= request.amount;
+        await user.save({ session });
+
+        // Create Wallet Transaction (Ledger Entry)
+        await WalletTransaction.create([{
+            userId: request.userId,
+            userType: request.userType,
+            amount: request.amount,
+            type: 'Debit',
+            description: `WITHDRAWAL_APPROVED - ${transactionReference || 'No Ref'}`,
+            status: 'Completed',
+            reference: `WDR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        }], { session });
+
+        // Update Platform Wallet tracking
+        try {
+            const wallet = await PlatformWallet.getWallet();
+            wallet.currentPlatformBalance -= request.amount;
+            if (request.userType === 'SELLER') {
+                wallet.sellerPendingPayouts -= request.amount;
+            } else {
+                wallet.deliveryBoyPendingPayouts -= request.amount;
+            }
+            await wallet.save({ session });
+        } catch (pwError) {
+            console.error("Error updating platform wallet:", pwError);
+        }
+
+        // Update request status
+        request.status = 'Completed'; // Marking as completed since payment is processed
         request.processedBy = new mongoose.Types.ObjectId(adminId);
         request.processedAt = new Date();
-        await request.save();
+        request.transactionReference = transactionReference;
+        if (remarks) request.remarks = remarks;
+        await request.save({ session });
+
+        await session.commitTransaction();
 
         return res.status(200).json({
             success: true,
-            message: 'Withdrawal request approved successfully',
+            message: 'Withdrawal approved and processed successfully',
             data: request,
         });
     } catch (error: any) {
+        await session.abortTransaction();
         console.error('Error approving withdrawal:', error);
         return res.status(500).json({
             success: false,
             message: error.message || 'Failed to approve withdrawal',
         });
+    } finally {
+        session.endSession();
     }
 };
 

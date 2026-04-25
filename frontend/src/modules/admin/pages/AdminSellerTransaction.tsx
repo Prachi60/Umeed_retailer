@@ -248,17 +248,14 @@ export default function AdminSellerTransaction() {
             </button>
           </div>
 
-          <div className="bg-blue-600 p-8 rounded-3xl text-white shadow-xl shadow-blue-100 overflow-hidden relative">
+          <div className="bg-teal-600 p-8 rounded-3xl text-white shadow-xl shadow-teal-100 overflow-hidden relative group">
             <div className="relative z-10">
-              <h3 className="text-lg font-bold mb-2">Settlement Policy</h3>
-              <p className="text-blue-100 text-sm leading-relaxed mb-6">
-                Payments are processed based on confirmed COD collections. Pending COD amounts are not eligible for settlement until delivery boys remit the cash.
+              <h3 className="text-lg font-bold mb-2">Settlement Guide</h3>
+              <p className="text-teal-50 mt-0.5 leading-relaxed" style={{ color: '#ccfbf1' }}>
+                Record manual payouts to sellers. <span className="font-bold text-white underline">Step 1:</span> Transfer the requested amount to the seller's bank/UPI account. <span className="font-bold text-white underline">Step 2:</span> Click the <span className="font-bold text-white">'Settle Payment'</span> button to log the transaction and update their wallet balance.
               </p>
-              <button className="px-6 py-2.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-bold transition-all backdrop-blur-md">
-                Learn More
-              </button>
             </div>
-            <svg className="absolute -right-8 -bottom-8 w-40 h-40 text-white/10" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute -right-8 -bottom-8 w-40 h-40 text-white/10 group-hover:scale-110 transition-transform duration-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
             </svg>
           </div>

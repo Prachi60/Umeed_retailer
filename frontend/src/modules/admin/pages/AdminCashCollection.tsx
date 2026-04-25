@@ -178,6 +178,24 @@ export default function AdminCashCollection() {
       {/* Summary Cards */}
       <SummaryCards data={summaryData} />
 
+      {/* Quick Guide Banner */}
+      <div className="mt-8 bg-teal-600 rounded-2xl p-4 text-white shadow-lg shadow-teal-100 flex items-center justify-between overflow-hidden relative group">
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/30">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+          <div>
+            <h4 className="font-bold text-sm">Cash Collection Guide</h4>
+            <p className="text-xs text-teal-500 mt-0.5 leading-relaxed" style={{ color: '#ccfbf1' }}>
+              Reconcile COD cash from your delivery fleet. <span className="font-bold text-white underline">Step 1:</span> Collect the physical cash from the Rider. <span className="font-bold text-white underline">Step 2:</span> Click the 'Collect' button and enter the Amount + Reference ID to settle their pending balance.
+            </p>
+          </div>
+        </div>
+        <div className="hidden sm:block absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+          <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" /></svg>
+        </div>
+      </div>
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
         <div className="lg:col-span-3">
