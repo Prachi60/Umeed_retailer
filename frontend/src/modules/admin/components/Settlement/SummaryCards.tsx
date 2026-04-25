@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 interface SummaryCardsProps {
   stats: {
     totalSellerEarnings: number;
-    codReceived: number;
+    onlineEarnings: number;
+    codCollected: number;
     alreadyPaid: number;
     availableToSettle: number;
     pendingCOD: number;
@@ -16,7 +17,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({ stats }) => {
     {
       title: "Total Seller Earnings",
       value: `₹${stats?.totalSellerEarnings.toLocaleString('en-IN') || '0'}`,
-      subtitle: "System calculated from orders",
+      subtitle: "Online + Collected COD proceeds",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -26,9 +27,9 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({ stats }) => {
       bg: "bg-blue-50",
     },
     {
-      title: "COD Received",
-      value: `₹${stats?.codReceived.toLocaleString('en-IN') || '0'}`,
-      subtitle: "Actual cash in Admin Wallet",
+      title: "Funds Held by Admin",
+      value: `₹${((stats?.onlineEarnings || 0) + (stats?.codCollected || 0)).toLocaleString('en-IN')}`,
+      subtitle: "Online Earnings + Collected COD",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -40,27 +41,27 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({ stats }) => {
     {
       title: "Available to Settle",
       value: `₹${stats?.availableToSettle.toLocaleString('en-IN') || '0'}`,
-      subtitle: "COD Received - Already Paid",
+      subtitle: "Funds Held - Already Paid",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      color: "text-green-600",
-      bg: "bg-green-50",
+      color: "text-teal-600",
+      bg: "bg-teal-50",
       highlight: true
     },
     {
-      title: "Pending COD",
+      title: "Pending from Delivery",
       value: `₹${stats?.pendingCOD.toLocaleString('en-IN') || '0'}`,
-      subtitle: "Money with delivery boys",
+      subtitle: "Uncollected COD with agents",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      color: "text-red-600",
-      bg: "bg-red-50",
+      color: "text-amber-600",
+      bg: "bg-amber-50",
     }
   ];
 

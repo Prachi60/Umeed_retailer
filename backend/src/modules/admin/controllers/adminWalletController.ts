@@ -504,31 +504,62 @@ export const getDeliveryBoyWalletStats = asyncHandler(async (req: Request, res: 
  * Get Seller Settlement Stats (Aggregated)
  */
 export const getSellerSettlementStats = asyncHandler(async (_req: Request, res: Response) => {
-  const [sellerTxs, cashCollections, deliveryBoys] = await Promise.all([
+  const [sellerTxs, deliveryBoys] = await Promise.all([
     WalletTransaction.aggregate([
       { $match: { userType: 'SELLER', status: 'Completed' } },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'relatedOrder',
+          foreignField: '_id',
+          as: 'orderInfo'
+        }
+      },
+      {
+        $addFields: {
+          paymentMethod: { $arrayElemAt: ['$orderInfo.paymentMethod', 0] }
+        }
+      },
       {
         $group: {
           _id: null,
           totalEarnings: { $sum: { $cond: [{ $eq: ['$type', 'Credit'] }, '$amount', 0] } },
+          onlineEarnings: { 
+            $sum: { 
+              $cond: [
+                { $and: [{ $eq: ['$type', 'Credit'] }, { $ne: ['$paymentMethod', 'COD'] }] }, 
+                '$amount', 
+                0
+              ] 
+            } 
+          },
+          codEarnings: { 
+            $sum: { 
+              $cond: [
+                { $and: [{ $eq: ['$type', 'Credit'] }, { $eq: ['$paymentMethod', 'COD'] }] }, 
+                '$amount', 
+                0
+              ] 
+            } 
+          },
           totalPaid: { $sum: { $cond: [{ $eq: ['$type', 'Debit'] }, '$amount', 0] } }
         }
       }
-    ]),
-    mongoose.model('CashCollection').aggregate([
-      { $group: { _id: null, totalCollected: { $sum: '$amount' } } }
     ]),
     mongoose.model('Delivery').aggregate([
       { $group: { _id: null, totalCashInHand: { $sum: '$cashCollected' } } }
     ])
   ]);
 
+  const txStats = sellerTxs[0] || { totalEarnings: 0, onlineEarnings: 0, codEarnings: 0, totalPaid: 0 };
+  
   const stats = {
-    totalSellerEarnings: sellerTxs[0]?.totalEarnings || 0,
-    codReceived: cashCollections[0]?.totalCollected || 0,
-    alreadyPaid: sellerTxs[0]?.totalPaid || 0,
-    availableToSettle: (cashCollections[0]?.totalCollected || 0) - (sellerTxs[0]?.totalPaid || 0),
-    pendingCOD: deliveryBoys[0]?.totalCashInHand || 0
+    totalSellerEarnings: txStats.totalEarnings,
+    onlineEarnings: txStats.onlineEarnings,
+    codCollected: txStats.codEarnings, // This is the NET amount collected and credited to sellers
+    alreadyPaid: txStats.totalPaid,
+    availableToSettle: txStats.totalEarnings - txStats.totalPaid,
+    pendingCOD: deliveryBoys[0]?.totalCashInHand || 0 // This is the GROSS amount still with delivery boys
   };
 
   return res.status(200).json({

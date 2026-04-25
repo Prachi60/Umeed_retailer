@@ -213,7 +213,8 @@ export const manualFundTransfer = async (data: {
 
 export interface SellerSettlementStats {
   totalSellerEarnings: number;
-  codReceived: number;
+  onlineEarnings: number;
+  codCollected: number;
   alreadyPaid: number;
   availableToSettle: number;
   pendingCOD: number;
