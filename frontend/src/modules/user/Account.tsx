@@ -4,7 +4,11 @@ import { useAuth } from "../../context/AuthContext";
 import {
   getProfile,
   CustomerProfile,
+  deleteAccount as deleteAccountApi,
+  updateProfile,
 } from "../../services/api/customerService";
+import { sendOTP } from "../../services/api/auth/customerAuthService";
+import OTPInput from "../../components/OTPInput";
 
 export default function Account() {
   const navigate = useNavigate();
@@ -14,6 +18,17 @@ export default function Account() {
   const [error, setError] = useState("");
   const [showGstModal, setShowGstModal] = useState(false);
   const [gstNumber, setGstNumber] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteOtpModal, setShowDeleteOtpModal] = useState(false);
+  const [deleteSessionId, setDeleteSessionId] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editDob, setEditDob] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -71,6 +86,82 @@ export default function Account() {
   const handleGstSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setShowGstModal(false);
+  };
+
+  const handleDeleteRequest = async () => {
+    setLoading(true);
+    setDeleteError("");
+    try {
+      const phone = profile?.phone || user?.phone;
+      if (!phone) {
+        setDeleteError("Phone number not found. Please logout and login again.");
+        return;
+      }
+      const response = await sendOTP(phone);
+      if (response.success && response.sessionId) {
+        setDeleteSessionId(response.sessionId);
+        setShowDeleteModal(false);
+        setShowDeleteOtpModal(true);
+      } else {
+        setDeleteError(response.message || "Failed to send OTP");
+      }
+    } catch (err: any) {
+      setDeleteError(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteOtpComplete = async (otp: string) => {
+    setIsDeleting(true);
+    setDeleteError("");
+    try {
+      const phone = profile?.phone || user?.phone;
+      if (!phone) throw new Error("Phone number not found");
+
+      const response = await deleteAccountApi(phone, otp, deleteSessionId);
+      if (response.success) {
+        // Clear everything and redirect
+        authLogout();
+        navigate("/login", { state: { message: "Account deleted successfully." } });
+      } else {
+        setDeleteError(response.message || "Failed to delete account");
+      }
+    } catch (err: any) {
+      setDeleteError(err.response?.data?.message || "Failed to delete account");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleEditProfile = () => {
+    setEditName(profile?.name || user?.name || "");
+    setEditEmail(profile?.email || user?.email || "");
+    setEditDob(profile?.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : "");
+    setShowEditModal(true);
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUpdating(true);
+    setUpdateError("");
+    try {
+      const response = await updateProfile({
+        name: editName,
+        email: editEmail,
+        dateOfBirth: editDob,
+      });
+      if (response.success) {
+        setProfile(response.data);
+        setShowEditModal(false);
+      } else {
+        setUpdateError(response.message || "Failed to update profile");
+      }
+    } catch (err: any) {
+      setUpdateError(err.response?.data?.message || "Failed to update profile");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   // Show login/signup prompt for unregistered users
@@ -219,7 +310,9 @@ export default function Account() {
                     </svg>
                   </div>
                 </div>
-                <button className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-purple-600 border-2 border-white flex items-center justify-center text-white shadow-md hover:scale-110 active:scale-90 transition-all">
+                <button 
+                  onClick={handleEditProfile}
+                  className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-purple-600 border-2 border-white flex items-center justify-center text-white shadow-md hover:scale-110 active:scale-90 transition-all">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -297,7 +390,7 @@ export default function Account() {
             </h2>
           </div>
           
-          <div className="space-y-3">
+          <div className="bg-white rounded-2xl border border-neutral-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.04)] overflow-hidden">
             {[
               { id: 'address', label: 'Address Book', icon: (
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -317,13 +410,15 @@ export default function Account() {
               { id: 'terms', label: 'Terms & Conditions', icon: (
                 <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><polyline points="14 2 14 8 20 8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></>
               ), onClick: () => navigate("/terms") },
-            ].map((item) => (
+            ].map((item, index, array) => (
               <button
                 key={item.id}
                 onClick={item.onClick}
-                className="w-full group flex items-center justify-between p-4 bg-white rounded-2xl border border-neutral-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.04)] hover:border-purple-100 hover:shadow-md transition-all duration-300 outline-none">
+                className={`w-full group flex items-center justify-between px-4 py-3.5 hover:bg-neutral-50 transition-all duration-200 outline-none ${
+                  index !== array.length - 1 ? 'border-b border-neutral-50' : ''
+                }`}>
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
+                  <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-105 transition-transform">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       {item.icon}
                     </svg>
@@ -349,6 +444,19 @@ export default function Account() {
                   <line x1="21" y1="12" x2="9" y2="12" />
                 </svg>
                 <span className="text-sm font-bold text-red-600">Log Out</span>
+              </button>
+            </div>
+
+            {/* Delete Account button */}
+            <div className="pt-2 pb-6">
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="w-full flex items-center justify-center gap-2 p-3 text-neutral-400 hover:text-red-500 transition-all duration-300 group outline-none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+                <span className="text-xs font-semibold">Delete Account</span>
               </button>
             </div>
           </div>
@@ -417,6 +525,202 @@ export default function Account() {
                   <span className="underline">Terms & Conditions</span>
                 </p>
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Delete Account Warning Modal */}
+      {showDeleteModal && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+            onClick={() => !loading && setShowDeleteModal(false)}
+          />
+          <div className="fixed inset-x-0 bottom-0 z-[60] animate-in slide-in-from-bottom duration-500 ease-out p-4">
+            <div className="bg-white rounded-[32px] shadow-2xl max-w-lg mx-auto p-8 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-red-500" />
+              
+              <div className="text-center">
+                <div className="mx-auto mb-6 w-20 h-20 rounded-full bg-red-50 flex items-center justify-center">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-500">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                </div>
+                
+                <h3 className="text-2xl font-black text-neutral-900 mb-3">
+                  Delete Account?
+                </h3>
+                <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
+                  This will <span className="font-bold text-red-600">permanently delete</span> your profile, addresses, and all personal data. Completed orders will be anonymized for records. This action <span className="font-bold">cannot be undone</span>.
+                </p>
+
+                {deleteError && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-xs font-bold animate-shake">
+                    {deleteError}
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={handleDeleteRequest}
+                    disabled={loading}
+                    className="w-full rounded-2xl bg-red-600 text-white font-black py-4 hover:bg-red-700 transition-all shadow-xl shadow-red-500/20 uppercase tracking-widest text-sm flex items-center justify-center gap-2">
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      "Continue to Delete"
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    disabled={loading}
+                    className="w-full rounded-2xl bg-neutral-100 text-neutral-900 font-bold py-4 hover:bg-neutral-200 transition-all uppercase tracking-widest text-sm">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Delete OTP Verification Modal */}
+      {showDeleteOtpModal && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+            onClick={() => !isDeleting && setShowDeleteOtpModal(false)}
+          />
+          <div className="fixed inset-x-0 bottom-0 z-[60] animate-in slide-in-from-bottom duration-500 ease-out p-4">
+            <div className="bg-white rounded-[32px] shadow-2xl max-w-lg mx-auto p-8 relative">
+              <div className="text-center">
+                <div className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-purple-50 flex items-center justify-center">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-600">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                </div>
+                
+                <h3 className="text-2xl font-black text-neutral-900 mb-2">
+                  Verify Identity
+                </h3>
+                <p className="text-sm text-neutral-500 mb-8">
+                  Enter the OTP sent to your registered mobile number <span className="font-bold text-neutral-900">+{profile?.phone || user?.phone}</span> to confirm deletion.
+                </p>
+
+                <div className="flex justify-center mb-8">
+                  <OTPInput 
+                    onComplete={handleDeleteOtpComplete} 
+                    disabled={isDeleting} 
+                    size="compact"
+                    variant="light"
+                  />
+                </div>
+
+                {deleteError && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-xs font-bold">
+                    {deleteError}
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setShowDeleteOtpModal(false)}
+                  disabled={isDeleting}
+                  className="w-full rounded-2xl bg-neutral-100 text-neutral-900 font-bold py-4 hover:bg-neutral-200 transition-all uppercase tracking-widest text-sm">
+                  Go Back
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+            onClick={() => !isUpdating && setShowEditModal(false)}
+          />
+          <div className="fixed inset-x-0 bottom-0 z-[60] animate-in slide-in-from-bottom duration-500 ease-out p-4">
+            <div className="bg-white rounded-[32px] shadow-2xl max-w-lg mx-auto p-8 relative">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl font-black text-neutral-900">
+                  Edit Profile
+                </h3>
+                <button 
+                  onClick={() => setShowEditModal(false)}
+                  className="w-10 h-10 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-400 hover:text-neutral-900 transition-colors">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+
+              {updateError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-xs font-bold">
+                  {updateError}
+                </div>
+              )}
+
+              <form onSubmit={handleUpdateProfile} className="space-y-5">
+                <div>
+                  <label className="block text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-2 ml-1">Full Name</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      placeholder="Enter your name"
+                      className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-5 py-4 text-sm font-bold text-neutral-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-5 py-4 text-sm font-bold text-neutral-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-2 ml-1">Date of Birth</label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={editDob}
+                      onChange={(e) => setEditDob(e.target.value)}
+                      className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-5 py-4 text-sm font-bold text-neutral-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="w-full rounded-2xl bg-[#9048A5] text-white font-black py-4 hover:bg-[#7b3a8d] transition-all shadow-xl shadow-purple-500/20 uppercase tracking-widest text-sm flex items-center justify-center gap-2">
+                    {isUpdating ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </>

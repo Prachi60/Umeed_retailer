@@ -1,5 +1,13 @@
 import { Request, Response } from "express";
 import Customer from "../../../models/Customer";
+import Order from "../../../models/Order";
+import Address from "../../../models/Address";
+import Cart from "../../../models/Cart";
+import CartItem from "../../../models/CartItem";
+import Wishlist from "../../../models/Wishlist";
+import Review from "../../../models/Review";
+import Notification from "../../../models/Notification";
+import { verifySmsOtp } from "../../../services/otpService";
 import { asyncHandler } from "../../../utils/asyncHandler";
 
 /**
@@ -224,5 +232,93 @@ export const getLocation = asyncHandler(async (req: Request, res: Response) => {
       pincode: customer.pincode,
       locationUpdatedAt: customer.locationUpdatedAt,
     },
+  });
+});
+
+/**
+ * Delete customer account
+ */
+export const deleteAccount = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+  const { otp, sessionId, phone } = req.body;
+
+  if (!userId || (req as any).user?.userType !== "Customer") {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized or not a customer",
+    });
+  }
+
+  if (!otp || !sessionId || !phone) {
+    return res.status(400).json({
+      success: false,
+      message: "OTP, Session ID, and Phone number are required for verification",
+    });
+  }
+
+  // 1. Verify Identity via OTP
+  const isValid = await verifySmsOtp(sessionId, otp, phone, "Customer");
+  if (!isValid) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid or expired OTP",
+    });
+  }
+
+  const customer = await Customer.findById(userId);
+  if (!customer) {
+    return res.status(404).json({
+      success: false,
+      message: "Customer not found",
+    });
+  }
+
+  // 2. Anonymize Orders
+  await Order.updateMany(
+    { customer: userId },
+    {
+      $set: {
+        customerName: "Deleted User",
+        customerEmail: "deleted@example.com",
+        customerPhone: "0000000000",
+        customerNotes: "[Anonymized]",
+      }
+    }
+  );
+
+  // 3. Anonymize Reviews
+  await Review.updateMany(
+    { customer: userId },
+    {
+      $set: {
+        comment: "[Review deleted by user]",
+        title: "[Deleted]",
+      }
+    }
+  );
+
+  // 4. Delete related data
+  // Delete Addresses
+  await Address.deleteMany({ customer: userId });
+
+  // Delete Cart & Items
+  const cart = await Cart.findOne({ customer: userId });
+  if (cart) {
+    await CartItem.deleteMany({ cart: cart._id });
+    await Cart.deleteOne({ _id: cart._id });
+  }
+
+  // Delete Wishlist
+  await Wishlist.deleteOne({ customer: userId });
+
+  // Delete Notifications
+  await Notification.deleteMany({ recipientId: userId, recipientType: "Customer" });
+
+  // 5. Finally, Hard Delete Customer
+  await Customer.deleteOne({ _id: userId });
+
+  return res.status(200).json({
+    success: true,
+    message: "Your account and all related personal data have been permanently deleted.",
   });
 });

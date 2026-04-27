@@ -213,7 +213,7 @@ function isMockMode(): boolean {
  * Check if developer bypass OTP
  */
 function isDeveloperBypass(otp: string): boolean {
-  return (process.env.NODE_ENV !== 'production' || process.env.USE_MOCK_OTP === 'true') && otp === '999999';
+  return (process.env.NODE_ENV !== 'production' || process.env.USE_MOCK_OTP === 'true') && (otp === '999999' || otp === '9999');
 }
 
 // ==========================================
@@ -226,6 +226,12 @@ export async function sendSmsOtp(
 ): Promise<OtpResponse> {
   try {
     const otp = generateOTP(4);
+
+    if (process.env.NODE_ENV !== 'production' || process.env.USE_MOCK_OTP === 'true') {
+      console.log(`\n-----------------------------------`);
+      console.log(`[OTP DEBUG] Mobile: ${mobile}, Type: ${userType}, OTP: ${otp}`);
+      console.log(`-----------------------------------\n`);
+    }
 
     // Special number bypass
     if (isSpecialBypass(mobile)) {
@@ -335,6 +341,12 @@ export async function sendOTP(
 ): Promise<OtpResponse> {
   try {
     const otp = generateOTP(4);
+
+    if (process.env.NODE_ENV !== 'production' || process.env.USE_MOCK_OTP === 'true') {
+      console.log(`\n-----------------------------------`);
+      console.log(`[OTP DEBUG] Mobile: ${mobile}, Type: ${userType}, OTP: ${otp}`);
+      console.log(`-----------------------------------\n`);
+    }
 
     // Special number bypass
     if (isSpecialBypass(mobile)) {
