@@ -105,3 +105,40 @@ export const deletePolicy = asyncHandler(async (req: Request, res: Response) => 
         message: "Policy deleted successfully",
     });
 });
+/**
+ * Upsert policy by type (Create if not exists, otherwise update)
+ */
+export const upsertPolicy = asyncHandler(async (req: Request, res: Response) => {
+    const { type, title, content, version, isActive } = req.body;
+
+    if (!type || !title || !content || !version) {
+        return res.status(400).json({
+            success: false,
+            message: "Type, title, content, and version are required",
+        });
+    }
+
+    let policy = await Policy.findOne({ type });
+
+    if (policy) {
+        policy.title = title;
+        policy.content = content;
+        policy.version = version;
+        if (isActive !== undefined) policy.isActive = isActive;
+        await policy.save();
+    } else {
+        policy = await Policy.create({
+            type,
+            title,
+            content,
+            version,
+            isActive: isActive !== undefined ? isActive : true,
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: `Policy for ${type} updated successfully`,
+        data: policy,
+    });
+});

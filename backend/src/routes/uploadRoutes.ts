@@ -17,15 +17,10 @@ import { asyncHandler } from "../utils/asyncHandler";
 
 const router = Router();
 
-// All upload routes require authentication
-router.use(authenticate);
-
-/**
- * POST /api/v1/upload/image
- * Upload a single image
- */
+// Routes that require authentication
 router.post(
   "/image",
+  authenticate,
   requireUserType("Admin", "Seller"),
   uploadSingleImage.single("image"),
   handleUploadError,
@@ -50,12 +45,9 @@ router.post(
   })
 );
 
-/**
- * POST /api/v1/upload/images
- * Upload multiple images
- */
 router.post(
   "/images",
+  authenticate,
   requireUserType("Admin", "Seller"),
   uploadMultipleImages.array("images", 10), // Max 10 images
   handleUploadError,
@@ -88,11 +80,10 @@ router.post(
 
 /**
  * POST /api/v1/upload/document
- * Upload a document (image or PDF)
+ * Upload a document (image or PDF) - PUBLIC for signup
  */
 router.post(
   "/document",
-  authenticate, // All authenticated users can upload documents
   uploadDocument.single("document"),
   handleUploadError,
   asyncHandler(async (req: Request, res: Response) => {
@@ -103,13 +94,11 @@ router.post(
       });
     }
 
-    // Determine folder based on user type
-    let folder: string = CLOUDINARY_FOLDERS.SELLER_DOCUMENTS;
+    // Determine folder based on user type if authenticated, otherwise default to delivery
+    let folder: string = CLOUDINARY_FOLDERS.DELIVERY_DOCUMENTS;
     const userType = (req as any).user?.userType;
 
-    if (userType === "Delivery") {
-      folder = CLOUDINARY_FOLDERS.DELIVERY_DOCUMENTS;
-    } else if (userType === "Seller") {
+    if (userType === "Seller") {
       folder = CLOUDINARY_FOLDERS.SELLER_DOCUMENTS;
     }
 
@@ -131,11 +120,10 @@ router.post(
 
 /**
  * POST /api/v1/upload/documents
- * Upload multiple documents
+ * Upload multiple documents - PUBLIC for signup
  */
 router.post(
   "/documents",
-  authenticate,
   uploadMultipleDocuments.array("documents", 5), // Max 5 documents
   handleUploadError,
   asyncHandler(async (req: Request, res: Response) => {
@@ -146,13 +134,11 @@ router.post(
       });
     }
 
-    // Determine folder based on user type
-    let folder: string = CLOUDINARY_FOLDERS.SELLER_DOCUMENTS;
+    // Determine folder
+    let folder: string = CLOUDINARY_FOLDERS.DELIVERY_DOCUMENTS;
     const userType = (req as any).user?.userType;
 
-    if (userType === "Delivery") {
-      folder = CLOUDINARY_FOLDERS.DELIVERY_DOCUMENTS;
-    } else if (userType === "Seller") {
+    if (userType === "Seller") {
       folder = CLOUDINARY_FOLDERS.SELLER_DOCUMENTS;
     }
 
@@ -182,6 +168,7 @@ router.post(
  */
 router.delete(
   "/:publicId",
+  authenticate,
   requireUserType("Admin", "Seller"),
   asyncHandler(async (req: Request, res: Response) => {
     const { publicId } = req.params;

@@ -135,7 +135,10 @@ export default function DeliverySettings() {
                 />
               </svg>
             </button>
-            <button className="w-full p-4 flex items-center justify-between hover:bg-neutral-50 transition-colors">
+            <button 
+              onClick={() => navigate("/privacy-policy")}
+              className="w-full p-4 flex items-center justify-between hover:bg-neutral-50 transition-colors"
+            >
               <div className="flex-1 text-left">
                 <p className="text-neutral-900 text-sm font-medium">Privacy Policy</p>
               </div>
@@ -150,7 +153,10 @@ export default function DeliverySettings() {
                 />
               </svg>
             </button>
-            <button className="w-full p-4 flex items-center justify-between hover:bg-neutral-50 transition-colors">
+            <button 
+              onClick={() => navigate("/terms")}
+              className="w-full p-4 flex items-center justify-between hover:bg-neutral-50 transition-colors"
+            >
               <div className="flex-1 text-left">
                 <p className="text-neutral-900 text-sm font-medium">Terms & Conditions</p>
               </div>

@@ -239,12 +239,29 @@ export default function DeliveryProfile() {
             </button>
           </div>
         ) : (
-          <button
-            onClick={handleEdit}
-            className="w-full mt-4 bg-orange-500 text-white rounded-xl py-3 font-semibold hover:bg-orange-600 transition-colors"
-          >
-            Edit Profile
-          </button>
+          <div className="space-y-3 mt-4">
+            <button
+              onClick={handleEdit}
+              className="w-full bg-orange-500 text-white rounded-xl py-3 font-semibold hover:bg-orange-600 transition-colors"
+            >
+              Edit Profile
+            </button>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => navigate("/privacy-policy")}
+                className="bg-white py-3 px-4 rounded-xl border border-neutral-200 text-sm font-semibold text-neutral-700 hover:border-orange-500 transition-colors text-center"
+              >
+                Privacy Policy
+              </button>
+              <button
+                onClick={() => navigate("/terms")}
+                className="bg-white py-3 px-4 rounded-xl border border-neutral-200 text-sm font-semibold text-neutral-700 hover:border-orange-500 transition-colors text-center"
+              >
+                Terms & Conditions
+              </button>
+            </div>
+          </div>
         )}
       </div>
       <DeliveryBottomNav />

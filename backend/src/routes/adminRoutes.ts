@@ -300,6 +300,7 @@ router.put("/faqs/order", faqController.updateFAQOrder);
 
 // ==================== Policy Routes ====================
 router.post("/policies", policyController.createPolicy);
+router.post("/policies/upsert", policyController.upsertPolicy);
 router.get("/policies", policyController.getPolicies);
 router.put("/policies/:id", policyController.updatePolicy);
 router.delete("/policies/:id", policyController.deletePolicy);

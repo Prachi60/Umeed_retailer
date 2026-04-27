@@ -24,6 +24,8 @@ export default function AdminManageDeliveryBoy() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalDeliveryBoys, setTotalDeliveryBoys] = useState(0);
     const [successMessage, setSuccessMessage] = useState('');
+    const [selectedDeliveryBoy, setSelectedDeliveryBoy] = useState<DeliveryBoy | null>(null);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
     // Debounce search term and fetch delivery boys
     useEffect(() => {
@@ -562,6 +564,19 @@ export default function AdminManageDeliveryBoy() {
                                             <td className="p-4 align-middle">
                                                 <div className="flex items-center gap-2">
                                                     <button
+                                                        onClick={() => {
+                                                            setSelectedDeliveryBoy(deliveryBoy);
+                                                            setIsDetailModalOpen(true);
+                                                        }}
+                                                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                                        title="View Details"
+                                                    >
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                    </button>
+                                                    <button
                                                         onClick={() => handleStatusChange(deliveryBoy._id, deliveryBoy.status === 'Active' ? 'Inactive' : 'Active')}
                                                         disabled={processing === deliveryBoy._id}
                                                         className={`p-1.5 rounded transition-colors ${deliveryBoy.status === 'Active'
@@ -708,6 +723,244 @@ export default function AdminManageDeliveryBoy() {
                 Copyright © 2025. Developed By{' '}
                 <a href="#" className="text-blue-600 hover:underline">Speedoo - 10 Minute App</a>
             </footer>
+
+            {/* Delivery Boy Detail Modal */}
+            {isDetailModalOpen && selectedDeliveryBoy && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                        {/* Modal Header */}
+                        <div className="bg-teal-600 text-white px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+                            <h3 className="text-xl font-bold">Delivery Partner Details</h3>
+                            <button 
+                                onClick={() => setIsDetailModalOpen(false)}
+                                className="text-white hover:text-neutral-200 transition-colors"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-8">
+                            {/* Personal Info Section */}
+                            <div>
+                                <h4 className="text-teal-700 font-bold border-b border-teal-100 pb-2 mb-4 flex items-center gap-2">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    Personal Information
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Full Name</p>
+                                        <p className="text-neutral-800 font-medium">{selectedDeliveryBoy.name}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Mobile</p>
+                                        <p className="text-neutral-800 font-medium">+91 {selectedDeliveryBoy.mobile}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Email</p>
+                                        <p className="text-neutral-800 font-medium">{selectedDeliveryBoy.email || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Date of Birth</p>
+                                        <p className="text-neutral-800 font-medium">
+                                            {selectedDeliveryBoy.dateOfBirth ? new Date(selectedDeliveryBoy.dateOfBirth).toLocaleDateString('en-IN', {
+                                                day: '2-digit',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            }) : 'N/A'}
+                                        </p>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Full Address</p>
+                                        <p className="text-neutral-800 font-medium">{selectedDeliveryBoy.address}, {selectedDeliveryBoy.city} - {selectedDeliveryBoy.pincode}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bank Info Section */}
+                            <div>
+                                <h4 className="text-teal-700 font-bold border-b border-teal-100 pb-2 mb-4 flex items-center gap-2">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                                        <line x1="2" y1="10" x2="22" y2="10"></line>
+                                    </svg>
+                                    Bank Account Details
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-50 p-4 rounded-lg border border-neutral-100">
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Account Holder Name</p>
+                                        <p className="text-neutral-800 font-medium">{selectedDeliveryBoy.accountName || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Bank Name</p>
+                                        <p className="text-neutral-800 font-medium">{selectedDeliveryBoy.bankName || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Account Number</p>
+                                        <p className="text-neutral-800 font-medium">{selectedDeliveryBoy.bankAccountNumber || (selectedDeliveryBoy as any).accountNumber || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider">IFSC Code</p>
+                                        <p className="text-neutral-800 font-medium font-mono">{selectedDeliveryBoy.ifscCode || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Documents Section */}
+                            <div>
+                                <h4 className="text-teal-700 font-bold border-b border-teal-100 pb-2 mb-4 flex items-center gap-2">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                    Uploaded Documents
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Driving License */}
+                                    <div className="border border-neutral-200 rounded-lg overflow-hidden group">
+                                        <div className="bg-neutral-100 px-4 py-2 border-b border-neutral-200 flex justify-between items-center">
+                                            <span className="text-sm font-bold text-neutral-700">Driving License</span>
+                                            {selectedDeliveryBoy.drivingLicense && (
+                                                <a 
+                                                    href={selectedDeliveryBoy.drivingLicense} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="text-teal-600 hover:text-teal-700 text-xs font-bold underline"
+                                                >
+                                                    View Full
+                                                </a>
+                                            )}
+                                        </div>
+                                        <div className="p-2 flex justify-center bg-neutral-50 min-h-[200px] items-center">
+                                            {selectedDeliveryBoy.drivingLicense ? (
+                                                selectedDeliveryBoy.drivingLicense.toLowerCase().endsWith('.pdf') ? (
+                                                    <div className="flex flex-col items-center gap-2 text-neutral-500">
+                                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                                        </svg>
+                                                        <span className="text-xs">PDF Document</span>
+                                                    </div>
+                                                ) : (
+                                                    <img 
+                                                        src={selectedDeliveryBoy.drivingLicense} 
+                                                        alt="Driving License" 
+                                                        className="max-h-[300px] rounded object-contain transition-transform group-hover:scale-[1.02]"
+                                                    />
+                                                )
+                                            ) : (
+                                                <span className="text-sm text-neutral-400 italic">Not Uploaded</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* National ID */}
+                                    <div className="border border-neutral-200 rounded-lg overflow-hidden group">
+                                        <div className="bg-neutral-100 px-4 py-2 border-b border-neutral-200 flex justify-between items-center">
+                                            <span className="text-sm font-bold text-neutral-700">National ID Card</span>
+                                            {selectedDeliveryBoy.nationalIdentityCard && (
+                                                <a 
+                                                    href={selectedDeliveryBoy.nationalIdentityCard} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    className="text-teal-600 hover:text-teal-700 text-xs font-bold underline"
+                                                >
+                                                    View Full
+                                                </a>
+                                            )}
+                                        </div>
+                                        <div className="p-2 flex justify-center bg-neutral-50 min-h-[200px] items-center">
+                                            {selectedDeliveryBoy.nationalIdentityCard ? (
+                                                selectedDeliveryBoy.nationalIdentityCard.toLowerCase().endsWith('.pdf') ? (
+                                                    <div className="flex flex-col items-center gap-2 text-neutral-500">
+                                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                                        </svg>
+                                                        <span className="text-xs">PDF Document</span>
+                                                    </div>
+                                                ) : (
+                                                    <img 
+                                                        src={selectedDeliveryBoy.nationalIdentityCard} 
+                                                        alt="National ID Card" 
+                                                        className="max-h-[300px] rounded object-contain transition-transform group-hover:scale-[1.02]"
+                                                    />
+                                                )
+                                            ) : (
+                                                <span className="text-sm text-neutral-400 italic">Not Uploaded</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Status & Actions Section */}
+                            <div className="bg-teal-50 p-6 rounded-xl border border-teal-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+                                <div className="flex items-center gap-4">
+                                    <div>
+                                        <p className="text-xs text-teal-600 uppercase font-bold tracking-wider">Current Status</p>
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold mt-1 ${
+                                            selectedDeliveryBoy.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                        }`}>
+                                            {selectedDeliveryBoy.status}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-teal-600 uppercase font-bold tracking-wider">Availability</p>
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-bold mt-1 ${
+                                            selectedDeliveryBoy.available === 'Available' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                        }`}>
+                                            {selectedDeliveryBoy.available}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap gap-3">
+                                    <button
+                                        onClick={() => {
+                                            handleStatusChange(selectedDeliveryBoy._id, selectedDeliveryBoy.status === 'Active' ? 'Inactive' : 'Active');
+                                            // Status update happens asynchronously, so we don't close modal here to allow feedback
+                                        }}
+                                        disabled={processing === selectedDeliveryBoy._id}
+                                        className={`px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-sm ${
+                                            selectedDeliveryBoy.status === 'Active' 
+                                            ? 'bg-red-600 text-white hover:bg-red-700' 
+                                            : 'bg-green-600 text-white hover:bg-green-700'
+                                        }`}
+                                    >
+                                        {selectedDeliveryBoy.status === 'Active' ? 'Deactivate Rider' : 'Approve & Activate'}
+                                    </button>
+                                    <button
+                                        onClick={() => handleAvailabilityChange(selectedDeliveryBoy._id, selectedDeliveryBoy.available === 'Available' ? 'Not Available' : 'Available')}
+                                        disabled={processing === selectedDeliveryBoy._id}
+                                        className="px-4 py-2 bg-amber-500 text-white rounded-lg font-bold text-sm hover:bg-amber-600 transition-all shadow-sm"
+                                    >
+                                        Toggle Availability
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="bg-neutral-50 px-6 py-4 border-t border-neutral-200 flex justify-end">
+                            <button 
+                                onClick={() => setIsDetailModalOpen(false)}
+                                className="px-6 py-2 bg-neutral-200 text-neutral-700 rounded-lg font-bold text-sm hover:bg-neutral-300 transition-all"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

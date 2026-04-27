@@ -19,7 +19,6 @@ export default function DeliverySignUp() {
     mobile: "",
     email: "",
     dateOfBirth: "",
-    password: "",
     address: "",
     city: "",
     pincode: "",
@@ -139,6 +138,18 @@ export default function DeliverySignUp() {
     setError("");
   };
 
+  const validateAge = (dob: string) => {
+    if (!dob) return false;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 18;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -147,7 +158,6 @@ export default function DeliverySignUp() {
       !formData.name ||
       !formData.mobile ||
       !formData.email ||
-      !formData.password ||
       !formData.address ||
       !formData.city
     ) {
@@ -160,8 +170,24 @@ export default function DeliverySignUp() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (!formData.dateOfBirth) {
+      setError("Please enter your Date of Birth");
+      return;
+    }
+
+    if (!validateAge(formData.dateOfBirth)) {
+      setError("You must be at least 18 years old to register as a rider.");
+      return;
+    }
+
+    // Make documents mandatory
+    if (!drivingLicenseFile) {
+      setError("Driving License is mandatory.");
+      return;
+    }
+
+    if (!nationalIdentityCardFile) {
+      setError("National Identity Card is mandatory.");
       return;
     }
 
@@ -169,43 +195,37 @@ export default function DeliverySignUp() {
     setError("");
 
     try {
-      // Upload documents if provided
-      let drivingLicenseUrl = formData.drivingLicenseUrl;
-      let nationalIdentityCardUrl = formData.nationalIdentityCardUrl;
+      // Upload documents
+      let drivingLicenseUrl = "";
+      let nationalIdentityCardUrl = "";
 
-      if (drivingLicenseFile || nationalIdentityCardFile) {
-        setUploadingDocs(true);
+      setUploadingDocs(true);
 
-        if (drivingLicenseFile) {
-          const drivingLicenseResult = await uploadDocument(
-            drivingLicenseFile,
-            "Speedoo/delivery/documents"
-          );
-          drivingLicenseUrl = drivingLicenseResult.secureUrl;
-        }
+      const drivingLicenseResult = await uploadDocument(
+        drivingLicenseFile,
+        "Speedoo/delivery/documents"
+      );
+      drivingLicenseUrl = drivingLicenseResult.secureUrl;
 
-        if (nationalIdentityCardFile) {
-          const nationalIdResult = await uploadDocument(
-            nationalIdentityCardFile,
-            "Speedoo/delivery/documents"
-          );
-          nationalIdentityCardUrl = nationalIdResult.secureUrl;
-        }
+      const nationalIdResult = await uploadDocument(
+        nationalIdentityCardFile,
+        "Speedoo/delivery/documents"
+      );
+      nationalIdentityCardUrl = nationalIdResult.secureUrl;
 
-        setUploadingDocs(false);
-      }
+      setUploadingDocs(false);
 
       const response = await register({
         name: formData.name,
         mobile: formData.mobile,
         email: formData.email,
         dateOfBirth: formData.dateOfBirth || undefined,
-        password: formData.password,
+        password: "DefaultPassword123", // Send a default password as it's optional in backend but good to have a placeholder
         address: formData.address,
         city: formData.city,
         pincode: formData.pincode || undefined,
-        drivingLicense: drivingLicenseUrl || undefined,
-        nationalIdentityCard: nationalIdentityCardUrl || undefined,
+        drivingLicense: drivingLicenseUrl,
+        nationalIdentityCard: nationalIdentityCardUrl,
         accountName: formData.accountName || undefined,
         bankName: formData.bankName || undefined,
         accountNumber: formData.accountNumber || undefined,
@@ -213,25 +233,26 @@ export default function DeliverySignUp() {
         bonusType: formData.bonusType || undefined,
       });
 
-      if (response.success) {
-        // Clear token from registration (we'll get it after OTP verification)
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("userData");
-        // Registration successful, now send SMS OTP for verification
-        try {
-          const otpRes = await sendOTP(formData.mobile);
-          if (otpRes.sessionId) setSessionId(otpRes.sessionId);
-          setShowOTP(true);
-        } catch (otpErr: any) {
-          setError(
-            otpErr.message || "Registration successful but failed to send OTP."
-          );
-        }
+      if (response.success && response.data && response.data.user) {
+        // Automatic Login after registration
+        login(response.data.token || "", {
+          id: response.data.user.id,
+          name: response.data.user.name,
+          mobile: response.data.user.mobile,
+          email: response.data.user.email,
+          city: response.data.user.city,
+          status: response.data.user.status,
+          userType: "Delivery",
+        });
+
+        // Navigate to delivery dashboard
+        navigate("/delivery");
       }
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
+      setUploadingDocs(false);
     }
   };
 
@@ -385,30 +406,13 @@ export default function DeliverySignUp() {
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Date of Birth
+                    Date of Birth <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
                     name="dateOfBirth"
                     value={formData.dateOfBirth}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Password <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    placeholder="Enter password (min 6 characters)"
-                    required
-                    minLength={4}
                     className="w-full px-3 py-2.5 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                     disabled={loading}
                   />
@@ -575,12 +579,12 @@ export default function DeliverySignUp() {
               {/* Documents Section */}
               <div className="space-y-4 pt-4 border-t">
                 <h3 className="text-sm font-semibold text-neutral-700 border-b pb-2">
-                  Documents (Optional - Can be uploaded later)
+                  Documents <span className="text-red-500">*</span>
                 </h3>
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Driving License
+                    Driving License <span className="text-red-500">*</span>
                   </label>
                   <div className="space-y-2">
                     <input
@@ -601,7 +605,7 @@ export default function DeliverySignUp() {
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    National Identity Card
+                    National Identity Card <span className="text-red-500">*</span>
                   </label>
                   <div className="space-y-2">
                     <input
@@ -713,7 +717,20 @@ export default function DeliverySignUp() {
 
       {/* Footer Text */}
       <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Speedoo's Terms of Service and Privacy Policy
+        By continuing, you agree to Speedoo's{" "}
+        <button 
+          onClick={() => navigate("/terms")} 
+          className="text-purple-600 hover:underline font-medium"
+        >
+          Terms of Service
+        </button>{" "}
+        and{" "}
+        <button 
+          onClick={() => navigate("/privacy-policy")} 
+          className="text-purple-600 hover:underline font-medium"
+        >
+          Privacy Policy
+        </button>
       </p>
     </div>
   );

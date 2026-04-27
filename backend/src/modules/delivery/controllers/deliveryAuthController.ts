@@ -130,10 +130,10 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   } = req.body;
 
   // Validation
-  if (!name || !mobile || !email || !password) {
+  if (!name || !mobile || !email) {
     return res.status(400).json({
       success: false,
-      message: "Name, mobile, email, and password are required",
+      message: "Name, mobile, and email are required",
     });
   }
 
@@ -157,12 +157,12 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Create new delivery partner
-  await Delivery.create({
+  const delivery = await Delivery.create({
     name,
     mobile,
     email,
     dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
-    password,
+    password: password || undefined,
     address,
     city,
     pincode,
@@ -178,13 +178,23 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     cashCollected: 0,
   } as any);
 
-  // Generate token (Optional: usually registration doesn't login immediately if approval needed, but for seamless UX we can)
-  // However, FE Flow: Register -> OTP -> Login. So we return success, then FE calls sendSmsOtp.
+  // Generate token for automatic login
+  const token = generateToken(delivery._id.toString(), "Delivery");
 
   return res.status(201).json({
     success: true,
     message: "Delivery partner registered successfully.",
-    // No token returned here, flow continues to OTP
+    data: {
+      token,
+      user: {
+        id: delivery._id,
+        name: delivery.name,
+        mobile: delivery.mobile,
+        email: delivery.email,
+        city: delivery.city,
+        status: delivery.status,
+      },
+    },
   });
 });
 

@@ -30,6 +30,7 @@ import customerHomeRoutes from "./customerHomeRoutes";
 import customerCartRoutes from "./customerCartRoutes";
 import wishlistRoutes from "./wishlistRoutes";
 import productReviewRoutes from "./productReviewRoutes";
+import policyRoutes from "./policyRoutes";
 import adminRoutes from "./adminRoutes";
 import customerTrackingRoutes from "../modules/customer/routes/trackingRoutes";
 import deliveryTrackingRoutes from "../modules/delivery/routes/trackingRoutes";
@@ -160,5 +161,8 @@ router.use("/seller/taxes", taxRoutes);
 
 // Add more routes here
 // router.use('/users', userRoutes);
+
+// Public policy routes
+router.use("/policies", policyRoutes);
 
 export default router;

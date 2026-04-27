@@ -1,166 +1,191 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getPolicies, upsertPolicy, type Policy } from '../../../services/api/admin/adminPolicyService';
+import { useToast } from '../../../context/ToastContext';
+
+type PolicyType = "rider_about_us" | "privacy_policy" | "terms_and_conditions";
 
 export default function AdminDeliveryAppPolicy() {
-  const [policyContent, setPolicyContent] = useState(`Welcome to Speedoo - 10 Minute App Delivery Partner Program!
+  const [activeTab, setActiveTab] = useState<PolicyType>("rider_about_us");
+  const [content, setContent] = useState('');
+  const [title, setTitle] = useState('');
+  const [version, setVersion] = useState('1.0.0');
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const { showToast } = useToast();
 
-By using our delivery app, you agree to the following terms and conditions:
+  const fetchPolicy = async (type: PolicyType) => {
+    setFetching(true);
+    try {
+      const response = await getPolicies({ type });
+      if (response.success && response.data && response.data.length > 0) {
+        const policy = response.data[0];
+        setContent(policy.content);
+        setTitle(policy.title);
+        setVersion(policy.version);
+      } else {
+        // Defaults if not found
+        setContent('');
+        setTitle(getDefaultTitle(type));
+        setVersion('1.0.0');
+      }
+    } catch (err) {
+      console.error('Failed to fetch policy:', err);
+    } finally {
+      setFetching(false);
+    }
+  };
 
-1. Delivery Partner Registration
-   - You must provide accurate and complete information during registration
-   - You must have a valid driver's license and vehicle registration
-   - Background checks may be required before approval
-   - You are responsible for maintaining the confidentiality of your account credentials
+  const getDefaultTitle = (type: PolicyType) => {
+    switch (type) {
+      case 'rider_about_us': return 'Rider About Us';
+      case 'privacy_policy': return 'Privacy Policy';
+      case 'terms_and_conditions': return 'Terms and Conditions';
+      default: return '';
+    }
+  };
 
-2. Delivery Responsibilities
-   - You must accept and complete deliveries in a timely manner
-   - You must handle all orders with care and ensure product integrity
-   - You must follow the delivery route provided by the app
-   - You must obtain customer signature or confirmation upon delivery
+  useEffect(() => {
+    fetchPolicy(activeTab);
+  }, [activeTab]);
 
-3. Vehicle and Equipment Requirements
-   - You must maintain a valid driver's license and vehicle insurance
-   - Your vehicle must be in good working condition
-   - You must have a smartphone with GPS capabilities
-   - You must maintain proper delivery equipment (bags, containers, etc.)
-
-4. Payment and Earnings
-   - Delivery fees are calculated based on distance and order value
-   - Earnings are credited to your account after successful delivery
-   - Payment is processed weekly via your registered payment method
-   - You are responsible for reporting your earnings for tax purposes
-
-5. Code of Conduct
-   - You must treat customers with respect and professionalism
-   - You must maintain a clean and presentable appearance
-   - You must not engage in any illegal activities
-   - You must follow all traffic laws and regulations
-
-6. Safety Requirements
-   - You must prioritize safety at all times
-   - You must not use your phone while driving
-   - You must wear appropriate safety gear when required
-   - You must report any accidents or incidents immediately
-
-7. Availability and Scheduling
-   - You can set your own availability through the app
-   - You must honor accepted delivery assignments
-   - Cancellation of accepted orders may result in penalties
-   - You must maintain a minimum acceptance rate to remain active
-
-8. Ratings and Reviews
-   - Customers may rate your service after delivery
-   - Low ratings may affect your access to delivery opportunities
-   - You can view and respond to customer feedback
-   - Maintaining high ratings is important for continued partnership
-
-9. Termination
-   - We reserve the right to suspend or terminate your account for violations
-   - Violations include but are not limited to: fraud, theft, unprofessional conduct
-   - You may terminate your partnership at any time with proper notice
-
-10. Privacy and Data
-    - We respect your privacy and handle your data in accordance with our Privacy Policy
-    - Your location data is used only for delivery purposes
-    - Your personal information will not be shared with customers
-
-11. Limitation of Liability
-    - You are an independent contractor, not an employee
-    - You are responsible for your own taxes and insurance
-    - We are not liable for accidents or incidents during deliveries
-
-12. Changes to Terms
-    - We reserve the right to modify these terms at any time
-    - Continued use of the app constitutes acceptance of modified terms
-    - You will be notified of significant changes via the app or email
-
-For any questions or concerns, please contact our delivery partner support team.
-
-Last updated: January 2025`);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    alert('Delivery App Policy updated successfully!');
+    setLoading(true);
+    try {
+      const response = await upsertPolicy({
+        type: activeTab,
+        title,
+        content,
+        version,
+        isActive: true
+      });
+      if (response.success) {
+        showToast(`${getDefaultTitle(activeTab)} updated successfully!`, 'success');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Failed to update policy', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-neutral-50">
       {/* Header */}
-      <div className="bg-white px-4 sm:px-6 py-4 border-b border-neutral-200">
+      <div className="bg-white px-4 sm:px-6 py-4 border-b border-neutral-200 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Delivery App Policy</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900">Rider App Content & Policies</h1>
+            <p className="text-sm text-neutral-500 mt-1">Manage what riders see in the About and Legal sections</p>
           </div>
-          <div className="text-sm text-neutral-600">
-            <span className="text-blue-600">Home</span> / <span className="text-neutral-900">Delivery App Policy</span>
+          <div className="text-sm">
+            <span className="text-orange-600 font-medium">Admin</span> / <span className="text-neutral-400">Rider Content</span>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-neutral-50">
-        <div className="max-w-4xl mx-auto">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Policy Content Section */}
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-              <div className="bg-teal-600 px-4 sm:px-6 py-3">
-                <h2 className="text-white text-lg font-semibold">Policy Content</h2>
-              </div>
-              <div className="p-4 sm:p-6">
-                <div>
-                  <label className="block text-sm font-bold text-neutral-800 mb-2">
-                    Policy Text <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    name="policyContent"
-                    value={policyContent}
-                    onChange={(e) => setPolicyContent(e.target.value)}
-                    placeholder="Enter Delivery App Policy content..."
-                    rows={25}
-                    required
-                    className="w-full px-4 py-3 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-y font-mono"
-                  />
-                  <p className="mt-2 text-xs text-neutral-500">
-                    You can format the policy content using plain text. Use line breaks and spacing to organize the content.
-                  </p>
-                </div>
-              </div>
-            </div>
+      {/* Tabs */}
+      <div className="bg-white px-4 sm:px-6 border-b border-neutral-200">
+        <div className="flex space-x-8 overflow-x-auto no-scrollbar">
+          {(['rider_about_us', 'privacy_policy', 'terms_and_conditions'] as PolicyType[]).map((type) => (
+            <button
+              key={type}
+              onClick={() => setActiveTab(type)}
+              className={`py-4 px-1 border-b-2 font-bold text-sm whitespace-nowrap transition-all ${
+                activeTab === type
+                  ? 'border-orange-600 text-orange-600'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+              }`}
+            >
+              {getDefaultTitle(type)}
+            </button>
+          ))}
+        </div>
+      </div>
 
-            {/* Preview Section */}
-            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
-              <div className="bg-teal-600 px-4 sm:px-6 py-3">
-                <h2 className="text-white text-lg font-semibold">Preview</h2>
-              </div>
-              <div className="p-4 sm:p-6">
-                <div className="prose max-w-none">
-                  <div className="whitespace-pre-wrap text-sm text-neutral-700 bg-neutral-50 p-4 rounded border border-neutral-200 min-h-[200px] max-h-[400px] overflow-y-auto">
-                    {policyContent || 'Policy content will appear here...'}
+      {/* Content Area */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="max-w-4xl mx-auto">
+          {fetching ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
+              <div className="p-6 border-b border-neutral-100">
+                <h3 className="text-lg font-bold text-neutral-900 mb-4">Edit {getDefaultTitle(activeTab)}</h3>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-neutral-800 mb-2">
+                        Title <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-neutral-800 mb-2">
+                        Version <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={version}
+                        onChange={(e) => setVersion(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-neutral-800 mb-2">
+                      Content Text <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      placeholder={`Enter ${getDefaultTitle(activeTab)} content...`}
+                      rows={15}
+                      required
+                      className="w-full px-4 py-3 border border-neutral-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-y font-mono"
+                    />
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={() => setPolicyContent('')}
-                className="px-6 py-2.5 border border-neutral-300 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
-              >
-                Clear
-              </button>
-              <button
-                type="submit"
-                className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-2.5 rounded-lg text-base font-medium transition-colors"
-              >
-                Update Policy
-              </button>
-            </div>
-          </form>
+              {/* Action Buttons */}
+              <div className="bg-neutral-50 px-6 py-4 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-3 bg-[#B95F15] text-white rounded-xl font-bold shadow-lg shadow-orange-200 hover:bg-[#a65513] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
+                      </svg>
+                      Save {getDefaultTitle(activeTab)}
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>
   );
 }
-

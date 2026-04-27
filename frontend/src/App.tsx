@@ -37,6 +37,8 @@ const Invoice = lazy(() => import("./modules/user/Invoice"));
 const Login = lazy(() => import("./modules/user/Login"));
 
 const AboutUs = lazy(() => import("./modules/user/AboutUs"));
+const PrivacyPolicy = lazy(() => import("./modules/user/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./modules/user/TermsOfService"));
 const FAQ = lazy(() => import("./modules/user/FAQ"));
 const Wishlist = lazy(() => import("./modules/user/Wishlist"));
 const Addresses = lazy(() => import("./modules/user/Addresses"));
@@ -362,6 +364,24 @@ function AppContent() {
                                 <AdminLogin />
                               </Suspense>
                             </PublicRoute>
+                          }
+                        />
+
+                        {/* Top-level Public Routes (Policy) */}
+                        <Route
+                          path="/privacy-policy"
+                          element={
+                            <Suspense fallback={<IconLoader forceShow />}>
+                              <PrivacyPolicy />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/terms"
+                          element={
+                            <Suspense fallback={<IconLoader forceShow />}>
+                              <TermsOfService />
+                            </Suspense>
                           }
                         />
 
