@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import {
   getAllCustomers,
+  getCustomerById,
+  updateCustomerStatus,
   type Customer,
 } from "../../../services/api/admin/adminCustomerService";
 import { useAuth } from "../../../context/AuthContext";
@@ -30,6 +32,10 @@ export default function AdminManageCustomer() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   // Fetch customers on component mount
   useEffect(() => {
@@ -99,6 +105,38 @@ export default function AdminManageCustomer() {
     } else {
       setSortField(field);
       setSortDirection("asc");
+    }
+  };
+
+  const handleView = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsEditMode(false);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsEditMode(true);
+    setIsModalOpen(true);
+  };
+
+  const handleStatusChange = async (newStatus: "Active" | "Inactive") => {
+    if (!selectedCustomer) return;
+
+    try {
+      setUpdatingStatus(true);
+      const response = await updateCustomerStatus(selectedCustomer._id, { status: newStatus });
+      if (response.success) {
+        setCustomers(prev => prev.map(c => c._id === selectedCustomer._id ? { ...c, status: newStatus } : c));
+        setSelectedCustomer({ ...selectedCustomer, status: newStatus });
+        alert("Customer status updated successfully!");
+        if (isEditMode) setIsModalOpen(false);
+      }
+    } catch (err) {
+      console.error("Error updating status:", err);
+      alert("Failed to update status. Please try again.");
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -466,34 +504,36 @@ export default function AdminManageCustomer() {
                       </td>
                       <td className="p-4 border border-neutral-200">
                         <div className="flex items-center gap-2">
-                          <button
-                            className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
-                            title="View Details">
-                            <svg
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2">
-                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                              <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                          </button>
-                          <button
-                            className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
-                            title="Edit">
-                            <svg
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2">
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                          </button>
+                            <button
+                              onClick={() => handleView(customer)}
+                              className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                              title="View Details">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleEdit(customer)}
+                              className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+                              title="Edit">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                              </svg>
+                            </button>
                         </div>
                       </td>
                     </tr>
@@ -554,6 +594,94 @@ export default function AdminManageCustomer() {
           </div>
         </div>
       </div>
+ 
+      {/* Customer Modal */}
+      {isModalOpen && selectedCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
+              <h3 className="text-lg font-bold text-neutral-900">
+                {isEditMode ? "Edit Customer Status" : "Customer Details"}
+              </h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-neutral-400 hover:text-neutral-600 transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-1">Full Name</label>
+                    <p className="text-sm font-medium text-neutral-900">{selectedCustomer.name}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-1">Email</label>
+                    <p className="text-sm font-medium text-neutral-900">{selectedCustomer.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-1">Phone</label>
+                    <p className="text-sm font-medium text-neutral-900">{selectedCustomer.phone}</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-1">Status</label>
+                    {isEditMode ? (
+                      <select
+                        value={selectedCustomer.status}
+                        onChange={(e) => handleStatusChange(e.target.value as "Active" | "Inactive")}
+                        disabled={updatingStatus}
+                        className="mt-1 block w-full px-3 py-2 text-sm border border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    ) : (
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${selectedCustomer.status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                        {selectedCustomer.status}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-1">Registration Date</label>
+                    <p className="text-sm font-medium text-neutral-900">
+                      {selectedCustomer.registrationDate ? new Date(selectedCustomer.registrationDate).toLocaleString() : "-"}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-1">Wallet Amount</label>
+                    <p className="text-sm font-medium text-neutral-900">₹{selectedCustomer.walletAmount?.toFixed(2) || "0.00"}</p>
+                  </div>
+                </div>
+              </div>
+ 
+              <div className="mt-8 pt-6 border-t border-neutral-200">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-neutral-50 p-4 rounded-lg">
+                    <p className="text-xs text-neutral-500 mb-1">Total Orders</p>
+                    <p className="text-xl font-bold text-neutral-900">{selectedCustomer.totalOrders}</p>
+                  </div>
+                  <div className="bg-neutral-50 p-4 rounded-lg">
+                    <p className="text-xs text-neutral-500 mb-1">Total Spent</p>
+                    <p className="text-xl font-bold text-neutral-900">₹{selectedCustomer.totalSpent.toFixed(2)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-200 flex justify-end">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded hover:bg-neutral-100 transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
