@@ -125,27 +125,36 @@ export default function Home() {
       <HomeHero activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Promo Strip - Only on specific category tabs */}
-      {activeTab !== "all" && <PromoStrip activeTab={activeTab} />}
+      {activeTab !== "all" && (
+        <div className="max-w-7xl mx-auto w-full">
+          <PromoStrip activeTab={activeTab} />
+        </div>
+      )}
 
       {/* Dynamic Banners Carousel */}
       {activeTab === "all" &&
         homeData.promoBanners &&
         homeData.promoBanners.length > 0 && (
-          <HomeBannerCarousel banners={homeData.promoBanners} />
+          <div className="max-w-7xl mx-auto w-full">
+            <HomeBannerCarousel banners={homeData.promoBanners} />
+          </div>
         )}
 
       {/* Lowest Prices Ever - Only on specific category tabs */}
       {activeTab !== "all" && (
-        <LowestPricesEver
-          activeTab={activeTab}
-          products={homeData.lowestPrices}
-        />
+        <div className="max-w-7xl mx-auto w-full">
+          <LowestPricesEver
+            activeTab={activeTab}
+            products={homeData.lowestPrices}
+          />
+        </div>
       )}
 
       {/* Main content */}
       <div
         ref={contentRef}
-        className="bg-neutral-50 -mt-2 pt-1 space-y-5 md:space-y-8 md:pt-4">
+        className="bg-neutral-50 -mt-2 pt-1 pb-10 space-y-5 md:space-y-8 md:pt-4 w-full">
+        <div className="max-w-7xl mx-auto w-full">
         {/* Filtered Products Section (from bestsellers) */}
         {activeTab !== "all" && filteredProducts.length > 0 && (
           <div data-products-section className="mt-6 mb-6 md:mt-8 md:mb-8">
@@ -324,6 +333,7 @@ export default function Home() {
             )}
           </>
         )}
+        </div>
       </div>
     </div >
   );

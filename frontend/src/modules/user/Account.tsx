@@ -169,7 +169,7 @@ export default function Account() {
     return (
       <div className="pb-24 md:pb-8 bg-white min-h-screen">
         <div className="bg-gradient-to-b from-purple-50 to-white pb-6 md:pb-8 pt-8">
-          <div className="px-4 md:px-6 lg:px-8">
+          <div className="px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
             <div className="flex flex-col items-center mb-4 md:mb-6">
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-purple-50 flex items-center justify-center mb-3 md:mb-4 border-2 border-white shadow-md backdrop-blur-sm">
                 <svg
@@ -253,7 +253,7 @@ export default function Account() {
     <div className="pb-24 md:pb-8 bg-gradient-to-br from-white via-yellow-50/30 to-purple-50/30 min-h-screen">
       {/* Top Header & Profile Section */}
       <div className="bg-[#9048A5] sticky top-0 z-10 shadow-sm">
-        <div className="px-4 py-3 flex items-center gap-4">
+        <div className="px-4 py-3 flex items-center gap-4 max-w-7xl mx-auto w-full">
           <button
             onClick={() => navigate(-1)}
             className="text-white p-1 rounded-full hover:bg-black/10 transition-colors"

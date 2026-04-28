@@ -376,7 +376,7 @@ export default function HomeHero({
       <div>
         <div
           ref={topSectionRef}
-          className="px-4 md:px-6 lg:px-8 pt-2 md:pt-3 pb-0">
+          className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pt-2 md:pt-3 pb-0">
           <div className="flex items-center justify-between mb-2 md:mb-3">
             {/* Left side: Logo */}
             <div className="flex-shrink-0">
@@ -436,8 +436,9 @@ export default function HomeHero({
             transition: "background 0.1s ease-out, box-shadow 0.1s ease-out",
           }),
         }}>
-        <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-2 pb-2 md:pb-2">
-          {/* Search Bar */}
+        <div className="max-w-7xl mx-auto">
+          <div className="px-4 md:px-6 lg:px-8 pt-2 md:pt-2 pb-2 md:pb-2">
+            {/* Search Bar */}
           <div
             onClick={() => navigate("/search")}
             className="w-full md:w-auto md:max-w-xl md:mx-auto rounded-xl shadow-lg px-3 py-2 md:px-3 md:py-1.5 flex items-center gap-2 cursor-pointer hover:shadow-xl transition-all duration-300 mb-2 md:mb-1.5 bg-white"
@@ -608,6 +609,7 @@ export default function HomeHero({
               );
             })}
           </div>
+        </div>
         </div>
       </div>
     </div>
