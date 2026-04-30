@@ -239,7 +239,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
             const tempLocation: Location = {
               latitude,
               longitude,
-              address: `Getting address for ${latitude.toFixed(6)}, ${longitude.toFixed(6)}...`, // More descriptive temporary
+              address: 'Detecting address...', // More descriptive temporary
               city: undefined,
               state: undefined,
               pincode: undefined,
@@ -262,7 +262,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
               }
 
               // Address is already cleaned from reverseGeocode function
-              const cleanedAddress = address.formatted_address || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+              const cleanedAddress = address.formatted_address || 'Current Location';
 
               const newLocation: Location = {
                 latitude,
@@ -298,7 +298,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
                 const fallbackLocation: Location = {
                   latitude,
                   longitude,
-                  address: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+                  address: 'Current Location',
                 };
                 setLocation(fallbackLocation);
                 setLocationError(null); // Clear error since we have valid coordinates
@@ -382,14 +382,14 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const reverseGeocode = async (lat: number, lng: number, signal?: AbortSignal, skipCache: boolean = false): Promise<GeocodeResult> => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
-      console.warn('⚠️ Google Maps API key not found, using coordinates only');
-      return { formatted_address: `${lat.toFixed(6)}, ${lng.toFixed(6)}` };
+      console.warn('⚠️ Google Maps API key not found, using placeholder');
+      return { formatted_address: 'Current Location' };
     }
 
     // Validate input coordinates
     if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
       console.error('❌ Invalid coordinates for geocoding:', lat, lng);
-      return { formatted_address: `${lat.toFixed(6)}, ${lng.toFixed(6)}` };
+      return { formatted_address: 'Invalid Location' };
     }
 
     // Generate cache key (needed for both cache lookup and storage)
@@ -440,7 +440,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
         // Handle API errors
         if (data.status === 'ZERO_RESULTS') {
-          return { formatted_address: `${lat}, ${lng}` };
+          return { formatted_address: 'Current Location' };
         }
 
         if (data.status !== 'OK') {
@@ -518,7 +518,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         });
 
         // Clean the formatted address to remove Plus Codes
-        const rawAddress = result.formatted_address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        const rawAddress = result.formatted_address || 'Current Location';
         const cleanedAddress = cleanAddress(rawAddress);
 
         const geocodeResult = {
@@ -564,7 +564,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
     // All retries failed
     console.error('Reverse geocoding failed after retries:', lastError);
-    return { formatted_address: `${lat}, ${lng}` };
+    return { formatted_address: 'Current Location' };
   };
 
   // Update location manually - OPTIMIZED for instant UI update

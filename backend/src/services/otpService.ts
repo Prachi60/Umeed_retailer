@@ -58,7 +58,9 @@ function generateOTP(length: number = 4): string {
 function normalizeMobileNumber(mobile: string): string {
   let cleanMobile = mobile.replace(/^\+/, '').replace(/\D/g, '');
 
-  if (!cleanMobile.startsWith('91')) {
+  if (cleanMobile.length === 10) {
+    cleanMobile = '91' + cleanMobile;
+  } else if (!cleanMobile.startsWith('91')) {
     cleanMobile = '91' + cleanMobile;
   }
 
@@ -147,7 +149,10 @@ async function sendSmsViaApi(mobile: string, message: string): Promise<void> {
  */
 async function saveOtpToDb(mobile: string, otp: string, userType: UserType): Promise<void> {
   // Normalize mobile number (remove any non-digits, ensure consistent format)
-  const normalizedMobile = mobile.replace(/\D/g, '');
+  let normalizedMobile = mobile.replace(/\D/g, '');
+  if (normalizedMobile.length === 12 && normalizedMobile.startsWith('91')) {
+    normalizedMobile = normalizedMobile.slice(2);
+  }
 
   await Otp.deleteMany({ mobile: normalizedMobile, userType });
   await Otp.create({
@@ -316,7 +321,10 @@ export async function verifySmsOtp(
   }
 
   // Normalize mobile number
-  const normalizedMobile = targetMobile.replace(/\D/g, '');
+  let normalizedMobile = targetMobile.replace(/\D/g, '');
+  if (normalizedMobile.length === 12 && normalizedMobile.startsWith('91')) {
+    normalizedMobile = normalizedMobile.slice(2);
+  }
 
   if (normalizedMobile.length !== 10) {
     console.error('OTP verification failed - invalid mobile format:', {
@@ -409,7 +417,10 @@ export async function verifyOTP(
   }
 
   // Normalize mobile number
-  const normalizedMobile = mobile.replace(/\D/g, '');
+  let normalizedMobile = mobile.replace(/\D/g, '');
+  if (normalizedMobile.length === 12 && normalizedMobile.startsWith('91')) {
+    normalizedMobile = normalizedMobile.slice(2);
+  }
 
   if (normalizedMobile.length !== 10) {
     console.error('OTP verification failed - invalid mobile format:', {

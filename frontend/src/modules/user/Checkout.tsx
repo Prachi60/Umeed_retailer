@@ -85,7 +85,6 @@ export default function Checkout() {
   const [similarProducts, setSimilarProducts] = useState<any[]>([]);
   const [showGstinSheet, setShowGstinSheet] = useState(false);
   const [gstin, setGstin] = useState<string>("");
-  const [showCancellationPolicy, setShowCancellationPolicy] = useState(false);
   const [giftPackaging, setGiftPackaging] = useState<boolean>(false);
   const [showRazorpayCheckout, setShowRazorpayCheckout] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
@@ -1832,14 +1831,6 @@ export default function Checkout() {
 
 
 
-      {/* Cancellation Policy */}
-      <div className="px-4 py-2">
-        <button
-          onClick={() => setShowCancellationPolicy(true)}
-          className="text-xs text-neutral-700 hover:text-neutral-900 transition-colors">
-          Cancellation Policy
-        </button>
-      </div>
 
       {/* Made with love by Speedoo */}
       <div className="px-4 py-2">
@@ -1862,86 +1853,6 @@ export default function Checkout() {
 
 
 
-      {/* Cancellation Policy Sheet Modal */}
-      <Sheet
-        open={showCancellationPolicy}
-        onOpenChange={setShowCancellationPolicy}>
-        <SheetContent side="bottom" className="max-h-[85vh]">
-          <SheetHeader className="text-left">
-            <div className="flex items-center justify-between mb-2">
-              <SheetTitle className="text-base font-bold text-neutral-900">
-                Cancellation Policy
-              </SheetTitle>
-              <SheetClose onClick={() => setShowCancellationPolicy(false)}>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M18 6L6 18M6 6l12 12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </SheetClose>
-            </div>
-          </SheetHeader>
-
-          <div className="px-4 pb-4 overflow-y-auto max-h-[calc(85vh-80px)]">
-            <div className="space-y-4 mt-4 text-sm text-neutral-700">
-              <div>
-                <h3 className="font-bold text-neutral-900 mb-2">
-                  Order Cancellation
-                </h3>
-                <p className="mb-2">
-                  You can cancel your order before it is confirmed by the
-                  seller. Once confirmed, cancellation may not be possible.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-neutral-900 mb-2">
-                  Refund Policy
-                </h3>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Refunds will be processed within 5-7 business days</li>
-                  <li>
-                    Refund amount will be credited to your original payment
-                    method
-                  </li>
-                  <li>Delivery charges are non-refundable</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-neutral-900 mb-2">
-                  Partial Cancellation
-                </h3>
-                <p>
-                  Partial cancellation of items in an order is not allowed. You
-                  can cancel the entire order or contact customer support for
-                  assistance.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-neutral-900 mb-2">
-                  Contact Support
-                </h3>
-                <p>
-                  For any cancellation requests or queries, please contact our
-                  customer support team at support@Speedoo.com or call
-                  +91-XXXXX-XXXXX
-                </p>
-              </div>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
 
       {/* Payment Method Selection */}
       <div className="px-4 py-3 border-b border-neutral-200 bg-neutral-50/50">

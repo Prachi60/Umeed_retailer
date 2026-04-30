@@ -19,7 +19,7 @@ export default function SellerLogin() {
 
   const handleMobileLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (mobileNumber.length !== 10) return;
+    if (mobileNumber.length !== 10 && mobileNumber.length !== 12) return;
 
     setLoading(true);
     setError("");
@@ -152,12 +152,15 @@ export default function SellerLogin() {
                     placeholder="Enter phone number"
                     type="tel"
                     value={mobileNumber}
-                    onChange={(e) =>
-                      setMobileNumber(
-                        e.target.value.replace(/\D/g, "").slice(0, 10)
-                      )
-                    }
-                    maxLength={10}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      if (val.length === 12 && val.startsWith("91")) {
+                        setMobileNumber(val.slice(2));
+                      } else {
+                        setMobileNumber(val.slice(0, 12));
+                      }
+                    }}
+                    maxLength={12}
                     disabled={loading}
                   />
                 </div>
@@ -173,7 +176,7 @@ export default function SellerLogin() {
                 <button
                   className="w-full bg-[#f57c00] text-white border-2 border-[#d66a00] font-headline font-extrabold text-lg py-4 rounded-2xl shadow-lg active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
                   type="submit"
-                  disabled={mobileNumber.length !== 10 || loading}
+                  disabled={(mobileNumber.length !== 10 && mobileNumber.length !== 12) || loading}
                 >
                   {loading ? "Sending..." : "Continue"}
                 </button>

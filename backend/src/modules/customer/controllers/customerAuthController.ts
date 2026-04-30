@@ -13,17 +13,33 @@ import { asyncHandler } from "../../../utils/asyncHandler";
  */
 export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
   const { mobile } = req.body;
+  if (!mobile) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is required",
+    });
+  }
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number: remove non-digits and leading zeros
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  
+  // If it starts with 91 and has 12 digits, strip the 91
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
 
+  const normalizedMobile = cleanMobile;
+
   // Send SMS OTP - no need to check if customer exists
   // New customers will be auto-created upon OTP verification
-  const result = await sendSmsOtpService(mobile, 'Customer');
+  const result = await sendSmsOtpService(normalizedMobile, 'Customer');
 
   return res.status(200).json({
     success: true,
@@ -39,13 +55,27 @@ export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
  */
 export const verifySmsOtp = asyncHandler(async (req: Request, res: Response) => {
   const { mobile, otp, sessionId } = req.body;
+  if (!mobile) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is required",
+    });
+  }
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
+
+  const normalizedMobile = cleanMobile;
 
   if (!otp || !/^[0-9]{4}$/.test(otp)) {
     return res.status(400).json({
@@ -62,7 +92,7 @@ export const verifySmsOtp = asyncHandler(async (req: Request, res: Response) => 
   }
 
   // Verify SMS OTP
-  const isValid = await verifySmsOtpService(sessionId, otp, mobile, 'Customer');
+  const isValid = await verifySmsOtpService(sessionId, otp, normalizedMobile, 'Customer');
   if (!isValid) {
     return res.status(401).json({
       success: false,
@@ -71,7 +101,7 @@ export const verifySmsOtp = asyncHandler(async (req: Request, res: Response) => 
   }
 
   // Find or create customer
-  let customer = await Customer.findOne({ phone: mobile });
+  let customer = await Customer.findOne({ phone: normalizedMobile });
   let isNewUser = false;
 
   if (!customer) {

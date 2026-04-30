@@ -12,16 +12,30 @@ import { asyncHandler } from "../../../utils/asyncHandler";
  */
 export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
   const { mobile } = req.body;
+  if (!mobile) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is required",
+    });
+  }
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
 
+  const normalizedMobile = cleanMobile;
+
   // Check if seller exists with this mobile
-  const seller = await Seller.findOne({ mobile });
+  const seller = await Seller.findOne({ mobile: normalizedMobile });
   if (!seller) {
     return res.status(404).json({
       success: false,
@@ -30,7 +44,7 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Send OTP - for login, always use default OTP
-  const result = await sendOTPService(mobile, "Seller", true);
+  const result = await sendOTPService(normalizedMobile, "Seller", true);
 
   return res.status(200).json({
     success: true,
@@ -43,13 +57,27 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
  */
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const { mobile, otp } = req.body;
+  if (!mobile) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is required",
+    });
+  }
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
+
+  const normalizedMobile = cleanMobile;
 
   if (!otp || !/^[0-9]{4}$/.test(otp)) {
     return res.status(400).json({
@@ -59,7 +87,7 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Verify OTP
-  const isValid = await verifyOTPService(mobile, otp, "Seller");
+  const isValid = await verifyOTPService(normalizedMobile, otp, "Seller");
   if (!isValid) {
     return res.status(401).json({
       success: false,
@@ -68,7 +96,7 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Find seller
-  const seller = await Seller.findOne({ mobile }).select("-password");
+  const seller = await Seller.findOne({ mobile: normalizedMobile }).select("-password");
   if (!seller) {
     return res.status(404).json({
       success: false,
@@ -128,12 +156,20 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  if (!/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
+
+  const normalizedMobile = cleanMobile;
 
   // Validate location is provided
   const latitude = req.body.latitude ? parseFloat(req.body.latitude) : null;
@@ -171,7 +207,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   // Check if seller already exists
   const existingSeller = await Seller.findOne({
-    $or: [{ mobile }, { email }],
+    $or: [{ mobile: normalizedMobile }, { email }],
   });
 
   if (existingSeller) {
@@ -190,7 +226,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   // Create new seller with GeoJSON location (password not required during signup)
   const seller = await Seller.create({
     sellerName,
-    mobile,
+    mobile: normalizedMobile,
     email,
     // password field removed - sellers don't need password during signup
     storeName,

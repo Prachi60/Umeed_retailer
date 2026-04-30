@@ -15,6 +15,7 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
         city,
         vehicleNumber,
         vehicleType,
+        dateOfBirth,
         bankName,
         accountNumber,
         ifscCode
@@ -36,6 +37,16 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
     if (city) delivery.city = city;
     if (vehicleNumber) delivery.vehicleNumber = vehicleNumber;
     if (vehicleType) delivery.vehicleType = vehicleType;
+    if (dateOfBirth) {
+        const dobDate = new Date(dateOfBirth);
+        if (dobDate > new Date()) {
+            return res.status(400).json({
+                success: false,
+                message: "Date of birth cannot be in the future"
+            });
+        }
+        delivery.dateOfBirth = dobDate;
+    }
 
     // Bank details updates
     if (bankName) delivery.bankName = bankName;

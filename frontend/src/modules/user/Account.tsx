@@ -704,6 +704,7 @@ export default function Account() {
                       value={editDob}
                       onChange={(e) => setEditDob(e.target.value)}
                       className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-5 py-4 text-sm font-bold text-neutral-900 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all"
+                      max={new Date().toISOString().split('T')[0]}
                     />
                   </div>
                 </div>

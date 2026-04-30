@@ -13,16 +13,30 @@ import { asyncHandler } from "../../../utils/asyncHandler";
  */
 export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
   const { mobile } = req.body;
+  if (!mobile) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is required",
+    });
+  }
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
 
+  const normalizedMobile = cleanMobile;
+
   // Check if delivery partner exists with this mobile
-  const delivery = await Delivery.findOne({ mobile });
+  const delivery = await Delivery.findOne({ mobile: normalizedMobile });
   if (!delivery) {
     return res.status(400).json({
       success: false,
@@ -31,7 +45,7 @@ export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Send SMS OTP
-  const result = await sendSmsOtpService(mobile, 'Delivery');
+  const result = await sendSmsOtpService(normalizedMobile, 'Delivery');
 
   return res.status(200).json({
     success: true,
@@ -45,13 +59,27 @@ export const sendSmsOtp = asyncHandler(async (req: Request, res: Response) => {
  */
 export const verifySmsOtp = asyncHandler(async (req: Request, res: Response) => {
   const { mobile, otp, sessionId } = req.body;
+  if (!mobile) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is required",
+    });
+  }
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
+
+  const normalizedMobile = cleanMobile;
 
   if (!otp || !/^[0-9]{4}$/.test(otp)) {
     return res.status(400).json({
@@ -68,7 +96,7 @@ export const verifySmsOtp = asyncHandler(async (req: Request, res: Response) => 
   }
 
   // Verify SMS OTP
-  const isValid = await verifySmsOtpService(sessionId, otp, mobile, 'Delivery');
+  const isValid = await verifySmsOtpService(sessionId, otp, normalizedMobile, 'Delivery');
 
   if (!isValid) {
     return res.status(401).json({
@@ -78,7 +106,7 @@ export const verifySmsOtp = asyncHandler(async (req: Request, res: Response) => 
   }
 
   // Find delivery partner
-  const delivery = await Delivery.findOne({ mobile }).select("-password");
+  const delivery = await Delivery.findOne({ mobile: normalizedMobile }).select("-password");
 
   if (!delivery) {
     return res.status(401).json({
@@ -137,16 +165,24 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  if (!/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
 
+  const normalizedMobile = cleanMobile;
+
   // Check if delivery partner already exists
   const existingDelivery = await Delivery.findOne({
-    $or: [{ mobile }, { email }],
+    $or: [{ mobile: normalizedMobile }, { email }],
   });
 
   if (existingDelivery) {
@@ -159,7 +195,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   // Create new delivery partner
   const delivery = await Delivery.create({
     name,
-    mobile,
+    mobile: normalizedMobile,
     email,
     dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
     password: password || undefined,

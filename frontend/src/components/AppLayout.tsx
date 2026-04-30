@@ -466,7 +466,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       </motion.svg>
                     </div>
                     <span className={`text-[10px] mt-1 relative z-10 transition-colors duration-300 ${isActive('/order-again') ? 'font-bold text-white' : 'font-medium text-white/60'}`}>
-                      Orders
+                      Reorder
                     </span>
                   </Link>
                 </motion.div>

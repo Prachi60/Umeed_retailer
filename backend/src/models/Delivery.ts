@@ -86,6 +86,12 @@ const DeliverySchema = new Schema<IDelivery>(
     },
     dateOfBirth: {
       type: Date,
+      validate: {
+        validator: function (v: Date) {
+          return !v || v <= new Date();
+        },
+        message: 'Date of birth cannot be in the future',
+      },
     },
     password: {
       type: String,

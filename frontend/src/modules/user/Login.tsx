@@ -22,7 +22,7 @@ export default function Login() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleContinue = async () => {
-    if (mobileNumber.length !== 10) return;
+    if (mobileNumber.length !== 10 && mobileNumber.length !== 12) return;
 
     setLoading(true);
     setError("");
@@ -122,14 +122,17 @@ export default function Login() {
               <input
                 type="tel"
                 value={mobileNumber}
-                onChange={(e) =>
-                  setMobileNumber(
-                    e.target.value.replace(/\D/g, "").slice(0, 10)
-                  )
-                }
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  if (val.length === 12 && val.startsWith("91")) {
+                    setMobileNumber(val.slice(2));
+                  } else {
+                    setMobileNumber(val.slice(0, 12));
+                  }
+                }}
                 placeholder="00000 00000"
                 className="flex-1 px-4 text-base bg-transparent text-white placeholder:text-white/20 focus:outline-none font-bold tracking-[0.05em]"
-                maxLength={10}
+                maxLength={12}
                 disabled={loading}
               />
             </div>
@@ -143,9 +146,9 @@ export default function Login() {
             {/* Vibrant Speedoo Brand Button */}
             <button
               onClick={handleContinue}
-              disabled={mobileNumber.length !== 10 || loading}
+              disabled={(mobileNumber.length !== 10 && mobileNumber.length !== 12) || loading}
               className={`w-full h-12 rounded-xl font-black text-xs tracking-[0.1em] uppercase transition-all transform active:scale-95 shadow-[0_15px_35px_rgba(245,124,0,0.35)] flex items-center justify-center border-b-4 ${
-                mobileNumber.length === 10 && !loading
+                (mobileNumber.length === 10 || mobileNumber.length === 12) && !loading
                   ? "bg-[#f57c00] text-white border-[#d66a00] hover:bg-[#ff8a00] hover:scale-[1.02]"
                   : "bg-white/5 text-white/20 cursor-not-allowed border-white/10 backdrop-blur-md"
               }`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

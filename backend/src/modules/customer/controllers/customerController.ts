@@ -101,7 +101,16 @@ export const updateProfile = asyncHandler(
 
       customer.email = email;
     }
-    if (dateOfBirth) customer.dateOfBirth = new Date(dateOfBirth);
+    if (dateOfBirth) {
+      const dobDate = new Date(dateOfBirth);
+      if (dobDate > new Date()) {
+        return res.status(400).json({
+          success: false,
+          message: "Date of birth cannot be in the future",
+        });
+      }
+      customer.dateOfBirth = dobDate;
+    }
     if (notificationPreferences) customer.notificationPreferences = { ...customer.notificationPreferences, ...notificationPreferences };
     if (accountPrivacy) customer.accountPrivacy = { ...customer.accountPrivacy, ...accountPrivacy };
 

@@ -12,16 +12,30 @@ import { asyncHandler } from "../../../utils/asyncHandler";
  */
 export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
   const { mobile } = req.body;
+  if (!mobile) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is required",
+    });
+  }
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
 
+  const normalizedMobile = cleanMobile;
+
   // Check if admin exists with this mobile
-  const admin = await Admin.findOne({ mobile });
+  const admin = await Admin.findOne({ mobile: normalizedMobile });
   if (!admin) {
     return res.status(404).json({
       success: false,
@@ -30,7 +44,7 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Send OTP - for login, always use default OTP
-  const result = await sendOTPService(mobile, "Admin", true);
+  const result = await sendOTPService(normalizedMobile, "Admin", true);
 
   return res.status(200).json({
     success: true,
@@ -43,13 +57,27 @@ export const sendOTP = asyncHandler(async (req: Request, res: Response) => {
  */
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const { mobile, otp } = req.body;
+  if (!mobile) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile number is required",
+    });
+  }
 
-  if (!mobile || !/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
+
+  const normalizedMobile = cleanMobile;
 
   if (!otp || !/^[0-9]{4}$/.test(otp)) {
     return res.status(400).json({
@@ -59,7 +87,7 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Verify OTP
-  const isValid = await verifyOTPService(mobile, otp, "Admin");
+  const isValid = await verifyOTPService(normalizedMobile, otp, "Admin");
   if (!isValid) {
     return res.status(401).json({
       success: false,
@@ -68,7 +96,7 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Find admin
-  const admin = await Admin.findOne({ mobile }).select("-password");
+  const admin = await Admin.findOne({ mobile: normalizedMobile }).select("-password");
   if (!admin) {
     return res.status(404).json({
       success: false,
@@ -110,16 +138,24 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  if (!/^[0-9]{10}$/.test(mobile)) {
+  // Clean the mobile number
+  let cleanMobile = mobile.replace(/\D/g, "").replace(/^0+/, "");
+  if (cleanMobile.length === 12 && cleanMobile.startsWith("91")) {
+    cleanMobile = cleanMobile.slice(2);
+  }
+
+  if (cleanMobile.length !== 10) {
     return res.status(400).json({
       success: false,
       message: "Valid 10-digit mobile number is required",
     });
   }
 
+  const normalizedMobile = cleanMobile;
+
   // Check if admin already exists
   const existingAdmin = await Admin.findOne({
-    $or: [{ mobile }, { email }],
+    $or: [{ mobile: normalizedMobile }, { email }],
   });
 
   if (existingAdmin) {
@@ -133,7 +169,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const admin = await Admin.create({
     firstName,
     lastName,
-    mobile,
+    mobile: normalizedMobile,
     email,
     password,
     role: role || "Admin",
