@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   sendOTP,
   verifyOTP,
@@ -242,6 +242,15 @@ export default function SellerLogin() {
             >
               Become a Seller
             </button>
+
+            <div className="flex gap-4 mt-2">
+              <Link to="/seller/terms-and-conditions" className="text-on-surface-variant/40 text-[10px] font-bold hover:text-on-surface-variant hover:underline">
+                Terms & Conditions
+              </Link>
+              <Link to="/seller/privacy-policy" className="text-on-surface-variant/40 text-[10px] font-bold hover:text-on-surface-variant hover:underline">
+                Privacy Policy
+              </Link>
+            </div>
           </div>
         </div>
       </main>

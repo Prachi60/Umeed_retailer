@@ -8,9 +8,14 @@ import { useToast } from '../../context/ToastContext';
 import Button from '../../components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { calculateProductPrice } from '../../utils/priceUtils';
+import { useAuth } from '../../context/AuthContext';
+import AuthPrompt from '../../components/AuthPrompt';
+
 
 export default function Wishlist() {
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
   const { location } = useLocation();
   const { addToCart } = useCart();
   const { showToast } = useToast();
@@ -47,8 +52,11 @@ export default function Wishlist() {
   };
 
   useEffect(() => {
-    fetchWishlist();
-  }, [location?.latitude, location?.longitude]);
+    if (isAuthenticated) {
+      fetchWishlist();
+    }
+  }, [location?.latitude, location?.longitude, isAuthenticated]);
+
 
   const handleRemove = async (productId: string) => {
     try {
@@ -83,7 +91,15 @@ export default function Wishlist() {
       </div>
 
       <div className="px-4 py-4">
-        {loading ? (
+        {!isAuthenticated ? (
+          <AuthPrompt 
+            title="Your Wishlist" 
+            description="Login to see your saved products."
+            icon="💝"
+          />
+
+        ) : loading ? (
+
           <div className="flex flex-col items-center justify-center pt-20 gap-4">
             <div className="relative w-12 h-12">
               <div className="absolute inset-0 border-4 border-purple-100 rounded-full"></div>

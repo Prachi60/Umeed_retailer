@@ -65,6 +65,9 @@ export default function Checkout() {
   const [selectedAddress, setSelectedAddress] = useState<OrderAddress | null>(
     null
   );
+  const [allAddresses, setAllAddresses] = useState<OrderAddress[]>([]);
+  const [showAddressSheet, setShowAddressSheet] = useState(false);
+
 
   // Recalculate delivery charges when address changes
   useEffect(() => {
@@ -143,29 +146,35 @@ export default function Checkout() {
 
         if (
           addressResponse.success &&
-          Array.isArray(addressResponse.data) &&
-          addressResponse.data.length > 0
+          Array.isArray(addressResponse.data)
         ) {
-          const defaultAddr =
-            addressResponse.data.find((a: any) => a.isDefault) ||
-            addressResponse.data[0];
-          const mappedAddress: OrderAddress = {
-            name: defaultAddr.fullName,
-            phone: defaultAddr.phone,
+          const mappedAddresses = addressResponse.data.map((addr: any) => ({
+            name: addr.fullName,
+            phone: addr.phone,
             flat: "",
-            street: defaultAddr.address,
-            city: defaultAddr.city,
-            state: defaultAddr.state,
-            pincode: defaultAddr.pincode,
-            landmark: defaultAddr.landmark || "",
-            latitude: defaultAddr.latitude,
-            longitude: defaultAddr.longitude,
-            id: defaultAddr._id,
-            _id: defaultAddr._id,
-          };
-          setSavedAddress(mappedAddress);
-          setSelectedAddress(mappedAddress);
+            street: addr.address,
+            city: addr.city,
+            state: addr.state,
+            pincode: addr.pincode,
+            landmark: addr.landmark || "",
+            latitude: addr.latitude,
+            longitude: addr.longitude,
+            id: addr._id,
+            _id: addr._id,
+            isDefault: addr.isDefault,
+            type: addr.type
+          }));
+          setAllAddresses(mappedAddresses);
+
+          if (mappedAddresses.length > 0) {
+            const defaultAddr =
+              mappedAddresses.find((a: any) => a.isDefault) ||
+              mappedAddresses[0];
+            setSavedAddress(defaultAddr);
+            setSelectedAddress(defaultAddr);
+          }
         }
+
 
         if (couponResponse.success) {
           setAvailableCoupons(couponResponse.data);
@@ -544,9 +553,10 @@ export default function Checkout() {
           updatePayload.state = mapLocation.address.state;
         if (mapLocation.address.pincode)
           updatePayload.pincode = mapLocation.address.pincode;
-        if (mapLocation.address.landmark)
-          updatePayload.landmark = mapLocation.address.landmark;
+        if (mapLocation.address.pincode)
+          updatePayload.pincode = mapLocation.address.pincode;
       }
+
 
       // Update the address in backend
       await updateAddress(selectedAddress.id, updatePayload);
@@ -949,39 +959,30 @@ export default function Checkout() {
         </div>
       </div>
 
-      {/* Ordering for someone else */}
-      <div className="px-4 md:px-6 lg:px-8 py-2 md:py-3 bg-neutral-50 border-b border-neutral-200">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-neutral-700">
-            Ordering for someone else?
-          </span>
-          <button
-            onClick={() =>
-              navigate("/checkout/address", {
-                state: {
-                  editAddress: savedAddress,
-                },
-              })
-            }
-            className="text-xs font-medium transition-colors"
-            style={{ color: currentTheme.primary[2] }}
-          >
-            Add details
-          </button>
-        </div>
-      </div>
 
       {/* Saved Address Section */}
       {savedAddress && (
         <div className="px-4 md:px-6 lg:px-8 py-2 md:py-3 border-b border-neutral-200">
-          <div className="mb-2">
-            <h3 className="text-xs font-semibold text-neutral-900 mb-0.5">
-              Delivery Address
-            </h3>
-            <p className="text-[10px] text-neutral-600">
-              Select or edit your saved address
-            </p>
+          <div className="mb-2 flex items-center justify-between">
+            <div>
+              <h3 className="text-xs font-semibold text-neutral-900 mb-0.5">
+                Delivery Address
+              </h3>
+              <p className="text-[10px] text-neutral-600">
+                Select or edit your saved address
+              </p>
+            </div>
+            {allAddresses.length > 1 && (
+              <button
+                onClick={() => setShowAddressSheet(true)}
+                className="text-xs font-bold px-3 py-1 rounded-lg border transition-all hover:opacity-80 active:scale-95"
+                style={{ borderColor: currentTheme.primary[2], color: currentTheme.primary[2] }}
+              >
+                Change
+              </button>
+            )}
           </div>
+
 
           <div
             className={`border rounded-lg p-2.5 cursor-pointer transition-all ${selectedAddress && !isMapSelected
@@ -1539,7 +1540,91 @@ export default function Checkout() {
       </div>
     )}
 
+      {/* Address Selection Sheet */}
+      <Sheet open={showAddressSheet} onOpenChange={setShowAddressSheet}>
+        <SheetContent side="bottom" className="rounded-t-[2rem] p-0 overflow-hidden border-none max-h-[85vh]">
+          <SheetHeader className="px-6 py-5 border-b border-neutral-100">
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-xl font-black text-neutral-900 tracking-tight">
+                Select Address
+              </SheetTitle>
+              <SheetClose className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </SheetClose>
+            </div>
+          </SheetHeader>
+
+          <div className="p-4 overflow-y-auto max-h-[calc(85vh-80px)] bg-neutral-50/50">
+            <div className="space-y-3 pb-6">
+              {allAddresses.map((addr) => (
+                <div
+                  key={addr.id}
+                  onClick={() => {
+                    setSelectedAddress(addr);
+                    setSavedAddress(addr);
+                    setIsMapSelected(false);
+                    setShowAddressSheet(false);
+                    showGlobalToast(`Switched to ${addr.name}'s address`);
+                  }}
+                  className={`p-4 rounded-2xl border-2 transition-all cursor-pointer group hover:shadow-md ${
+                    selectedAddress?.id === addr.id
+                      ? "bg-white"
+                      : "bg-white/60 border-transparent hover:border-neutral-200"
+                  }`}
+                  style={selectedAddress?.id === addr.id ? { borderColor: currentTheme.primary[2] } : {}}
+                >
+                  <div className="flex items-start gap-3">
+                    <div 
+                      className="w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors"
+                      style={selectedAddress?.id === addr.id 
+                        ? { borderColor: currentTheme.primary[2], backgroundColor: currentTheme.primary[2] } 
+                        : { borderColor: "#D4D4D4" }}
+                    >
+                      {selectedAddress?.id === addr.id && (
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5">
+                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-neutral-900 truncate">{addr.name}</span>
+                        {(addr as any).type && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 bg-neutral-100 text-neutral-500 rounded-full uppercase tracking-wider">
+                            {(addr as any).type}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-neutral-600 mb-1 font-medium">{addr.phone}</p>
+                      <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed">
+                        {addr.street}, {addr.city} - {addr.pincode}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              <button
+                onClick={() => {
+                  setShowAddressSheet(false);
+                  navigate("/checkout/address");
+                }}
+                className="w-full p-4 rounded-2xl border-2 border-dashed border-neutral-300 text-neutral-500 font-bold text-sm flex items-center justify-center gap-2 hover:border-neutral-400 hover:text-neutral-600 transition-all bg-white/40"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 5v14M5 12h14" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Add New Address
+              </button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       {/* Get FREE delivery banner */}
+
       {deliveryCharge > 0 && (
         <div className="px-4 py-2 bg-blue-50 border-b border-blue-100">
           <div className="flex items-center gap-2 mb-1.5">

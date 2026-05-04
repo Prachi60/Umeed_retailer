@@ -102,13 +102,8 @@ export default function GoogleMapsLocationPicker({
                                 if (types.includes('postal_code')) {
                                     pincode = component.long_name;
                                 }
-                                // Landmarks
-                                if (types.includes('point_of_interest') || types.includes('establishment') || types.includes('premise')) {
-                                    landmark = component.long_name;
-                                } else if (!landmark && (types.includes('sublocality') || types.includes('sublocality_level_1'))) {
-                                    landmark = component.long_name;
-                                }
                             });
+
 
                             onLocationSelect(lat, lng, {
                                 street: street.trim(),

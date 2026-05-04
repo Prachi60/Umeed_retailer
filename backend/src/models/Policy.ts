@@ -14,7 +14,7 @@ const PolicySchema = new Schema<IPolicy>(
     {
         type: {
             type: String,
-            enum: ["customer", "delivery", "privacy_policy", "terms_and_conditions", "about_us", "rider_about_us"],
+            enum: ["customer", "delivery", "privacy_policy", "terms_and_conditions", "about_us", "rider_about_us", "seller_privacy_policy", "seller_terms_and_conditions"],
             required: [true, "Policy type is required"],
         },
         title: {

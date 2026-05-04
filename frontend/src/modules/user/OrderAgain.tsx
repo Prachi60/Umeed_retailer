@@ -7,9 +7,14 @@ import { getProducts } from '../../services/api/customerProductService';
 import WishlistButton from '../../components/WishlistButton';
 import { calculateProductPrice } from '../../utils/priceUtils';
 import { useThemeContext } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import AuthPrompt from '../../components/AuthPrompt';
+
 
 export default function OrderAgain() {
+  const { isAuthenticated } = useAuth();
   const { orders } = useOrders();
+
   const { cart, addToCart, updateQuantity } = useCart();
   const navigate = useNavigate();
   const { currentTheme } = useThemeContext();
@@ -61,7 +66,15 @@ export default function OrderAgain() {
 
       {/* Main Content */}
       <div className="px-4 py-6">
-        {hasOrders ? (
+        {!isAuthenticated ? (
+          <AuthPrompt 
+            title="Reorder Favorites" 
+            description="Login to reorder your favorites."
+            icon="🔄"
+          />
+
+        ) : hasOrders ? (
+
           <>
             <h2 className="text-lg font-black text-neutral-900 mb-4 px-1">Previously Ordered Items</h2>
             <div className="grid grid-cols-2 gap-3">

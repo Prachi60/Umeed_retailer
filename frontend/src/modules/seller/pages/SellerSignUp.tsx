@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   register,
   sendOTP,
@@ -738,7 +738,14 @@ export default function SellerSignUp() {
 
       {/* Footer Text */}
       <p className="mt-6 text-xs text-neutral-500 text-center max-w-md">
-        By continuing, you agree to Speedoo's Terms of Service and Privacy Policy
+        By continuing, you agree to Speedoo's{' '}
+        <Link to="/seller/terms-and-conditions" className="text-[#7A3E8E] font-bold hover:underline">
+          Terms of Service
+        </Link>{' '}
+        and{' '}
+        <Link to="/seller/privacy-policy" className="text-[#7A3E8E] font-bold hover:underline">
+          Privacy Policy
+        </Link>
       </p>
     </div>
   );

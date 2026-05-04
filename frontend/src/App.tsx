@@ -266,6 +266,15 @@ const AdminProfile = lazy(() => import("./modules/admin/pages/AdminProfile"));
 const AdminBillingSettings = lazy(
   () => import("./modules/admin/pages/AdminBillingSettings"),
 );
+const AdminSellerAppPolicy = lazy(
+  () => import("./modules/admin/pages/AdminSellerAppPolicy"),
+);
+const SellerPrivacyPolicy = lazy(
+  () => import("./modules/seller/pages/SellerPrivacyPolicy"),
+);
+const SellerTermsAndConditions = lazy(
+  () => import("./modules/seller/pages/SellerTermsAndConditions"),
+);
 
 import { initializePushNotifications, setupForegroundNotificationHandler, registerFCMToken } from "./services/pushNotificationService";
 
@@ -381,6 +390,22 @@ function AppContent() {
                           element={
                             <Suspense fallback={<IconLoader forceShow />}>
                               <TermsOfService />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/seller/privacy-policy"
+                          element={
+                            <Suspense fallback={<IconLoader forceShow />}>
+                              <SellerPrivacyPolicy />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/seller/terms-and-conditions"
+                          element={
+                            <Suspense fallback={<IconLoader forceShow />}>
+                              <SellerTermsAndConditions />
                             </Suspense>
                           }
                         />
@@ -661,6 +686,10 @@ function AppContent() {
                                     <Route
                                       path="billing-settings"
                                       element={<AdminBillingSettings />}
+                                    />
+                                    <Route
+                                      path="seller-app-policy"
+                                      element={<AdminSellerAppPolicy />}
                                     />
                                     <Route
                                       path="users"

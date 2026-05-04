@@ -5,6 +5,8 @@ import { useAuth } from '../../../context/AuthContext';
 import { getCategories, Category } from '../../../services/api/categoryService';
 import GoogleMapsAutocomplete from '../../../components/GoogleMapsAutocomplete';
 import LocationPickerMap from '../../../components/LocationPickerMap';
+import { getPolicyByType } from '../../../services/api/policyService';
+import { Policy } from '../../../services/api/admin/adminPolicyService';
 
 const SellerAccountSettings = () => {
   const { user, updateUser } = useAuth();
@@ -44,10 +46,31 @@ const SellerAccountSettings = () => {
     status: ''
   });
 
+  const [privacyPolicy, setPrivacyPolicy] = useState<Policy | null>(null);
+  const [termsPolicy, setTermsPolicy] = useState<Policy | null>(null);
+  const [policiesLoading, setPoliciesLoading] = useState(false);
+
   useEffect(() => {
     fetchProfile();
     fetchCategories();
+    fetchPolicies();
   }, []);
+
+  const fetchPolicies = async () => {
+    try {
+      setPoliciesLoading(true);
+      const [pp, tp] = await Promise.all([
+        getPolicyByType('seller_privacy_policy'),
+        getPolicyByType('seller_terms_and_conditions')
+      ]);
+      if (pp.success) setPrivacyPolicy(pp.data);
+      if (tp.success) setTermsPolicy(tp.data);
+    } catch (err) {
+      console.error('Error fetching policies:', err);
+    } finally {
+      setPoliciesLoading(false);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -189,6 +212,15 @@ const SellerAccountSettings = () => {
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+      )
+    },
+    {
+      id: 'legal',
+      label: 'Legal & Policies',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       )
     },
@@ -547,6 +579,55 @@ const SellerAccountSettings = () => {
                             <InputGroup label="PAN Card Number" name="panCard" value={sellerData.panCard} onChange={handleInputChange} disabled={!isEditing} />
                             <InputGroup label="Tax Number (GST)" name="taxNumber" value={sellerData.taxNumber} onChange={handleInputChange} disabled={!isEditing} />
                           </div>
+                        </section>
+                      </div>
+                    )}
+
+                    {activeTab === 'legal' && (
+                      <div className="space-y-10">
+                        <section>
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            </div>
+                            <h4 className="text-lg font-bold text-gray-900">Legal Documents</h4>
+                          </div>
+
+                          {policiesLoading ? (
+                            <div className="flex justify-center py-12">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+                            </div>
+                          ) : (
+                            <div className="space-y-6">
+                              {/* Privacy Policy */}
+                              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                                <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                                  <h5 className="font-bold text-gray-900">{privacyPolicy?.title || 'Privacy Policy'}</h5>
+                                  <span className="text-xs text-gray-500">Version {privacyPolicy?.version || '1.0.0'}</span>
+                                </div>
+                                <div className="p-6 max-h-[300px] overflow-y-auto text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
+                                  {privacyPolicy?.content || 'No privacy policy content available.'}
+                                </div>
+                              </div>
+
+                              {/* Terms & Conditions */}
+                              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                                <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                                  <h5 className="font-bold text-gray-900">{termsPolicy?.title || 'Terms & Conditions'}</h5>
+                                  <span className="text-xs text-gray-500">Version {termsPolicy?.version || '1.0.0'}</span>
+                                </div>
+                                <div className="p-6 max-h-[300px] overflow-y-auto text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
+                                  {termsPolicy?.content || 'No terms and conditions content available.'}
+                                </div>
+                              </div>
+
+                              <div className="p-6 bg-teal-50 rounded-xl border border-teal-100">
+                                <p className="text-sm text-teal-800 leading-relaxed">
+                                  <strong>Note:</strong> These policies govern your relationship with Speedoo as a seller. We may update these documents from time to time to reflect changes in our services or legal requirements. You will be notified of any significant changes.
+                                </p>
+                              </div>
+                            </div>
+                          )}
                         </section>
                       </div>
                     )}

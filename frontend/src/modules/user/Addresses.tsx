@@ -99,9 +99,26 @@ export default function Addresses() {
                                     >
                                         Delete
                                     </button>
-                                    <button className="text-xs font-bold text-green-600 hover:text-green-700 uppercase tracking-wider">
+                                    <button 
+                                        onClick={() => {
+                                            const parts = (addr.address || '').split(', ');
+                                            navigate('/checkout/address', { 
+                                                state: { 
+                                                    editAddress: {
+                                                        ...addr,
+                                                        name: addr.fullName,
+                                                        flat: parts[0] || '',
+                                                        street: parts.slice(1).join(', ') || '',
+                                                        id: addr._id
+                                                    } 
+                                                } 
+                                            });
+                                        }}
+                                        className="text-xs font-bold text-green-600 hover:text-green-700 uppercase tracking-wider"
+                                    >
                                         Edit
                                     </button>
+
                                 </div>
                             </motion.div>
                         ))}

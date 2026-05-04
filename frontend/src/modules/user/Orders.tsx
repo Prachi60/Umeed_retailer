@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { useOrders } from '../../hooks/useOrders';
 import { useThemeContext } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import AuthPrompt from '../../components/AuthPrompt';
+
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -15,7 +18,9 @@ const formatDate = (dateString: string) => {
 };
 
 export default function Orders() {
+  const { isAuthenticated } = useAuth();
   const { orders } = useOrders();
+
   const { currentTheme } = useThemeContext();
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortBy, setSortBy] = useState('latest');
@@ -60,7 +65,21 @@ export default function Orders() {
     }
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div className="pb-24 bg-neutral-50 min-h-screen">
+        <AuthPrompt 
+          title="Your Orders" 
+          description="Login to track your orders."
+          icon="📦"
+        />
+
+      </div>
+    );
+  }
+
   if (orders.length === 0) {
+
     return (
       <div className="px-4 py-20 text-center">
         <div className="text-7xl mb-6 grayscale opacity-50">📦</div>

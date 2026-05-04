@@ -3,7 +3,7 @@ import { ApiResponse } from "./types";
 
 export interface Policy {
   _id: string;
-  type: "customer" | "delivery" | "privacy_policy" | "terms_and_conditions" | "about_us" | "rider_about_us";
+  type: "customer" | "delivery" | "privacy_policy" | "terms_and_conditions" | "about_us" | "rider_about_us" | "seller_privacy_policy" | "seller_terms_and_conditions";
   title: string;
   content: string;
   version: string;

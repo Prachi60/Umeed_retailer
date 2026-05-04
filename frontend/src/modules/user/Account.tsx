@@ -9,6 +9,8 @@ import {
 } from "../../services/api/customerService";
 import { sendOTP } from "../../services/api/auth/customerAuthService";
 import OTPInput from "../../components/OTPInput";
+import AuthPrompt from "../../components/AuthPrompt";
+
 
 export default function Account() {
   const navigate = useNavigate();
@@ -43,10 +45,11 @@ export default function Account() {
         }
       } catch (err: any) {
         setError(err.response?.data?.message || "Failed to load profile");
-        if (err.response?.status === 401) {
+        if (err.response?.status === 401 || err.response?.status === 404) {
           authLogout();
         }
       } finally {
+
         setLoading(false);
       }
     };
@@ -168,56 +171,19 @@ export default function Account() {
   if (!user) {
     return (
       <div className="pb-24 md:pb-8 bg-white min-h-screen">
-        <div className="bg-gradient-to-b from-purple-50 to-white pb-6 md:pb-8 pt-8">
-          <div className="px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
-            <div className="flex flex-col items-center mb-4 md:mb-6">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-purple-50 flex items-center justify-center mb-3 md:mb-4 border-2 border-white shadow-md backdrop-blur-sm">
-                <svg
-                  width="40"
-                  height="40"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="text-purple-600 md:w-12 md:h-12">
-                  <path
-                    d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle
-                    cx="12"
-                    cy="7"
-                    r="4"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <h1 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">
-                Welcome!
-              </h1>
-              <p className="text-sm md:text-base text-neutral-600 text-center px-4">
-                Login to access your profile, orders, and more
-              </p>
-            </div>
-          </div>
-        </div>
+        <div className="bg-gradient-to-b from-purple-50 to-white pb-6 md:pb-8 pt-8 px-4">
+          <AuthPrompt 
+            title="Your Profile" 
+            description="Login to view your profile."
+            icon="👤"
+          />
 
-        <div className="px-4 md:px-6 lg:px-8 mt-6">
-          <div className="max-w-md mx-auto">
-            <button
-              onClick={() => navigate("/login")}
-              className="w-full py-4 rounded-full font-bold text-base bg-gradient-to-r from-[#FFC107] to-[#B95F15] text-white hover:opacity-95 transition-all duration-300 shadow-xl shadow-orange-500/20 uppercase tracking-widest">
-              Login
-            </button>
-          </div>
+
         </div>
       </div>
     );
   }
+
 
   if (loading) {
     return (
@@ -522,8 +488,9 @@ export default function Account() {
                 </form>
                 <p className="mt-6 text-[11px] text-neutral-400">
                   By continuing, you agree to our{" "}
-                  <span className="underline">Terms & Conditions</span>
+                  <span onClick={() => navigate("/terms")} className="underline cursor-pointer hover:text-neutral-600 transition-colors">Terms & Conditions</span>
                 </p>
+
               </div>
             </div>
           </div>

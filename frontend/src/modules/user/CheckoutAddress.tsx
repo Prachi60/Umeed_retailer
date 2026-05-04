@@ -14,7 +14,8 @@ import { useThemeContext } from '../../context/ThemeContext';
 export default function CheckoutAddress() {
   const { currentTheme } = useThemeContext();
   const { cart } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,8 +25,8 @@ export default function CheckoutAddress() {
 
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
   const [address, setAddress] = useState<OrderAddress>({
-    name: editAddress?.name || '',
-    phone: editAddress?.phone || '',
+    name: editAddress?.name || user?.name || '',
+    phone: editAddress?.phone || user?.phone || '',
     flat: editAddress?.flat || '',
     street: editAddress?.street || '',
     city: editAddress?.city || '',
@@ -34,9 +35,11 @@ export default function CheckoutAddress() {
     landmark: editAddress?.landmark || '',
   });
 
+
   const [errors, setErrors] = useState<Partial<Record<keyof OrderAddress, string>>>({});
   const [isSaving, setIsSaving] = useState(false);
-  const [orderingFor, setOrderingFor] = useState<'myself' | 'someone-else'>('myself');
+  const [orderingFor, setOrderingFor] = useState<'myself' | 'someone-else'>((location.state as any)?.orderingFor || 'myself');
+
   const [addressType, setAddressType] = useState<'home' | 'work' | 'hotel' | 'other'>('home');
 
   // Location picker state
@@ -60,25 +63,9 @@ export default function CheckoutAddress() {
           if (response.success && Array.isArray(response.data)) {
             setSavedAddresses(response.data);
 
-            // If not editing, try to load the default 'home' address if it exists
-            if (!editAddress) {
-              const homeAddr = response.data.find(a => a.type === 'Home');
-              if (homeAddr) {
-                const parts = homeAddr.address.split(', ');
-                setAddress({
-                  name: homeAddr.fullName,
-                  phone: homeAddr.phone,
-                  flat: parts[0] || '',
-                  street: parts[1] || '',
-                  city: homeAddr.city,
-                  state: homeAddr.state || '',
-                  pincode: homeAddr.pincode,
-                  landmark: homeAddr.landmark || '',
-                  id: homeAddr._id,
-                });
-              }
-            }
+            setSavedAddresses(response.data);
           }
+
         } catch (error) {
           console.error('Error fetching addresses:', error);
         }
@@ -87,41 +74,18 @@ export default function CheckoutAddress() {
     }
   }, [isAuthenticated, editAddress]);
 
-  // Update address when addressType changes
+  // Update address type only, don't load existing addresses into the form
   useEffect(() => {
-    if (!editAddress && savedAddresses.length > 0) {
-      const typeLabel = addressType.charAt(0).toUpperCase() + addressType.slice(1) as any;
-      const existingAddr = savedAddresses.find(a => a.type === typeLabel);
-
-      if (existingAddr) {
-        const parts = existingAddr.address.split(', ');
-        setAddress({
-          name: existingAddr.fullName,
-          phone: existingAddr.phone,
-          flat: parts[0] || '',
-          street: parts[1] || '',
-          city: existingAddr.city,
-          state: existingAddr.state || '',
-          pincode: existingAddr.pincode,
-          landmark: existingAddr.landmark || '',
-          id: existingAddr._id,
-        });
-      } else {
-        // Clear or reset to defaults if no address of this type
-        setAddress(prev => ({
-          ...prev,
-          flat: '',
-          street: '',
-          city: '',
-          state: '',
-          pincode: '',
-          landmark: '',
-          id: undefined,
-          _id: undefined,
-        }));
-      }
+    if (!editAddress) {
+      // Clear ID to ensure it's treated as a new address
+      setAddress(prev => ({
+        ...prev,
+        id: undefined,
+        _id: undefined,
+      }));
     }
-  }, [addressType, savedAddresses, editAddress]);
+  }, [addressType, editAddress]);
+
 
   // Update address when editAddress changes
   useEffect(() => {
@@ -144,6 +108,26 @@ export default function CheckoutAddress() {
     }
   }, [editAddress]);
 
+  // Handle name/phone clearing when switching between myself/someone else
+  useEffect(() => {
+    if (!editAddress) {
+      if (orderingFor === 'someone-else') {
+        setAddress(prev => ({
+          ...prev,
+          name: '',
+          phone: '',
+        }));
+      } else {
+        setAddress(prev => ({
+          ...prev,
+          name: user?.name || '',
+          phone: user?.phone || '',
+        }));
+      }
+    }
+  }, [orderingFor, editAddress, user]);
+
+
   const platformFee = appConfig.platformFee;
   const deliveryFee = cart.total >= appConfig.freeDeliveryThreshold ? 0 : appConfig.deliveryFee;
   const totalAmount = cart.total + platformFee + deliveryFee;
@@ -158,9 +142,6 @@ export default function CheckoutAddress() {
       newErrors.phone = 'Phone is required';
     } else if (address.phone.length < 10) {
       newErrors.phone = 'Phone must be at least 10 digits';
-    }
-    if (!address.flat.trim()) {
-      newErrors.flat = 'Flat/House No. is required';
     }
     if (!address.street.trim()) {
       newErrors.street = 'Street/Area is required';
@@ -268,11 +249,11 @@ export default function CheckoutAddress() {
 
   const isFormValid = address.name.trim() !== '' &&
     address.phone.trim().length >= 10 &&
-    address.flat.trim() !== '' &&
     address.street.trim() !== '' &&
     address.city.trim() !== '' &&
     (address.state?.trim() || '') !== '' &&
     address.pincode.trim().length >= 6;
+
 
   return (
     <div className="pb-24 bg-white min-h-screen">
@@ -415,8 +396,9 @@ export default function CheckoutAddress() {
 
         <div>
           <label className="block text-xs font-medium text-neutral-700 mb-1">
-            Flat / House No. <span className="text-red-500">*</span>
+            Flat / House No. (Optional)
           </label>
+
           <input
             type="text"
             value={address.flat}
@@ -483,7 +465,21 @@ export default function CheckoutAddress() {
           />
           {errors.pincode && <p className="text-[10px] text-red-500 mt-0.5">{errors.pincode}</p>}
         </div>
+
+        <div>
+          <label className="block text-xs font-medium text-neutral-700 mb-1">
+            Landmark (Optional)
+          </label>
+          <input
+            type="text"
+            value={address.landmark || ''}
+            onChange={(e) => handleInputChange('landmark', e.target.value)}
+            className="w-full px-3 py-2 bg-white border border-neutral-200 rounded-lg text-xs focus:outline-none focus:border-neutral-900 transition-colors"
+            placeholder="e.g. Near Apollo Hospital"
+          />
+        </div>
       </div>
+
 
       {/* Order Summary */}
       <div className="px-4 mb-4">

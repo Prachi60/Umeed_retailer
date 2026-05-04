@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import AuthPrompt from "../../components/AuthPrompt";
 import {
+
   Address,
   deleteAddress,
   getAddresses,
@@ -21,7 +24,9 @@ function buildAddressLine(address: Address) {
 }
 
 export default function AddressBook() {
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -49,8 +54,11 @@ export default function AddressBook() {
   };
 
   useEffect(() => {
-    loadAddresses();
-  }, []);
+    if (isAuthenticated) {
+      loadAddresses();
+    }
+  }, [isAuthenticated]);
+
 
   const handleShare = async (address: Address) => {
     const text = `${address.fullName || "Address"}\n${buildAddressLine(
@@ -150,7 +158,15 @@ export default function AddressBook() {
       </div>
 
       <div className="px-4 md:px-6 pt-4 pb-6">
-        {loading ? (
+        {!isAuthenticated ? (
+          <AuthPrompt 
+            title="Saved Addresses" 
+            description="Login to manage your addresses."
+            icon="🏠"
+          />
+
+        ) : loading ? (
+
           <div className="flex justify-center py-10">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#7A3E8E]" />
           </div>
@@ -254,10 +270,43 @@ export default function AddressBook() {
                           {addr.isDefault ? "Default" : "Set default"}
                         </button>
                         <button
+                          onClick={() => {
+                            const parts = (addr.address || "").split(", ");
+                            navigate("/checkout/address", {
+                              state: {
+                                editAddress: {
+                                  ...addr,
+                                  name: addr.fullName,
+                                  flat: parts[0] || "",
+                                  street: parts.slice(1).join(", ") || "",
+                                  id: addr._id,
+                                },
+                              },
+                            });
+                          }}
+                          className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 disabled:text-neutral-400"
+                          disabled={isBusy}
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                          Edit
+                        </button>
+                        <button
                           onClick={() => handleDelete(addr._id)}
                           className="flex items-center gap-1 text-sm font-semibold text-red-600 hover:text-red-700 disabled:text-neutral-400"
                           disabled={isBusy}
                         >
+
                           <svg
                             viewBox="0 0 24 24"
                             className="w-4 h-4"
